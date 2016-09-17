@@ -48,7 +48,8 @@ var gitGraph = new GitGraph( config );
 var master = gitGraph.branch( "master" );
 
 // Commit on HEAD Branch which is "master"
-gitGraph.commit( "Initial commit" );
+gitGraph.commit( `Initial commit
+Branch: Master` ); //Newlines don't render
 
 // Add few commits on master.
 gitGraph.commit( "My second commit" ).commit( "Add awesome feature" );
@@ -83,13 +84,14 @@ gitGraph.commit( commitConfig );
 /***********************
  *       DETAILS       *
  ***********************/
+const blank = { message: ' '};
 
 var commitWithDetailsConfig = {
   message: "test",
   detailId: "detail" // Id of detail div (available in normal vertical mode only)
 };
-gitGraph.commit( commitWithDetailsConfig ).commit();
-dev.commit().commit(); // 2 default Commit on "dev"
+gitGraph.commit( commitWithDetailsConfig ).commit( blank);
+dev.commit(blank).commit(blank); // 2 default Commit on "dev"
 
 /***********************
  *    CUSTOMIZATION    *
@@ -153,3 +155,4 @@ test.commit( {
     console.log( "You just clicked my commit.", commit );
   }
 } );
+
