@@ -1,6 +1,4 @@
-<snippet>
-  <content><![CDATA[
-# ${1:Mangonada}
+# Mangonada
 
 Visual git
 
@@ -25,6 +23,3 @@ Zak
 ## License
 
 MIT
-]]></content>
-  <tabTrigger>readme</tabTrigger>
-</snippet>
