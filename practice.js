@@ -8,8 +8,7 @@ const config = {
 
 function makeConfig(branch) {
   return {
-    message: ' ',
-    dotColor: branch.color
+    dotColor: branch.color,
   };
 }
 
@@ -18,7 +17,7 @@ gitGraph.author = author;
 
 const master = gitGraph.branch( "master" );
 master.commit({ message: 'First commit!!!' })
-  .commit(blank)
+  .commit()
   .commit(blank);
 
 const dev = gitGraph.branch('dev');
@@ -32,7 +31,7 @@ master.commit(blank)
   .commit(blank);
 dev.merge(master);
 
-dev.commit(devConfig)  
+dev.commit(devConfig)
   .commit(devConfig)
   .commit(devConfig);
 
@@ -42,14 +41,17 @@ yellow.commit(yellowConfig)
   .commit(yellowConfig)
   .commit(yellowConfig);
 
-dev.commit(devConfig)  
+dev.commit(devConfig)
   .commit(devConfig)
   .commit(devConfig);
 yellow.merge(dev);
 dev.merge(master);
 
+console.log(dev);
+
 gitGraph.canvas.addEventListener("commit:mouseover", function(event) {
   this.style.cursor = "pointer";
+  this.gitOptions // how to work with tool tip?
 });
 
 // const fork = new GitGraph.orphanBranch(config);
