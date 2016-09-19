@@ -7,7 +7,7 @@ export default class App extends Component {
 
     return (
       <div>
-       GitViz
+       Example Repo
       </div>
     );
   }

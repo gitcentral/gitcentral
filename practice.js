@@ -1,6 +1,4 @@
 /**
- * practice.js
- *
  * This is a sample rendering of a Git repo. Reference the gitgraph.js
  * library for information on how it works. Each commit should be linear
  * in time, left to right. Hooked up in index.html.
