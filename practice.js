@@ -10,9 +10,9 @@
 const blank = { message: ' ' };
 const author = 'Arnav & Cady';
 const config = {
-  template: "metro",
-  orientation: "horizontal",
-  mode: "compact",     // special compact mode : hide messages & compact graph
+  template: 'metro',
+  orientation: 'horizontal',
+  mode: 'compact',     // special compact mode : hide messages & compact graph
 };
 
 function makeConfig(branch) {
@@ -22,10 +22,10 @@ function makeConfig(branch) {
   };
 }
 
-const gitGraph = new GitGraph( config );
+const gitGraph = new GitGraph(config);
 gitGraph.author = author;
 
-const master = gitGraph.branch( "master" );
+const master = gitGraph.branch('master');
 const masterConfig = makeConfig(master);
 master.commit({ message: 'First commit!!!' })
   .commit(masterConfig)
@@ -46,7 +46,7 @@ dev.commit(devConfig)
   .commit(devConfig)
   .commit(devConfig);
 
-const yellow = master.branch("Should be yellow");
+const yellow = master.branch('Should be yellow');
 const yellowConfig = makeConfig(yellow);
 yellow.commit(yellowConfig)
   .commit(yellowConfig)
@@ -61,8 +61,8 @@ dev.commit(devConfig)
 dev.merge(master);
 console.log(dev);
 
-gitGraph.canvas.addEventListener("commit:mouseover", function(event) {
-  this.style.cursor = "pointer";
+gitGraph.canvas.addEventListener('commit:mouseover', function (event) {
+  this.style.cursor = 'pointer';
 });
 
 // const fork = new GitGraph.orphanBranch(config);

@@ -1,13 +1,13 @@
 module.exports = {
   entry: [
     'babel-regenerator-runtime',
-    './src/index.js'
+    './src/index.js',
   ],
   devtool: 'source-map',
   output: {
     path: __dirname,
     publicPath: '/',
-    filename: 'bundle.js'
+    filename: 'bundle.js',
   },
   module: {
     loaders: [{
@@ -15,12 +15,12 @@ module.exports = {
       loader: 'babel',
       test: /\.jsx?$/,
       query: {
-        presets: ['react', 'es2017', 'stage-0']
-      }
-    }]
+        presets: ['react', 'es2017', 'stage-0'],
+      },
+    }],
   },
   devServer: {
     historyApiFallback: true,
-    contentBase: './'
-  }
+    contentBase: './',
+  },
 };
