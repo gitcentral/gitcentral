@@ -39,7 +39,13 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         if (children) {
             var count = children.length;
             for (var i = 0; i < count; i++) {
-                visit(children[i], visitFn, childrenFn);
+                //------------------------------------------------------
+                let thisChild = children[i];
+                if(!thisChild.hasBeenVisited) {
+                    visit(children[i], visitFn, childrenFn);
+                    thisChild.hasBeenVisited = true;
+                }
+                //------------------------------------------------------
             }
         }
     }
@@ -335,6 +341,45 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         centerNode(d);
     }
 
+    function merge(d, parent) {
+        //update line on drag
+        //
+
+        var couplingParent1 = tree.nodes(root).filter(function(d) {
+            return d['name'] === 'cluster';
+        })[0];
+  var couplingChild1 = tree.nodes(root).filter(function(d) {
+            return d['name'] === 'JSONConverter';
+        })[0];
+  
+      multiParents = [{
+                        parent: couplingParent1,
+                        child: couplingChild1
+                    }];
+      
+      multiParents.forEach(function(multiPair) {
+        svgGroup.append("path", "g")
+          .attr("class", "additionalParentLink")
+            .attr("d", function() {
+              var oTarget = {
+                x: multiPair.parent.x0,
+                y: multiPair.parent.y0
+              };
+              var oSource = {
+                x: multiPair.child.x0,
+                y: multiPair.child.y0
+              };
+                /*if (multiPair.child.depth === multiPair.couplingParent1.depth) {
+                    return "M" + oSource.y + " " + oSource.x + " L" + (oTarget.y + ((Math.abs((oTarget.x - oSource.x))) * 0.25)) + " " + oTarget.x + " " + oTarget.y + " " + oTarget.x;
+                }*/
+              return diagonal({
+                source: oSource,
+                target: oTarget
+              });
+           });
+        }); 
+    }
+
     function update(source) {
         // Compute the new height, function counts total children of root node and sets tree height accordingly.
         // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
@@ -533,26 +578,26 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
                 }];
   
   multiParents.forEach(function(multiPair) {
-            svgGroup.append("path", "g")
-            .attr("class", "additionalParentLink")
-                .attr("d", function() {
-                    var oTarget = {
-                        x: multiPair.parent.x0,
-                        y: multiPair.parent.y0
-                    };
-                    var oSource = {
-                        x: multiPair.child.x0,
-                        y: multiPair.child.y0
-                    };
-                    /*if (multiPair.child.depth === multiPair.couplingParent1.depth) {
-                        return "M" + oSource.y + " " + oSource.x + " L" + (oTarget.y + ((Math.abs((oTarget.x - oSource.x))) * 0.25)) + " " + oTarget.x + " " + oTarget.y + " " + oTarget.x;
-                    }*/
-                    return diagonal({
-                        source: oSource,
-                        target: oTarget
-                    });
-                });
-        }); 
+    svgGroup.append("path", "g")
+      .attr("class", "additionalParentLink")
+        .attr("d", function() {
+          var oTarget = {
+            x: multiPair.parent.x0,
+            y: multiPair.parent.y0
+          };
+          var oSource = {
+            x: multiPair.child.x0,
+            y: multiPair.child.y0
+          };
+            /*if (multiPair.child.depth === multiPair.couplingParent1.depth) {
+                return "M" + oSource.y + " " + oSource.x + " L" + (oTarget.y + ((Math.abs((oTarget.x - oSource.x))) * 0.25)) + " " + oTarget.x + " " + oTarget.y + " " + oTarget.x;
+            }*/
+          return diagonal({
+            source: oSource,
+            target: oTarget
+          });
+       });
+    }); 
 });
 
 

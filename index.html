@@ -14,79 +14,14 @@
   </head>
   <body>
     <div class="container"></div>
+
     <canvas id="gitGraph"></canvas>
-    <div class="test">
-      <pre>       Testing</pre>
-    </div>
-
-    <div class="test">
-      <pre>       the</pre>
-    </div>
-
-    <div class="test">
-      <pre>       D3</pre>
-    </div>
-
-    <div class="test">
-      <pre>       Library</pre>
-    </div>
-
-     <div id="tree-container"></div>
-
+    <div id="tree-container"></div>
 
   </body>
   <script src="/bundle.js"></script>
   <script src="practice.js"></script>
   <script src="dndTree.js"></script>
-
-
-  <style type="text/css">
-  
-  .node {
-    cursor: pointer;
-  }
-
-  .overlay{
-      background-color:#EEE;
-  }
-   
-  .node circle {
-    fill: #fff;
-    stroke: steelblue;
-    stroke-width: 1.5px;
-  }
-   
-  .node text {
-    font-size:10px; 
-    font-family:sans-serif;
-  }
-   
-  .link {
-    fill: none;
-    stroke: #ccc;
-    stroke-width: 1.5px;
-  }
-  
-  .additionalParentLink {
-    fill: none;
-    stroke: blue;
-    stroke-width: 1.5px;
-  }
-
-  .templink {
-    fill: none;
-    stroke: red;
-    stroke-width: 3px;
-  }
-
-  .ghostCircle.show{
-      display:block;
-  }
-
-  .ghostCircle, .activeDrag .ghostCircle{
-       display: none;
-  }
-
-</style>
+  <link rel="stylesheet" href="treeStyle.css">
 
 </html>
