@@ -49,7 +49,7 @@ git checkout -b `your-branch-name`
 
 #### Commit Message Guidelines
 
-The commit message should follow the following format:
+The commit message should follow the following format (taken from [Chris Beams][]):
 ```
 (keyword) Summarize changes in around 50 characters or less
 
@@ -194,3 +194,4 @@ no problem getting your changes merged in.
 [squashed]: http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html
 <!-- A link to your directory of tests on github -->
 [tests]: tests/
+[Chris Beams]: http://chris.beams.io/posts/git-commit/
