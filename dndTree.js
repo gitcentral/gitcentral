@@ -78,6 +78,7 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
                     if(innerNode.parents) {
                         innerNode.parents.forEach(parent => {
                             parent.children.push(outerNode);
+
                             //delete nodeToCheck and all its children
                             parent.children.shift();
                         });
@@ -87,6 +88,14 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         });
     }
 
+    /**
+     * setFalse()
+     * Recursively traverse the tree and set a property false on 
+     * every node. Used in conjunction with the visit functions to
+     * ensure that a node doesn't get processed twice.
+     * @param {Object} node - the node to start at.
+     * @param {String} property - the property to set false
+     */
     function setFalse(node, property) {
         node[property] = false;
         if(node.children) {
@@ -94,6 +103,12 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         }
     }
 
+    /**
+     * checkLevels()
+     * An untested function that will check the levels of each node and make sure
+     * they are correct; if they are not, re-run setLevels().
+     * @param  {Object} startNode - the node to start at, generally root
+     */
     function checkLevels(startNode = root) {
         let edited = false;
         smartVisit(startNode, node => {
@@ -115,17 +130,14 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         });
 
         if(edited) {
-            console.log('Edited')
             setLevels();
         }
     }
 
     /**
+     * function setLevels()
      * Define our own levels property because d3.layout.tree may not
      * handle its depth property correctly with our graph structure.
-     *
-     * BUG: See below
-     * 
      * @param {Object} node - The node to set level for. Typically
      *                      this will be called without an argument,
      *                      which means node will default to root,
@@ -136,34 +148,20 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             if(!node.parents) {
                 node.level = 1;
             } else {
-                //BUG: If one of the parents' levels property is not yet set, 
-                //we pretend it's 0 for the sake of calculating the child's level.
-                //Should rerun the whole function (I think)...
                 const parentLevels = node.parents.map(parent => parent.level || 0);
-                console.log(parentLevels);
                 node.level = Math.max(...parentLevels) + 1;
             }
-
-            checkLevels();
         });
 
-        // if(!node.parents) {
-        //     node.level = 1;
-        // } else {
-        //     const parentLevels = node.parents.map(parent => parent.level);
-        //     node.level = Math.max(...parentLevels) + 1;
-        // }
-        // if(node.children) {
-        //     node.children.forEach(child => {
-        //         setLevels(child);
-        //     });
-        // }
+        //This is in case one of the parents hadn't had their level set yet.
+        //We check every level to make sure it's correct and if it's not, 
+        //re-run recursively.
+        checkLevels();
     }
 
     //Remove duplicates and merge the branches
     mergeBranches();
     setLevels();
-    console.log(root)
 
     //Set totalNodes and maxLabelLength;
     smartVisit(root, node => {
@@ -178,8 +176,9 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         });
     }
 
-    // Sort the tree initially incase the JSON isn't in a sorted order.
-    sortTree();
+    // Sort the tree initially in case the JSON isn't in a sorted order.
+    // I see potential for this breaking so I'll comment it out for now...
+    // sortTree();
 
     // TODO: Pan function, can be better implemented.
     function pan(domNode, direction) {
@@ -537,7 +536,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             .attr('class', 'nodeCircle')
             .attr("r", 0)
             .style("fill", function(d) {
-                console.log(d.name, d.x, d.y)
                 return d._children ? "lightsteelblue" : "#fff";
             });
 
