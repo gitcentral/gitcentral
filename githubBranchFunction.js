@@ -1,7 +1,7 @@
 
 // let {JSONcommits, SHALookup, JSONbranches} = require ('./a.js');
 
-let {JSONcommits, JSONbranches} = require ('./l-2.js');
+let {JSONcommits, JSONbranches} = require ('./jsonTogitGraph.js');
 let SHALookup = { "sha" : {}};
 /**
  * Set up SHALookup hash table
