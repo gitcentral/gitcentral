@@ -2,28 +2,28 @@
 treeJSON = d3.json("flare.json", function(error, treeData) {
 
     // Calculate total nodes, max label length
-    var totalNodes = 0;
-    var maxLabelLength = 0;
+    let totalNodes = 0;
+    let maxLabelLength = 0;
     // variables for drag/drop
-    var selectedNode = null;
-    var draggingNode = null;
+    let selectedNode = null;
+    let draggingNode = null;
     // panning variables
-    var panSpeed = 200;
-    var panBoundary = 20; // Within 20px from edges will pan when dragging.
+    const panSpeed = 200;
+    const panBoundary = 20; // Within 20px from edges will pan when dragging.
     // Misc. variables
-    var i = 0;
-    var duration = 750;
-    var root = treeData;
+    let i = 0;
+    let duration = 750;
+    let root = treeData;
 
     // size of the diagram
-    var viewerWidth = $(document).width();
-    var viewerHeight = $(document).height();
+    const viewerWidth = $(document).width();
+    const viewerHeight = $(document).height();
 
-    var tree = d3.layout.tree()
+    let tree = d3.layout.tree()
         .size([viewerHeight, viewerWidth]);
 
     // define a d3 diagonal projection for use by the node paths later on.
-    var diagonal = d3.svg.diagonal()
+    const diagonal = d3.svg.diagonal()
         .projection(function(d) {
             return [d.y, d.x];
         });
@@ -41,8 +41,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             });
         }
     }
-
-    // addParents();
 
     function dumbVisit(node, fn) {
         const checker = 'asdf78609';
@@ -96,36 +94,15 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         }
     }
 
-    // A recursive helper function for performing some setup by walking through all nodes
-
-    function visit(parent, visitFn, childrenFn) {
-        if (!parent) return;
-
-        visitFn(parent);
-
-        var children = childrenFn(parent);
-        if (children) {
-            var count = children.length;
-            for (var i = 0; i < count; i++) {
-                visit(children[i], visitFn, childrenFn);
-            }
-        }
-    }
-
     mergeBranches();
 
-    // Call visit function to establish maxLabelLength
-    visit(treeData, function(d) {
+    //Set totalNodes and maxLabelLength;
+    smartVisit(root, node => {
         totalNodes++;
-        maxLabelLength = Math.max(d.name.length, maxLabelLength);
-
-    }, function(d) {
-        return d.children && d.children.length > 0 ? d.children : null;
+        maxLabelLength = Math.max(node.name.length, maxLabelLength);
     });
 
-
     // sort the tree according to the node names
-
     function sortTree() {
         tree.sort(function(a, b) {
             return b.name.toLowerCase() < a.name.toLowerCase() ? 1 : -1;
@@ -440,8 +417,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
 
         // Compute the new tree layout.
         var nodesWithDupes = tree.nodes(root);
-        console.log(nodesWithDupes);
-        console.log(tree.nodes)
         let nodes = [];
 
         nodesWithDupes.forEach(node => {
