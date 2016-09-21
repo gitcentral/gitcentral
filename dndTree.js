@@ -485,6 +485,10 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         centerNode(d);
     }
 
+    ////////////////////////////////////////////////////////////////
+    //BUG: Moving some nodes results in a massive shift downwards.//
+    //     Must be tested and fixed.                              //
+    ////////////////////////////////////////////////////////////////
     function update(source) {
         /**
          * filterDuplicates()
@@ -518,9 +522,9 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
          * parents. If it's too large (determined arbitrarily),
          * make it smaller.
          *
-         * //////////////////////////////////////////////////
-         * //Implementation is poor - should be refactored //
-         * //////////////////////////////////////////////////
+         * ////////////////////////////////////////////////
+         * //Implementation is poor - should be rewritten//
+         * ////////////////////////////////////////////////
          * 
          * @param  {Array} nodesArray - an array of nodes to check
          */
@@ -531,19 +535,26 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             });
         }
 
+        function getLevelWidths() {
+            const levels = {};
+            smartVisit(root, node => {
+                levels[node.level] = levels[node.level] + 1 || 1;
+            });
+
+            const levelWidth = [];
+
+            let currentLevel = 0;
+            while(levels[++currentLevel]) {
+                levelWidth.push(levels[currentLevel]);
+            }
+
+            return levelWidth;
+        }
+
         // Compute the new height, function counts total children of root node and sets tree height accordingly.
         // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
         // This makes the layout more consistent.
-        var levelWidth = [];
-        var levels = {};
-        smartVisit(root, node => {
-            levels[node.level] = levels[node.level] + 1 || 1;
-        });
-
-        let currentLevel = 0;
-        while(levels[++currentLevel]) {
-            levelWidth.push(levels[currentLevel]);
-        }
+        var levelWidth = getLevelWidths();
 
         var newHeight = d3.max(levelWidth) * 25; // 25 pixels per line  
         tree = tree.size([newHeight, viewerWidth]);
