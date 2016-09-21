@@ -486,6 +486,32 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     function update(source) {
+        function filterDuplicates(nodesWithDupes) {
+            const nodes = [];
+
+            nodesWithDupes.forEach(node => {
+                let exists = false;
+                nodes.forEach(alreadyPresent => {
+                    if(alreadyPresent.name === node.name) {
+                        exists = true;
+                    }
+                });
+
+                if(!exists) {
+                    nodes.push(node);
+                }
+            });
+
+            return nodes;
+        }
+
+        function fixXCoord(nodesArray) {
+            nodesArray.forEach(node => {
+                if(node.x > 400) //set arbitrarily
+                    node.x = node.parent.x + 25;
+            });
+        }
+
         // Compute the new height, function counts total children of root node and sets tree height accordingly.
         // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
         // This makes the layout more consistent.
@@ -504,38 +530,16 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         tree = tree.size([newHeight, viewerWidth]);
 
         // Compute the new tree layout.
-        var nodesWithDupes = tree.nodes(root);
-        let nodes = [];
-
-        nodesWithDupes.forEach(node => {
-            let exists = false;
-            nodes.forEach(alreadyPresent => {
-                if(alreadyPresent.name === node.name) {
-                    exists = true;
-                }
-            });
-
-            if(!exists) {
-                nodes.push(node);
-            }
-        });
-
-        nodes = nodes.reverse();
-
-        function fixXCoord(nodesArray) {
-            nodesArray.forEach(node => {
-                if(node.x > 400) //set arbitrarily
-                    node.x = node.parent.x + 25;
-            });
-        }
-
+        var nodes = filterDuplicates(tree.nodes(root)).reverse();
         fixXCoord(nodes);
 
         var links = tree.links(nodes);
 
         // Set widths between levels based on maxLabelLength.
         nodes.forEach(function(d) {
-            d.y = (d.depth * (maxLabelLength * 10)); //maxLabelLength * 10px
+            //maxLabelLength * 10px
+            d.y = (d.depth * (maxLabelLength * 10)); 
+
             // alternatively to keep a fixed scale one can set a fixed depth per level
             // Normalize for fixed-depth by commenting out below line
             // d.y = (d.depth * 500); //500px per level.
