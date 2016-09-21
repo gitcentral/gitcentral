@@ -486,6 +486,12 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     function update(source) {
+        /**
+         * filterDuplicates()
+         * Given an array of nodes, filter out the duplicate nodes.
+         * @param  {Array} nodesWithDupes - an array of the nodes
+         * @return {Array} - A new array without duplicate nodes
+         */
         function filterDuplicates(nodesWithDupes) {
             const nodes = [];
 
@@ -505,6 +511,19 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             return nodes;
         }
 
+        /**
+         * fixXCoord
+         * The d3.layout.tree.nodes function returns an x-property
+         * that is much too large for our nodes with duplicate
+         * parents. If it's too large (determined arbitrarily),
+         * make it smaller.
+         *
+         * //////////////////////////////////////////////////
+         * //Implementation is poor - should be refactored //
+         * //////////////////////////////////////////////////
+         * 
+         * @param  {Array} nodesArray - an array of nodes to check
+         */
         function fixXCoord(nodesArray) {
             nodesArray.forEach(node => {
                 if(node.x > 400) //set arbitrarily
