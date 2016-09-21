@@ -1,31 +1,29 @@
 {
-    "name": "Mangonada",
+    "name": "Master",
     "children": [{
-        "name": "Arnav",
+        "name": "coolfeature",
         "children": [{
-            "name": "feat",
+            "name": "coolfeature2",
             "coupling_id": 1,
             "children": [{
-                "name": "awesome merge",
+                "name": "Master4",
                 "size": "first"
             }]
         }, {
-            "name": "gitgraph",
+            "name": "experiment",
             "children": [{
                 "name": "d3 tree",
                 "size": 3416
             }]
         }]
     }, {
-        "name": "Cady",
+        "name": "Master2",
         "children": [{
-            "name": "experiment",
+            "name": "Master3",
             "children": [{
-                "name": "awesome merge",
+                "name": "Master4",
                 "size": "second"
             }]
-        }, {
-                "name": "gitgraph"
-            }]
+        }]
     }]
 }

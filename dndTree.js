@@ -462,32 +462,27 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         var newHeight = d3.max(levelWidth) * 25; // 25 pixels per line  
         tree = tree.size([newHeight, viewerWidth]);
 
+        console.log(root)
+
         // Compute the new tree layout.
-        var nodes = tree.nodes(root).reverse(),
-            links = tree.links(nodes);
-            // console.log('in update: ');
-            // links.forEach(link => {
-            //     console.log(`s: ${link.source.name}, t: ${link.target.name}`)
-            // });
+        var nodesWithDupes = tree.nodes(root);
+        let nodes = [];
 
-            // myLinks = [];
-            // nodes.forEach(node => {
-            //     if(node.parents) {
-            //         node.parents.forEach(parent => {
-            //             myLinks.push({
-            //                 source: parent,
-            //                 target: node
-            //             });
-            //         });
-            //     }
-            // });
+        nodesWithDupes.forEach(node => {
+            let exists = false;
+            nodes.forEach(alreadyPresent => {
+                if(alreadyPresent.name === node.name) {
+                    exists = true;
+                }
+            });
 
-            // links = myLinks;
+            if(!exists) {
+                nodes.push(node);
+            }
+        });
 
-            // console.log('\n\nMy links: ');
-            // myLinks.forEach(link => {
-            //     console.log(`s: ${link.source.name}, t: ${link.target.name}`)
-            // });
+        nodes = nodes.reverse();
+        var links = tree.links(nodes);
 
         // Set widths between levels based on maxLabelLength.
         nodes.forEach(function(d) {
@@ -594,7 +589,8 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         // Update the links…
         var link = svgGroup.selectAll("path.link")
             .data(links, function(d) {
-                return d.target.id;
+                return Math.floor(Math.random() * 1000000000);
+                // return d.target.id;
             });
 
         // Enter any new links at the parent's previous position.
@@ -644,38 +640,57 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             return false;
         });
 
-        const multiParents = [];
+        const multiParentsWithDupes = [];
 
         nodesWith2Parents.forEach(node => {
             node.parents.forEach(parent => {
-                multiParents.push({
+                multiParentsWithDupes.push({
                     parent: parent,
                     child: node
                 });
             });
-        });  
-    
-        multiParents.forEach(function(multiPair) {
-                svgGroup.append("path", "g")
-                .attr("class", "additionalParentLink")
-                    .attr("d", function() {
-                        var oTarget = {
-                            x: multiPair.parent.x0,
-                            y: multiPair.parent.y0
-                        };
-                        var oSource = {
-                            x: multiPair.child.x0,
-                            y: multiPair.child.y0
-                        };
-                        // if (multiPair.child.depth === multiPair.couplingParent1.depth) {
-                        //     return "M" + oSource.y + " " + oSource.x + " L" + (oTarget.y + ((Math.abs((oTarget.x - oSource.x))) * 0.25)) + " " + oTarget.x + " " + oTarget.y + " " + oTarget.x;
-                        // }
-                        return diagonal({
-                            source: oSource,
-                            target: oTarget
-                        });
-                    });
         });
+
+        const multiParents = [];
+
+        multiParentsWithDupes.forEach(linkObj => {
+            let exists = false;
+            multiParents.forEach(item => {
+                if(item.parent === linkObj.parent && item.child === linkObj.child) {
+                    exists = true;
+                }
+            });
+
+            if(!exists) {
+                multiParents.push(linkObj);
+            }
+        });
+
+        console.log(multiParents)
+        console.log(links)
+
+    
+        // multiParents.forEach(function(multiPair) {
+        //         svgGroup.append("path", "g")
+        //         .attr("class", "additionalParentLink")
+        //             .attr("d", function() {
+        //                 var oTarget = {
+        //                     x: multiPair.parent.x0,
+        //                     y: multiPair.parent.y0
+        //                 };
+        //                 var oSource = {
+        //                     x: multiPair.child.x0,
+        //                     y: multiPair.child.y0
+        //                 };
+        //                 // if (multiPair.child.depth === multiPair.couplingParent1.depth) {
+        //                 //     return "M" + oSource.y + " " + oSource.x + " L" + (oTarget.y + ((Math.abs((oTarget.x - oSource.x))) * 0.25)) + " " + oTarget.x + " " + oTarget.y + " " + oTarget.x;
+        //                 // }
+        //                 return diagonal({
+        //                     source: oSource,
+        //                     target: oTarget
+        //                 });
+        //             });
+        // });
     }
 
     // Append a group which holds all nodes and which the zoom Listener can act upon.
