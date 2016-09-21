@@ -113,7 +113,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     mergeBranches();
-    console.log(root);
 
     // Call visit function to establish maxLabelLength
     visit(treeData, function(d) {
@@ -184,8 +183,8 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         });
         // if nodes has children, remove the links and nodes
         if (nodes.length > 1) {
-            // remove link paths
-            links = tree.links(nodes);
+            // remove link paths //
+            links = tree.links(nodes);            
             nodePaths = svgGroup.selectAll("path.link")
                 .data(links, function(d) {
                     return d.target.id;
@@ -202,8 +201,11 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
                 }).remove();
         }
 
-        // remove parent link
+        ////////////////////////
+        // remove parent link //
+        ////////////////////////
         parentLink = tree.links(tree.nodes(draggingNode.parent));
+
         svgGroup.selectAll('path.link').filter(function(d, i) {
             if (d.target.id == draggingNode.id) {
                 return true;
@@ -220,7 +222,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         .attr("height", viewerHeight)
         .attr("class", "overlay")
         .call(zoomListener);
-
 
     // Define the drag listeners for drag/drop behaviour of nodes.
     dragListener = d3.behavior.drag()
@@ -276,11 +277,13 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             }
             domNode = this;
             if (selectedNode) {
+
                 // now remove the element from the parent, and insert it into the new elements children
                 var index = draggingNode.parent.children.indexOf(draggingNode);
                 if (index > -1) {
                     draggingNode.parent.children.splice(index, 1);
                 }
+
                 if (typeof selectedNode.children !== 'undefined' || typeof selectedNode._children !== 'undefined') {
                     if (typeof selectedNode.children !== 'undefined') {
                         selectedNode.children.push(draggingNode);
@@ -416,19 +419,56 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             if (n.children && n.children.length > 0) {
                 if (levelWidth.length <= level + 1) levelWidth.push(0);
 
-                levelWidth[level + 1] += n.children.length;
+                n.children.forEach(child => {
+                    if(!child.counted) {
+                        levelWidth[level + 1]++;
+                        child.counted = true;
+                    }
+                })
+
                 n.children.forEach(function(d) {
-                    childCount(level + 1, d);
+                        childCount(level + 1, d);
                 });
             }
         };
+
         childCount(0, root);
+        setFalse(root, 'counted');
+
         var newHeight = d3.max(levelWidth) * 25; // 25 pixels per line  
         tree = tree.size([newHeight, viewerWidth]);
 
         // Compute the new tree layout.
-        var nodes = tree.nodes(root).reverse(),
-            links = tree.links(nodes);
+        var nodesWithDupes = tree.nodes(root);
+        console.log(nodesWithDupes);
+        console.log(tree.nodes)
+        let nodes = [];
+
+        nodesWithDupes.forEach(node => {
+            let exists = false;
+            nodes.forEach(alreadyPresent => {
+                if(alreadyPresent.name === node.name) {
+                    exists = true;
+                }
+            });
+
+            if(!exists) {
+                nodes.push(node);
+            }
+        });
+
+        nodes = nodes.reverse();
+
+        function fixXCoord(nodesArray) {
+            nodesArray.forEach(node => {
+                if(node.x > 400) //set arbitrarily
+                    node.x = node.parent.x + 25;
+            });
+        }
+
+        fixXCoord(nodes);
+
+        var links = tree.links(nodes);
 
         // Set widths between levels based on maxLabelLength.
         nodes.forEach(function(d) {
@@ -457,6 +497,7 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             .attr('class', 'nodeCircle')
             .attr("r", 0)
             .style("fill", function(d) {
+                console.log(d.name, d.x, d.y)
                 return d._children ? "lightsteelblue" : "#fff";
             });
 
@@ -535,7 +576,8 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         // Update the links…
         var link = svgGroup.selectAll("path.link")
             .data(links, function(d) {
-                return d.target.id;
+                return Math.floor(Math.random() * 1000000000);
+                // return d.target.id;
             });
 
         // Enter any new links at the parent's previous position.
@@ -577,6 +619,39 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             d.x0 = d.x;
             d.y0 = d.y;
         });
+
+        const nodesWith2Parents = nodes.filter(node => {
+            if(node.parents && node.parents.length > 1) {
+                return true;
+            }
+            return false;
+        });
+
+        const multiParentsWithDupes = [];
+
+        nodesWith2Parents.forEach(node => {
+            node.parents.forEach(parent => {
+                multiParentsWithDupes.push({
+                    parent: parent,
+                    child: node
+                });
+            });
+        });
+
+        const multiParents = [];
+
+        multiParentsWithDupes.forEach(linkObj => {
+            let exists = false;
+            multiParents.forEach(item => {
+                if(item.parent === linkObj.parent && item.child === linkObj.child) {
+                    exists = true;
+                }
+            });
+
+            if(!exists) {
+                multiParents.push(linkObj);
+            }
+        });
     }
 
     // Append a group which holds all nodes and which the zoom Listener can act upon.
@@ -589,38 +664,4 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     // Layout the tree initially and center on the root node.
     update(root);
     centerNode(root);
-    
-    var couplingParent1 = tree.nodes(root).filter(function(d) {
-            return d['name'] === 'cluster';
-        })[0];
-    var couplingChild1 = tree.nodes(root).filter(function(d) {
-            return d['name'] === 'JSONConverter';
-        })[0];
-    
-    multiParents = [{
-                    parent: couplingParent1,
-                    child: couplingChild1
-                }];
-    
-    multiParents.forEach(function(multiPair) {
-            svgGroup.append("path", "g")
-            .attr("class", "additionalParentLink")
-                .attr("d", function() {
-                    var oTarget = {
-                        x: multiPair.parent.x0,
-                        y: multiPair.parent.y0
-                    };
-                    var oSource = {
-                        x: multiPair.child.x0,
-                        y: multiPair.child.y0
-                    };
-                    /*if (multiPair.child.depth === multiPair.couplingParent1.depth) {
-                        return "M" + oSource.y + " " + oSource.x + " L" + (oTarget.y + ((Math.abs((oTarget.x - oSource.x))) * 0.25)) + " " + oTarget.x + " " + oTarget.y + " " + oTarget.x;
-                    }*/
-                    return diagonal({
-                        source: oSource,
-                        target: oTarget
-                    });
-                });
-        }); 
 });

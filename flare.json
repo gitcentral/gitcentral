@@ -1,27 +1,27 @@
 {
-    "name": "Git Repo",
+    "name": "Master",
     "children": [{
-        "name": "analytics",
+        "name": "coolfeature",
         "children": [{
-            "name": "cluster",
+            "name": "coolfeature2",
             "coupling_id": 1,
             "children": [{
-                "name": "JSONConverter",
+                "name": "Master4",
                 "size": "first"
             }]
         }, {
-            "name": "graph",
+            "name": "experiment",
             "children": [{
-                "name": "SpanningTree",
+                "name": "d3 tree",
                 "size": 3416
             }]
         }]
     }, {
-        "name": "data",
+        "name": "Master2",
         "children": [{
-            "name": "converters",
+            "name": "Master3",
             "children": [{
-                "name": "JSONConverter",
+                "name": "Master4",
                 "size": "second"
             }]
         }]
