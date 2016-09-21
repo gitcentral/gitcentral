@@ -489,30 +489,16 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         // Compute the new height, function counts total children of root node and sets tree height accordingly.
         // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
         // This makes the layout more consistent.
-        var levelWidth = [1];
+        var levelWidth = [];
+        var levels = {};
+        smartVisit(root, node => {
+            levels[node.level] = levels[node.level] + 1 || 1;
+        });
 
-
-
-        var childCount = function(level, n) {
-
-            if (n.children && n.children.length > 0) {
-                if (levelWidth.length <= level + 1) levelWidth.push(0);
-
-                n.children.forEach(child => {
-                    if(!child.counted) {
-                        levelWidth[level + 1]++;
-                        child.counted = true;
-                    }
-                })
-
-                n.children.forEach(function(d) {
-                        childCount(level + 1, d);
-                });
-            }
-        };
-
-        childCount(0, root);
-        setFalse(root, 'counted');
+        let currentLevel = 0;
+        while(levels[++currentLevel]) {
+            levelWidth.push(levels[currentLevel]);
+        }
 
         var newHeight = d3.max(levelWidth) * 25; // 25 pixels per line  
         tree = tree.size([newHeight, viewerWidth]);
