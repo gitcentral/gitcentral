@@ -28,20 +28,15 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             return [d.y, d.x];
         });
 
-    function addParents(node = root) {
-        if(node === root) {
-            node.parents = null;
-        }
-
-        if(node.children) {
-            node.children.forEach(child => {
-                child.parents = child.parents || [];
-                child.parents.push(node);
-                addParents(child);
-            });
-        }
-    }
-
+    /**
+     * dumbVisit()
+     * Perform a given function on each node; skip
+     * over a node if it's already been processed
+     * @param  {Object} node - The node to start at
+     *                       (will generally be root)
+     * @param  {Function} fn - the function to call
+     *                       on each node
+     */
     function dumbVisit(node, fn) {
         const checker = 'asdf78609';
         fn(node);
@@ -56,11 +51,54 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         }
     }
 
+    /**
+     * smartVisit()
+     * Call dumbVisit on the node passed in; dumbVisit
+     * will set the property 'asdf78609' true on all
+     * nodes, so set it to false afterwards.
+     * @param  {Object} node - The node to start at
+     *                       (will generally be root)
+     * @param  {Function} fn - The function to call
+     *                       on each node
+     */
     function smartVisit(node, fn) {
         dumbVisit(node, fn);
         setFalse(node, 'asdf78609');
     }
 
+    /**
+     * addParents()
+     * On each node, create a parents property which is an array.
+     * Populate the array with its parents.
+     * @param {[type]} node [description]
+     */
+    function addParents(node = root) {
+        if(node === root) {
+            node.parents = null;
+        }
+
+        if(node.children) {
+            node.children.forEach(child => {
+                child.parents = child.parents || [];
+                child.parents.push(node);
+                addParents(child);
+            });
+        }
+    }
+
+    /**
+     * mergeBranches()
+     * Take the tree object and turn it into a graph. Remove duplicate items
+     * from the tree and merge the parents of those items.
+     *
+     * Traverse down the tree. For each node (node1):
+     *     If we come across another node with the same name (node2):
+     *          Add node2's parents to node1's children array
+     *          From node2's parents array:
+     *              Take each parent and push
+     *              node 1 into its children array.
+     *              Remove node2 from its parents' children arrays
+     */
     function mergeBranches() {
         addParents();
 
