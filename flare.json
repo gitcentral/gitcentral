@@ -7,7 +7,7 @@
             "coupling_id": 1,
             "children": [{
                 "name": "JSONConverter",
-                "size": 2220
+                "size": "first"
             }]
         }, {
             "name": "graph",
@@ -22,7 +22,7 @@
             "name": "converters",
             "children": [{
                 "name": "JSONConverter",
-                "size": 2220
+                "size": "second"
             }]
         }]
     }]

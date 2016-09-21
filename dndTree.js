@@ -29,7 +29,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         });
 
     function addParents(node = root) {
-        debugger;
         if(node === root) {
             node.parents = null;
         }
@@ -66,7 +65,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
 
     function mergeBranches() {
         addParents();
-        console.log(root);
 
         smartVisit(root, outerNode => {
             smartVisit(root, innerNode => {
@@ -80,11 +78,11 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
                     //add outerNode to each of innerNode's parents'
                     //children arrays
                     if(innerNode.parents) {
-                        innerNode.parents.forEach(parent =>
-                            parent.children.push(outerNode));
-
-                        //delete nodeToCheck and all its children
-                        innerNode.parents.shift();
+                        innerNode.parents.forEach(parent => {
+                            parent.children.push(outerNode);
+                            //delete nodeToCheck and all its children
+                            parent.children.shift();
+                        });
                     }
                 }
             });
