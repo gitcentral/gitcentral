@@ -2,48 +2,41 @@
 treeJSON = d3.json("flare.json", function(error, treeData) {
 
     // Calculate total nodes, max label length
-    var totalNodes = 0;
-    var maxLabelLength = 0;
+    let totalNodes = 0;
+    let maxLabelLength = 0;
     // variables for drag/drop
-    var selectedNode = null;
-    var draggingNode = null;
+    let selectedNode = null;
+    let draggingNode = null;
     // panning variables
-    var panSpeed = 200;
-    var panBoundary = 20; // Within 20px from edges will pan when dragging.
+    const panSpeed = 200;
+    const panBoundary = 20; // Within 20px from edges will pan when dragging.
     // Misc. variables
-    var i = 0;
-    var duration = 750;
-    var root = treeData;
+    let i = 0;
+    let duration = 750;
+    let root = treeData;
 
     // size of the diagram
-    var viewerWidth = $(document).width();
-    var viewerHeight = $(document).height();
+    const viewerWidth = $(document).width();
+    const viewerHeight = $(document).height();
 
-    var tree = d3.layout.tree()
+    let tree = d3.layout.tree()
         .size([viewerHeight, viewerWidth]);
 
     // define a d3 diagonal projection for use by the node paths later on.
-    var diagonal = d3.svg.diagonal()
+    const diagonal = d3.svg.diagonal()
         .projection(function(d) {
             return [d.y, d.x];
         });
 
-    function addParents(node = root) {
-        if(node === root) {
-            node.parents = null;
-        }
-
-        if(node.children) {
-            node.children.forEach(child => {
-                child.parents = child.parents || [];
-                child.parents.push(node);
-                addParents(child);
-            });
-        }
-    }
-
-    // addParents();
-
+    /**
+     * dumbVisit()
+     * Perform a given function on each node; skip
+     * over a node if it's already been processed
+     * @param  {Object} node - The node to start at
+     *                       (will generally be root)
+     * @param  {Function} fn - the function to call
+     *                       on each node
+     */
     function dumbVisit(node, fn) {
         const checker = 'asdf78609';
         fn(node);
@@ -58,11 +51,54 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         }
     }
 
+    /**
+     * smartVisit()
+     * Call dumbVisit on the node passed in; dumbVisit
+     * will set the property 'asdf78609' true on all
+     * nodes, so set it to false afterwards.
+     * @param  {Object} node - The node to start at
+     *                       (will generally be root)
+     * @param  {Function} fn - The function to call
+     *                       on each node
+     */
     function smartVisit(node, fn) {
         dumbVisit(node, fn);
         setFalse(node, 'asdf78609');
     }
 
+    /**
+     * addParents()
+     * On each node, create a parents property which is an array.
+     * Populate the array with its parents.
+     * @param {[type]} node [description]
+     */
+    function addParents(node = root) {
+        if(node === root) {
+            node.parents = null;
+        }
+
+        if(node.children) {
+            node.children.forEach(child => {
+                child.parents = child.parents || [];
+                child.parents.push(node);
+                addParents(child);
+            });
+        }
+    }
+
+    /**
+     * mergeBranches()
+     * Take the tree object and turn it into a graph. Remove duplicate items
+     * from the tree and merge the parents of those items.
+     *
+     * Traverse down the tree. For each node (node1):
+     *     If we come across another node with the same name (node2):
+     *          Add node2's parents to node1's children array
+     *          From node2's parents array:
+     *              Take each parent and push
+     *              node 1 into its children array.
+     *              Remove node2 from its parents' children arrays
+     */
     function mergeBranches() {
         addParents();
 
@@ -80,6 +116,7 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
                     if(innerNode.parents) {
                         innerNode.parents.forEach(parent => {
                             parent.children.push(outerNode);
+
                             //delete nodeToCheck and all its children
                             parent.children.shift();
                         });
@@ -89,6 +126,14 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         });
     }
 
+    /**
+     * setFalse()
+     * Recursively traverse the tree and set a property false on 
+     * every node. Used in conjunction with the visit functions to
+     * ensure that a node doesn't get processed twice.
+     * @param {Object} node - the node to start at.
+     * @param {String} property - the property to set false
+     */
     function setFalse(node, property) {
         node[property] = false;
         if(node.children) {
@@ -96,46 +141,84 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         }
     }
 
-    // A recursive helper function for performing some setup by walking through all nodes
-
-    function visit(parent, visitFn, childrenFn) {
-        if (!parent) return;
-
-        visitFn(parent);
-
-        var children = childrenFn(parent);
-        if (children) {
-            var count = children.length;
-            for (var i = 0; i < count; i++) {
-                visit(children[i], visitFn, childrenFn);
+    /**
+     * checkLevels()
+     * An untested function that will check the levels of each node and make sure
+     * they are correct; if they are not, re-run setLevels().
+     * @param  {Object} startNode - the node to start at, generally root
+     */
+    function checkLevels(startNode = root) {
+        let edited = false;
+        smartVisit(startNode, node => {
+            if(node === root) {
+                if(node.level !== 1) {
+                    node.level = 1;
+                    edited = true;
+                }
+            } else {
+                //check that each level is what it should be, based on its parents.
+                //If it's not at the correct level, fix it
+                const parentLevels = node.parents.map(parent => parent.level || 0);
+                const correctLevel = Math.max(...parentLevels) + 1;
+                if(node.level !== correctLevel) {
+                    node.level = correctLevel;
+                    edited = true;
+                }
             }
+        });
+
+        if(edited) {
+            setLevels();
         }
     }
 
+    /**
+     * function setLevels()
+     * Define our own levels property because d3.layout.tree may not
+     * handle its depth property correctly with our graph structure.
+     * @param {Object} node - The node to set level for. Typically
+     *                      this will be called without an argument,
+     *                      which means node will default to root,
+     *                      setting levels for the whole tree.
+     */
+    function setLevels(startNode = root) {
+        smartVisit(startNode, node => {
+            if(!node.parents) {
+                node.level = 1;
+            } else {
+                const parentLevels = node.parents.map(parent => parent.level || 0);
+                node.level = Math.max(...parentLevels) + 1;
+            }
+        });
+
+        //This is in case one of the parents hadn't had their level set yet.
+        //We check every level to make sure it's correct and if it's not, 
+        //re-run recursively.
+        checkLevels();
+    }
+
+    //Remove duplicates and merge the branches
     mergeBranches();
+    setLevels();
 
-    // Call visit function to establish maxLabelLength
-    visit(treeData, function(d) {
+    //Set totalNodes and maxLabelLength;
+    smartVisit(root, node => {
         totalNodes++;
-        maxLabelLength = Math.max(d.name.length, maxLabelLength);
-
-    }, function(d) {
-        return d.children && d.children.length > 0 ? d.children : null;
+        maxLabelLength = Math.max(node.name.length, maxLabelLength);
     });
 
-
     // sort the tree according to the node names
-
     function sortTree() {
         tree.sort(function(a, b) {
             return b.name.toLowerCase() < a.name.toLowerCase() ? 1 : -1;
         });
     }
-    // Sort the tree initially incase the JSON isn't in a sorted order.
-    sortTree();
+
+    // Sort the tree initially in case the JSON isn't in a sorted order.
+    // I see potential for this breaking so I'll comment it out for now...
+    // sortTree();
 
     // TODO: Pan function, can be better implemented.
-
     function pan(domNode, direction) {
         var speed = panSpeed;
         if (panTimer) {
@@ -162,11 +245,9 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     // Define the zoom function for the zoomable tree
-
     function zoom() {
         svgGroup.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     }
-
 
     // define the zoomListener which calls the zoom function on the "zoom" event constrained within the scaleExtents
     var zoomListener = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
@@ -201,9 +282,7 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
                 }).remove();
         }
 
-        ////////////////////////
-        // remove parent link //
-        ////////////////////////
+        // remove parent link
         parentLink = tree.links(tree.nodes(draggingNode.parent));
 
         svgGroup.selectAll('path.link').filter(function(d, i) {
@@ -318,7 +397,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     // Helper functions for collapsing and expanding nodes.
-
     function collapse(d) {
         if (d.children) {
             d._children = d.children;
@@ -339,6 +417,7 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         selectedNode = d;
         updateTempConnector();
     };
+
     var outCircle = function(d) {
         selectedNode = null;
         updateTempConnector();
@@ -373,7 +452,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     };
 
     // Function to center node when clicked/dropped so node doesn't get lost when collapsing/moving with large amount of children.
-
     function centerNode(source) {
         scale = zoomListener.scale();
         x = -source.y0;
@@ -388,7 +466,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     // Toggle children function
-
     function toggleChildren(d) {
         if (d.children) {
             d._children = d.children;
@@ -401,7 +478,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     // Toggle children on click.
-
     function click(d) {
         if (d3.event.defaultPrevented) return; // click suppressed
         d = toggleChildren(d);
@@ -409,56 +485,49 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         centerNode(d);
     }
 
+    ////////////////////////////////////////////////////////////////
+    //BUG: Moving some nodes results in a massive shift downwards.//
+    //     Must be tested and fixed.                              //
+    ////////////////////////////////////////////////////////////////
     function update(source) {
-        // Compute the new height, function counts total children of root node and sets tree height accordingly.
-        // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
-        // This makes the layout more consistent.
-        var levelWidth = [1];
-        var childCount = function(level, n) {
+        /**
+         * filterDuplicates()
+         * Given an array of nodes, filter out the duplicate nodes.
+         * @param  {Array} nodesWithDupes - an array of the nodes
+         * @return {Array} - A new array without duplicate nodes
+         */
+        function filterDuplicates(nodesWithDupes) {
+            const nodes = [];
 
-            if (n.children && n.children.length > 0) {
-                if (levelWidth.length <= level + 1) levelWidth.push(0);
-
-                n.children.forEach(child => {
-                    if(!child.counted) {
-                        levelWidth[level + 1]++;
-                        child.counted = true;
+            nodesWithDupes.forEach(node => {
+                let exists = false;
+                nodes.forEach(alreadyPresent => {
+                    if(alreadyPresent.name === node.name) {
+                        exists = true;
                     }
-                })
-
-                n.children.forEach(function(d) {
-                        childCount(level + 1, d);
                 });
-            }
-        };
 
-        childCount(0, root);
-        setFalse(root, 'counted');
-
-        var newHeight = d3.max(levelWidth) * 25; // 25 pixels per line  
-        tree = tree.size([newHeight, viewerWidth]);
-
-        // Compute the new tree layout.
-        var nodesWithDupes = tree.nodes(root);
-        console.log(nodesWithDupes);
-        console.log(tree.nodes)
-        let nodes = [];
-
-        nodesWithDupes.forEach(node => {
-            let exists = false;
-            nodes.forEach(alreadyPresent => {
-                if(alreadyPresent.name === node.name) {
-                    exists = true;
+                if(!exists) {
+                    nodes.push(node);
                 }
             });
 
-            if(!exists) {
-                nodes.push(node);
-            }
-        });
+            return nodes;
+        }
 
-        nodes = nodes.reverse();
-
+        /**
+         * fixXCoord
+         * The d3.layout.tree.nodes function returns an x-property
+         * that is much too large for our nodes with duplicate
+         * parents. If it's too large (determined arbitrarily),
+         * make it smaller.
+         *
+         * ////////////////////////////////////////////////
+         * //Implementation is poor - should be rewritten//
+         * ////////////////////////////////////////////////
+         * 
+         * @param  {Array} nodesArray - an array of nodes to check
+         */
         function fixXCoord(nodesArray) {
             nodesArray.forEach(node => {
                 if(node.x > 400) //set arbitrarily
@@ -466,13 +535,41 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             });
         }
 
+        function getLevelWidths() {
+            const levels = {};
+            smartVisit(root, node => {
+                levels[node.level] = levels[node.level] + 1 || 1;
+            });
+
+            const levelWidth = [];
+
+            let currentLevel = 0;
+            while(levels[++currentLevel]) {
+                levelWidth.push(levels[currentLevel]);
+            }
+
+            return levelWidth;
+        }
+
+        // Compute the new height, function counts total children of root node and sets tree height accordingly.
+        // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
+        // This makes the layout more consistent.
+        var levelWidth = getLevelWidths();
+
+        var newHeight = d3.max(levelWidth) * 25; // 25 pixels per line  
+        tree = tree.size([newHeight, viewerWidth]);
+
+        // Compute the new tree layout.
+        var nodes = filterDuplicates(tree.nodes(root)).reverse();
         fixXCoord(nodes);
 
         var links = tree.links(nodes);
 
         // Set widths between levels based on maxLabelLength.
         nodes.forEach(function(d) {
-            d.y = (d.depth * (maxLabelLength * 10)); //maxLabelLength * 10px
+            //maxLabelLength * 10px
+            d.y = (d.depth * (maxLabelLength * 10)); 
+
             // alternatively to keep a fixed scale one can set a fixed depth per level
             // Normalize for fixed-depth by commenting out below line
             // d.y = (d.depth * 500); //500px per level.
@@ -497,7 +594,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             .attr('class', 'nodeCircle')
             .attr("r", 0)
             .style("fill", function(d) {
-                console.log(d.name, d.x, d.y)
                 return d._children ? "lightsteelblue" : "#fff";
             });
 
@@ -665,3 +761,38 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     update(root);
     centerNode(root);
 });
+
+//Sample flare.json:
+//
+//  {
+//     "name": "Master",
+//     "children": [{
+//         "name": "coolfeature",
+//         "children": [{
+//             "name": "coolfeature2",
+//             "coupling_id": 1,
+//             "children": [{
+//                 "name": "coolFeature3",
+//                 "size": "first",
+//                 "children": [{
+//                      "name": "Master4"
+//                 }]
+//             }]
+//         }, {
+//             "name": "experiment",
+//             "children": [{
+//                 "name": "d3 tree",
+//                 "size": 3416
+//             }]
+//         }]
+//     }, {
+//         "name": "Master2",
+//         "children": [{
+//             "name": "Master3",
+//             "children": [{
+//                 "name": "Master4",
+//                 "size": "second"
+//             }]
+//         }]
+//     }]
+// }
