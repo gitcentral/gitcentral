@@ -1,29 +1,31 @@
 {
-    "name": "Git Repo",
+    "name": "Mangonada",
     "children": [{
-        "name": "analytics",
+        "name": "Arnav",
         "children": [{
-            "name": "cluster",
+            "name": "feat",
             "coupling_id": 1,
             "children": [{
-                "name": "JSONConverter",
+                "name": "awesome merge",
                 "size": "first"
             }]
         }, {
-            "name": "graph",
+            "name": "gitgraph",
             "children": [{
-                "name": "SpanningTree",
+                "name": "d3 tree",
                 "size": 3416
             }]
         }]
     }, {
-        "name": "data",
+        "name": "Cady",
         "children": [{
-            "name": "converters",
+            "name": "experiment",
             "children": [{
-                "name": "JSONConverter",
+                "name": "awesome merge",
                 "size": "second"
             }]
-        }]
+        }, {
+                "name": "gitgraph"
+            }]
     }]
 }
