@@ -94,7 +94,76 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         }
     }
 
+    function checkLevels(startNode = root) {
+        let edited = false;
+        smartVisit(startNode, node => {
+            if(node === root) {
+                if(node.level !== 1) {
+                    node.level = 1;
+                    edited = true;
+                }
+            } else {
+                //check that each level is what it should be, based on its parents.
+                //If it's not at the correct level, fix it
+                const parentLevels = node.parents.map(parent => parent.level || 0);
+                const correctLevel = Math.max(...parentLevels) + 1;
+                if(node.level !== correctLevel) {
+                    node.level = correctLevel;
+                    edited = true;
+                }
+            }
+        });
+
+        if(edited) {
+            console.log('Edited')
+            setLevels();
+        }
+    }
+
+    /**
+     * Define our own levels property because d3.layout.tree may not
+     * handle its depth property correctly with our graph structure.
+     *
+     * BUG: See below
+     * 
+     * @param {Object} node - The node to set level for. Typically
+     *                      this will be called without an argument,
+     *                      which means node will default to root,
+     *                      setting levels for the whole tree.
+     */
+    function setLevels(startNode = root) {
+        smartVisit(startNode, node => {
+            if(!node.parents) {
+                node.level = 1;
+            } else {
+                //BUG: If one of the parents' levels property is not yet set, 
+                //we pretend it's 0 for the sake of calculating the child's level.
+                //Should rerun the whole function (I think)...
+                const parentLevels = node.parents.map(parent => parent.level || 0);
+                console.log(parentLevels);
+                node.level = Math.max(...parentLevels) + 1;
+            }
+
+            checkLevels();
+        });
+
+        // if(!node.parents) {
+        //     node.level = 1;
+        // } else {
+        //     const parentLevels = node.parents.map(parent => parent.level);
+        //     node.level = Math.max(...parentLevels) + 1;
+        // }
+        // if(node.children) {
+        //     node.children.forEach(child => {
+        //         setLevels(child);
+        //     });
+        // }
+    }
+
+    //Remove duplicates and merge the branches
     mergeBranches();
+    setLevels();
+    console.log(root)
 
     //Set totalNodes and maxLabelLength;
     smartVisit(root, node => {
@@ -108,11 +177,11 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
             return b.name.toLowerCase() < a.name.toLowerCase() ? 1 : -1;
         });
     }
+
     // Sort the tree initially incase the JSON isn't in a sorted order.
     sortTree();
 
     // TODO: Pan function, can be better implemented.
-
     function pan(domNode, direction) {
         var speed = panSpeed;
         if (panTimer) {
@@ -139,11 +208,9 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     // Define the zoom function for the zoomable tree
-
     function zoom() {
         svgGroup.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     }
-
 
     // define the zoomListener which calls the zoom function on the "zoom" event constrained within the scaleExtents
     var zoomListener = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
@@ -178,9 +245,7 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
                 }).remove();
         }
 
-        ////////////////////////
-        // remove parent link //
-        ////////////////////////
+        // remove parent link
         parentLink = tree.links(tree.nodes(draggingNode.parent));
 
         svgGroup.selectAll('path.link').filter(function(d, i) {
@@ -295,7 +360,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     // Helper functions for collapsing and expanding nodes.
-
     function collapse(d) {
         if (d.children) {
             d._children = d.children;
@@ -316,6 +380,7 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         selectedNode = d;
         updateTempConnector();
     };
+
     var outCircle = function(d) {
         selectedNode = null;
         updateTempConnector();
@@ -350,7 +415,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     };
 
     // Function to center node when clicked/dropped so node doesn't get lost when collapsing/moving with large amount of children.
-
     function centerNode(source) {
         scale = zoomListener.scale();
         x = -source.y0;
@@ -365,7 +429,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     // Toggle children function
-
     function toggleChildren(d) {
         if (d.children) {
             d._children = d.children;
@@ -378,7 +441,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     // Toggle children on click.
-
     function click(d) {
         if (d3.event.defaultPrevented) return; // click suppressed
         d = toggleChildren(d);
@@ -391,6 +453,9 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
         // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
         // This makes the layout more consistent.
         var levelWidth = [1];
+
+
+
         var childCount = function(level, n) {
 
             if (n.children && n.children.length > 0) {
@@ -640,3 +705,38 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     update(root);
     centerNode(root);
 });
+
+//Sample flare.json:
+//
+//  {
+//     "name": "Master",
+//     "children": [{
+//         "name": "coolfeature",
+//         "children": [{
+//             "name": "coolfeature2",
+//             "coupling_id": 1,
+//             "children": [{
+//                 "name": "coolFeature3",
+//                 "size": "first",
+//                 "children": [{
+//                      "name": "Master4"
+//                 }]
+//             }]
+//         }, {
+//             "name": "experiment",
+//             "children": [{
+//                 "name": "d3 tree",
+//                 "size": 3416
+//             }]
+//         }]
+//     }, {
+//         "name": "Master2",
+//         "children": [{
+//             "name": "Master3",
+//             "children": [{
+//                 "name": "Master4",
+//                 "size": "second"
+//             }]
+//         }]
+//     }]
+// }
