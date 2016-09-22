@@ -18,9 +18,5 @@ module.exports = {
         presets: ['react', 'es2017', 'stage-0'],
       },
     }],
-  },
-  devServer: {
-    historyApiFallback: true,
-    contentBase: './',
-  },
+  }
 };
