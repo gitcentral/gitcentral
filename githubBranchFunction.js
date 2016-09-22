@@ -127,3 +127,6 @@ class GithubApiInterface {
         .map(this.renameOrphanParent.bind(this));
   }
 }
+
+
+module.exports = GithubApiInterface;
