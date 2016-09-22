@@ -1227,4 +1227,8 @@ var JSONcommits = [
     }
 ]
 
-module.exports = {JSONcommits, JSONbranches};
+
+let githubTranslator = new GithubApiInterface(JSONcommits, JSONbranches);
+JSONcommits = githubTranslator.JSONCommits;
+var SHALookup = githubTranslator.SHALookup;
+var branchLookUp = githubTranslator.branchLookUp;

@@ -1,159 +1,129 @@
 
-// let {JSONcommits, SHALookup, JSONbranches} = require ('./a.js');
+class GithubApiInterface {
+  constructor(JSONCommits, JSONBranches) {
+    this.JSONCommits = JSONCommits;
+    this.JSONBranches = JSONBranches;
+    this.SHALookup = {};
+    this.branchLookup = {};
 
-// let {JSONcommits, JSONbranches} = require ('./testJSON.js');
-let {JSONcommits, JSONbranches} = require ('./jsonTogitGraph.js');
-
-let SHALookup = { "sha" : {}};
-/**
- * Set up SHALookup hash table
- * @type {Array}
- */
-JSONcommits.reduce(function initCommitsAndLookupTable(results, commit, index, collection) {
-  results[commit.sha] = commit;
-  commit.children = [];
-  return results;
-}, SHALookup);
-// console.log(SHALookup);
-
-/**
- * Add childrens to each node
- * @type {[type]}
- */
-JSONcommits.map(function insertChildren(commit, index, collection) {
-  commit.parents.map(function (parentInfo) {
-    var parentCommit = SHALookup[parentInfo.sha];
-    if(parentCommit===undefined){
-      return;
-    }
-    parentCommit.children.push(commit.sha);
-  });
-})
-
-var branchLookUp={};
-
-JSONbranches.reduce(function makeBranchesHash(results, branch, index, collection) {
-  results[branch.commit.sha] = branch;
-  return results;
-}, branchLookUp);
-
-
-JSONbranches.filter((branch)=>{
-  return branch.name !== "master";
-}).forEach((branch)=>{
-  const commit = branchLookUp[branch.commit.sha];
-  checkBranch(commit);
-});
-
-JSONbranches.filter((branch)=>{
-  console.log(branch.name);
-  return branch.name === "master";
-}).forEach((branch)=>{
-  const commit = branchLookUp[branch.commit.sha];
-  checkBranch(commit);
-});
-
-/**
- * Recurse through each commit's parents and pass on its branch name
- * @param  {[type]} name   [name property of branch]
- * @param  {[type]} sha [sha property of branch]
- * @return {[type]}        [description]
- */
-function checkBranch({name,commit:{sha}}){
-  const commit = SHALookup[sha];
-  const checkBranchName = (commitObj)=>{
-    if(commitObj===undefined){
-      return;
-    }
-    commitObj.branch = name;
-
-    commitObj.parents.forEach((parent)=>{
-      checkBranchName(SHALookup[parent.sha]);
-    })
+    // initialization
+    this.setupShaLookup();
+    this.setupBranchLookup();
+    this.addChildren();
+    this.addBranchName();
+    // json obj transformation
+    this.addOrphanBranch();
   }
-  checkBranchName(commit);
-}
-
-// const checkOrphan = (commitObj)=>{
-//   if(commitObj===undefined){
-//     return;
-//   }
-//   if(commitObj.children > 1){
-//     return;
-//   }
-//   console.log(commitObj.children,"??????");
-//   commitObj.branch = SHALookup[commitObj.children[0]].branch;
-//   checkOrphan(SHALookup[commitObj.parents[0].sha]);
-// }
-
-// const makeOrphan = (commitObj)=>{
-//
-//   let branchName = commitObj.branch + commitObj.sha.slice(0,3);
-//
-//
-//   commitObj.branch = branchName;
-//
-//   checkOrphan(SHALookup[commitObj.parents[0].sha]);
-//
-//
-// }
-//
-// const checkMerge = (commitObj) => {
-//   //check if current branch is not equal to incoming branch or else break
-//   if(commitObj===undefined){
-//     return;
-//   }
-//   if(commitObj.parents===undefined){
-//     return;
-//   }
-//   // console.log(commitObj.parents);
-//   if(commitObj.parents[1]){
-//     makeOrphan(SHALookup[commitObj.parents[1].sha]);
-//   }
-//   checkMerge(SHALookup[commitObj.parents[0].sha]);
-//
-// }
-
-const filter2Parents = (JSONcommitObj)=>{
-  return JSONcommitObj.parents.length > 1;
-}
-
-const getRightParent = (JSONcommitObj)=>{
-  return SHALookup[JSONcommitObj.parents[1].sha];
-}
-
-const renameOrphanParent = (JSONcommitObj)=>{
-  JSONcommitObj.branch += JSONcommitObj.sha.slice(0,5);
-
-  const checkOrphan = (commitObj,branchName)=>{
-    if(commitObj===undefined){
-      return;
-    }
-    if(commitObj.children.length > 1){
-      return;
-    }
-    commitObj.branch = branchName;
-    if(commitObj.parents.length > 0){
-      checkOrphan(SHALookup[commitObj.parents[0].sha],branchName);
-    }
+  /**
+   * Set up table to look up commit objects by sha
+   * Initialize children array on each commit object
+   */
+  setupShaLookup() {
+    this.JSONCommits.reduce((results, commit) => {
+      results[commit.sha] = commit;
+      commit.children = [];
+      return results;
+    }, this.SHALookup);
   }
-  let leftParent = SHALookup[JSONcommitObj.parents[0].sha];
-  checkOrphan(leftParent,JSONcommitObj.branch);
+  /**
+   * Iterate through each commit to link children and parents
+   */
+  addChildren() {
+    this.JSONCommits.forEach((commit) => {
+      commit.parents.forEach((parentInfo) => {
+        const parentCommit = this.SHALookup[parentInfo.sha];
+        if (parentCommit !== undefined) {
+          parentCommit.children.push(commit.sha);
+        }
+      });
+    });
+  }
+  /**
+   * Set up table to look up branch objects by sha
+   */
+  setupBranchLookup() {
+    this.JSONBranches.reduce((results, branch) => {
+      const branchLookup = results;
+      branchLookup[branch.commit.sha] = branch;
+      return branchLookup;
+    }, this.branchLookup);
+  }
+  /**
+   * Iterate through each branch that is not master, and name branches
+   */
+  addBranchName() {
+    this.JSONBranches.filter(branch => branch.name !== 'master')
+                     .forEach((branch) => {
+                       const commit = this.branchLookup[branch.commit.sha];
+                       this.nameBranch(commit);
+                     });
+
+    this.JSONBranches.filter(branch => branch.name === 'master')
+                     .forEach((branch) => {
+                       const commit = this.branchLookup[branch.commit.sha];
+                       this.nameBranch(commit);
+                     });
+  }
+  /**
+   * Assign branch property to each commit object
+   * name: name of current branch
+   * sha: sha of current commit
+   */
+  nameBranch({ name, commit: { sha } }) {
+    const commit = this.SHALookup[sha];
+    const checkBranchName = (commitObj) => {
+      if (commitObj !== undefined) {
+        commitObj.branch = name;
+        commitObj.parents.forEach(parent => checkBranchName(this.SHALookup[parent.sha]));
+      }
+    }
+    checkBranchName(commit);
+  }
+  /**
+   * Return commit objects with more than one parent
+   * [Filter function]
+   */
+  filter2Parents(JSONCommitObj) {
+    return JSONCommitObj.parents.length > 1;
+  }
+  /**
+   * Return the parent at index 1
+   * [Map function]
+   */
+  getRightParent(JSONCommitObj) {
+    return this.SHALookup[JSONCommitObj.parents[1].sha];
+  }
+  /**
+   * Rename Orphan branches
+   * [Map function]
+   */
+  renameOrphanParent(JSONCommitObj) {
+    if (JSONCommitObj.children.length > 1) {
+      return;
+    }
+    JSONCommitObj.branch += JSONCommitObj.sha.slice(0, 5);
+    const checkOrphan = (commitObj, branchName) => {
+      if (commitObj === undefined) {
+        return;
+      }
+      if (commitObj.children.length > 1) {
+        return;
+      }
+      commitObj.branch = branchName;
+      if (commitObj.parents.length > 0) {
+        checkOrphan(this.SHALookup[commitObj.parents[0].sha], branchName);
+      }
+    }
+    const leftParent = this.SHALookup[JSONCommitObj.parents[0].sha];
+    checkOrphan(leftParent, JSONCommitObj.branch);
+  }
+  /**
+   * Alter JSONCommits object to have Orphan branch names
+   */
+  addOrphanBranch() {
+    this.JSONCommits
+        .filter(this.filter2Parents)
+        .map(this.getRightParent.bind(this))
+        .map(this.renameOrphanParent.bind(this));
+  }
 }
-
-JSONcommits.filter(filter2Parents).map(getRightParent).map(renameOrphanParent);
-
-JSONbranches.forEach((branch)=>{
-  const commit = SHALookup[branch.commit.sha];
-
-  // console.log(commit);
-  // checkMerge(commit);
-});
-
-
-
-console.log("after-=============branches");
-JSONcommits.forEach(function(commit) {
-  console.log({ sha: commit.sha.slice(0,5), branch:commit.branch});
-
-})
