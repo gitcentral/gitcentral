@@ -2,7 +2,7 @@
 // let {JSONcommits, SHALookup, JSONbranches} = require ('./a.js');
 
 // let {JSONcommits, JSONbranches} = require ('./testJSON.js');
-let {JSONcommits, JSONbranches} = require ('./jsonTogitGraph.js');
+// let {JSONcommits, JSONbranches} = require ('./jsonTogitGraph.js');
 
 let SHALookup = { "sha" : {}};
 /**
@@ -129,7 +129,7 @@ const renameOrphanParent = (JSONcommitObj)=>{
     if(commitObj===undefined){
       return;
     }
-    if(commitObj.children.length > 1){
+    if (commitObj.children.length > 1){
       return;
     }
     commitObj.branch = branchName;
@@ -143,17 +143,9 @@ const renameOrphanParent = (JSONcommitObj)=>{
 
 JSONcommits.filter(filter2Parents).map(getRightParent).map(renameOrphanParent);
 
-JSONbranches.forEach((branch)=>{
-  const commit = SHALookup[branch.commit.sha];
-
-  // console.log(commit);
-  // checkMerge(commit);
-});
-
-
-
-console.log("after-=============branches");
-JSONcommits.forEach(function(commit) {
-  console.log({ sha: commit.sha.slice(0,5), branch:commit.branch});
-
-})
+//
+// console.log("after-=============branches");
+// JSONcommits.forEach(function(commit) {
+//   console.log({ sha: commit.sha.slice(0,5), branch:commit.branch});
+//
+// })

@@ -43,98 +43,108 @@ const config = {
 /** *********************
  * BRANCHS AND COMMITS *
  ***********************/
+//
+// function makeGitGraph(gitCommands, gitGraphOptions) {
+//  // convert git-command-lists -> gitgraph
+//
+//   const branches = {}; // gitCommit, gitBranch // GitGraph.checkout???
+//   const gitGraph = new GitGraph(gitGraphOptions);
+//   const gitGraphMethods = {
+//     git_branch: gitBranch,
+//     git_commit: gitCommit,
+//     git_merge: gitMerge,
+//     git_rebase: gitRebase,
+//     git_checkout: gitCheckout,
+//   };
+//
+//   gitCommands.forEach((gitCommand) => {
+//     const gitGraphMethod = gitGraphMethods[gitCommand.command];
+//     gitGraphMethod(gitCommand, gitGraph);
+//   });
+//
+//   return gitGraph;
+//
+//   // function
+//
+//   function gitBranch(gitCommand, gitGraph) {
+//     if (!branches.hasOwnProperty(gitCommand.branch)) {
+//       gitCommand
+//       const branch = gitGraph.branch(gitCommand.branch);
+//       branches[gitCommand.branch] = branch;
+//       return branch;
+//     }
+//     return branches[gitCommand.branch];
+//   }
+//
+//   function gitCommit(gitCommand, gitGraph) {
+//     console.log(gitCommand);
+//     const branch = gitBranch(gitCommand,gitGraph);
+//     branch.commit(gitCommand);
+//   }
+//   function gitMerge(gitCommand, gitGraph) {
+//     console.log(gitCommand);
+//     const mergeFromBranch = branches[gitCommand.mergeFrom];
+//     const mergeToBranch = branches[gitCommand.mergeTo];
+//     mergeFromBranch.merge(/* into*/ mergeToBranch, gitCommand.message || 'martin is not happy');
+//   }
+//
+//   function gitRebase(gitCommand, gitGraph) {
+//     console.log(gitCommand);
+//   }
+//   function gitCheckout(gitCommand, gitGraph) {
+//     console.log(gitCommand);
+//   }
+// }
+// JSONcommits.forEach((obj)=>{
+//   console.log({ sha: obj.sha.slice(0,5),
+//     // message : obj.commit.message,
+//     branch : obj.branch,
+//     parents: JSON.stringify(obj.parents),
+//     children : JSON.stringify(obj.children.map(c => c.slice(0,5)))
+//   });
+// })
 
-const martin = 'Martin Kwan <martinkkwan@gmail.com>';
-const tim = 'timothy shiu <timoweave@gmail.com>';
-console.log('hello');
-
-const gitCommandLists = [
-  { command: 'git_branch', branch: 'master' },
-  { command: 'git_commit', branch: 'master', sha1: '666', message: 'Initial commit', author: martin },
-  { command: 'git_commit', branch: 'master', sha1: '666', message: 'My second commit', author: martin },
-  { command: 'git_commit', branch: 'master', sha1: '666', message: 'Add awesome feature', author: martin },
-  { command: 'git_branch', branch: 'dev' },
-  { command: 'git_commit', branch: 'dev', sha1: '666', message: 'youhou', author: tim },
-  { command: 'git_commit', branch: 'master', sha1: '666', message: "I'm the master", author: martin },
-  { command: 'git_commit', branch: 'dev', dotColor: 'white',
-   dotSize: 10, dotStrokeWidth: 10,
-   messageHashDisplay: false, messageAuthorDisplay: true,
-   message: "Alors c'est qui le papa ?", tooltipDisplay: false,
-   author: 'Me <me@planee.fr>' },
-  { command: 'git_commit', branch: 'dev', message: 'test', detailId: 'detail' },
-  { command: 'git_commit', branch: 'dev', message: 'nothing' },
-  { command: 'git_commit', branch: 'dev', message: 'nothing 2' },
-
-  { command: 'git_commit', branch: 'master', sha1: '666', message: '', author: martin },
-
-  { command: 'git_commit', branch: 'master', sha1: '666', message: '', author: martin },
-  { command: 'git_commit', branch: 'master', sha1: '666', message: '', author: martin },
-  { command: 'git_merge', branch: 'master', mergeFrom: 'dev', mergeTo: 'master' },
-  { command: 'git_branch', branch: 'test' },
-  { command: 'git_commit', branch: 'test', message: 'final commit' },
-  { command: 'git_merge', branch: 'test', mergeFrom: 'test', mergeTo: 'master', message: 'My special merge commit message' },
-  { command: 'git_commit', branch: 'test', message: 'It works!' },
-  { command: 'git_commit', branch: 'test', message: 'Here you can see something', tag: 'a-tag' },
-  { command: 'git_commit', branch: 'test', message: 'Here is a fresh new tag', tag: 'my-tag', displayTagBox: false },
-  { command: 'git_merge', branch: 'test', mergeFrom: 'test', mergeTo: 'master', message: 'New release', tag: 'v1.0.0' },
-  { command: 'git_commit', branch: 'test', message: 'Click me!' },
-];
-
-// console.log(gitCommandLists);
-console.log('hey martin');
-
-function makeGitGraph(gitCommands, gitGraphOptions) {
- // convert git-command-lists -> gitgraph
-
-  const branches = {}; // gitCommit, gitBranch // GitGraph.checkout???
+const makeGitGraph = (JSONcommits,gitGraphOptions)=>{
   const gitGraph = new GitGraph(gitGraphOptions);
-  const gitGraphMethods = {
-    git_branch: gitBranch,
-    git_commit: gitCommit,
-    git_merge: gitMerge,
-    git_rebase: gitRebase,
-    git_checkout: gitCheckout,
-  };
+  let branches = {};
+  //console.log(JSONcommits);
+  JSONcommits.reverse().forEach((commitObj)=>{
+    //this is a commit
+    if(commitObj.parents.length===0){
+      const master = gitGraph.branch('master');
+      master.commit({message: commitObj.branch +" = "+ commitObj.commit.message, sha1: commitObj.sha});
+      branches["master"] = master;
+    }else if(commitObj.parents.length===1){
+      //check if its a new branch
+      if(!branches[commitObj.branch]){
+        branches[commitObj.branch] = gitGraph.branch(commitObj.branch);
+        // console.log(commitObj.branch,"commitObj.branch");
+      }
+      branches[commitObj.branch].commit({ sha1 : commitObj.sha.slice(0,5), message : commitObj.branch +" = "+ commitObj.commit.message, sha1: commitObj.sha});
+    }else if(commitObj.parents.length===2){
+      //this is a Merge
+      // console.log(SHALookup[commitObj.parents[0].sha].branch,"branch for parent 0")
+      // console.log(SHALookup[commitObj.parents[1].sha].branch,"branch for parent 1")
+      let parent0Branch =SHALookup[commitObj.parents[0].sha].branch;
+      let parent1Branch =SHALookup[commitObj.parents[1].sha].branch;
 
-  gitCommands.forEach((gitCommand) => {
-    const gitGraphMethod = gitGraphMethods[gitCommand.command];
-    gitGraphMethod(gitCommand, gitGraph);
-  });
+      let mergeTo = branches[parent0Branch];
+      let mergeFrom = branches[parent1Branch];
+      if(!mergeTo){
+        branches[parent0Branch] = mergeTo = gitGraph.branch(parent0Branch);
+      }
+      if(!mergeFrom){
+        branches[parent1Branch] = mergeFrom = gitGraph.branch(parent1Branch);
+      }
 
-  return gitGraph;
-
-  // function
-
-  function gitBranch(gitCommand, gitGraph) {
-    if (!branches.hasOwnProperty(gitCommand.branch)) {
-      const branch = gitGraph.branch(gitCommand.branch);
-      branches[gitCommand.branch] = branch;
-      return branch;
+      mergeFrom.merge(mergeTo, { sha1: commitObj.sha.slice(0,5), message :
+        parent1Branch + " -> " + parent0Branch + " "+commitObj.commit.message});
     }
-    return branches[gitCommand.branch];
-  }
+  });
+};
 
-  function gitCommit(gitCommand, gitGraph) {
-    console.log(gitCommand);
-    const branch = branches[gitCommand.branch];
-    branch.commit(gitCommand);
-  }
-  function gitMerge(gitCommand, gitGraph) {
-    console.log(gitCommand);
-    const mergeFromBranch = branches[gitCommand.mergeFrom];
-    const mergeToBranch = branches[gitCommand.mergeTo];
-    mergeFromBranch.merge(/* into*/ mergeToBranch, gitCommand.message || 'martin is not happy');
-  }
 
-  function gitRebase(gitCommand, gitGraph) {
-    console.log(gitCommand);
-  }
-  function gitCheckout(gitCommand, gitGraph) {
-    console.log(gitCommand);
-  }
-}
-
-makeGitGraph(gitCommandLists, config);
+makeGitGraph(JSONcommits, config);
 
 // Create branch named "master"
 // const master = gitGraph.branch('master');
