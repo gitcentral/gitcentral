@@ -34,11 +34,13 @@ const config = {
   template: 'metro',      // could be: "blackarrow" or "metro" or `myTemplate` (custom Template object)
   orientation: 'horizontal'
 };
+/**
+ * Loop through each item in commit and render each commit in gitGraph
+ */
 
 const makeGitGraph = (JSONcommits,gitGraphOptions)=>{
   const gitGraph = new GitGraph(gitGraphOptions);
   let branches = {};
-  //console.log(JSONcommits);
   JSONcommits.reverse().forEach((commitObj)=>{
     //this is a commit
     if(commitObj.parents.length===0){
@@ -54,11 +56,8 @@ const makeGitGraph = (JSONcommits,gitGraphOptions)=>{
       branches[commitObj.branch].commit({ sha1 : commitObj.sha.slice(0,5), message : commitObj.branch +" = "+ commitObj.commit.message, sha1: commitObj.sha});
     }else if(commitObj.parents.length===2){
       //this is a Merge
-      // console.log(SHALookup[commitObj.parents[0].sha].branch,"branch for parent 0")
-      // console.log(SHALookup[commitObj.parents[1].sha].branch,"branch for parent 1")
       let parent0Branch =SHALookup[commitObj.parents[0].sha].branch;
       let parent1Branch =SHALookup[commitObj.parents[1].sha].branch;
-
       let mergeTo = branches[parent0Branch];
       let mergeFrom = branches[parent1Branch];
       if(!mergeTo){
@@ -67,12 +66,10 @@ const makeGitGraph = (JSONcommits,gitGraphOptions)=>{
       if(!mergeFrom){
         branches[parent1Branch] = mergeFrom = gitGraph.branch(parent1Branch);
       }
-
       mergeFrom.merge(mergeTo, { sha1: commitObj.sha.slice(0,5), message :
         parent1Branch + " -> " + parent0Branch + " "+commitObj.commit.message});
     }
   });
 };
-
 
 makeGitGraph(JSONcommits, config);
