@@ -34,7 +34,7 @@ var JSONcommits = [
             "message": "Merge pull request #7 from cadeban/commandFeat\n\nFeat(gitCommands)/remove modified gitGraph lib from gitignore file",
 
         },
-        
+
         "parents": [
             {
                 "sha": "db157b4ef84473925dc9574785e21d10adfd7559",
@@ -609,4 +609,7 @@ var JSONcommits = [
     }
 ]
 
-// module.exports = {JSONcommits, JSONbranches};
+let githubTranslator = new GithubApiInterface(JSONcommits, JSONbranches);
+JSONcommits = githubTranslator.JSONCommits;
+console.log(githubTranslator.SHALookup,"??");
+var SHALookup = githubTranslator.SHALookup;
