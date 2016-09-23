@@ -38,6 +38,9 @@ export default class GithubApiInterface {
       });
     });
   }
+  getParentShas(commit) {
+    return commit.parents.map( parent => parent.sha);
+  }
   /**
    * Set up table to look up branch objects by sha
    */
@@ -70,6 +73,7 @@ export default class GithubApiInterface {
    * sha: sha of current commit
    */
   nameBranch({ name, commit: { sha } }) {
+
     const commit = this.SHALookup[sha];
     const checkBranchName = (commitObj) => {
       if (commitObj !== undefined) {
@@ -127,3 +131,6 @@ export default class GithubApiInterface {
         .map(this.renameOrphanParent.bind(this));
   }
 }
+
+
+module.exports = GithubApiInterface;
