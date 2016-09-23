@@ -5,6 +5,8 @@ const webpackConfig = require('./webpack.config');
 const app = express();
 const port = process.env.PORT || 8080;
 
+const compiler = webpack(webpackConfig);
+
 app.set('port', port);
 
 app.use(webpackMiddleware(compiler, {
@@ -17,9 +19,9 @@ app.use(webpackMiddleware(compiler, {
 }));
 app.use(express.static(__dirname + '/'));
 
-app.get('/', function(req, res){
+app.get('*', function(req, res){
   console.log('Serving /');
-  res.sendFile(__dirname + '/client/index.html');
+  res.sendFile(__dirname + '/index.html');
 });
 
 const server = app.listen(port);

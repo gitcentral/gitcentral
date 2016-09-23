@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// const Git = require('nodegit');
 
 export default class App extends Component {
   onLinkEnter(link) {
@@ -18,6 +17,7 @@ export default class App extends Component {
           />
         </form>
         <canvas id="gitGraph"/>
+        {this.props.children}
       </div>
     );
   }
