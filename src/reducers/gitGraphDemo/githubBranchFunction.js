@@ -1,5 +1,5 @@
 
-class GithubApiInterface {
+export default class GithubApiInterface {
   constructor(JSONCommits, JSONBranches) {
     this.JSONCommits = JSONCommits;
     this.JSONBranches = JSONBranches;

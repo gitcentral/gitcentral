@@ -1,3 +1,5 @@
+import GithubApiInterface from './githubBranchFunction'
+
 var JSONbranches = [
   {
     "name": "dev",
@@ -1230,5 +1232,8 @@ var JSONcommits = [
 
 let githubTranslator = new GithubApiInterface(JSONcommits, JSONbranches);
 JSONcommits = githubTranslator.JSONCommits;
-var SHALookup = githubTranslator.SHALookup;
+export const SHALookup = githubTranslator.SHALookup;
 var branchLookUp = githubTranslator.branchLookUp;
+
+// export SHALookup;
+export default JSONcommits;
