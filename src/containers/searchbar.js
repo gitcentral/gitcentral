@@ -10,12 +10,14 @@ class SearchBar extends Component {
     this.state = { term: '' };
   }
 
-  onInputChange() {
+  onInputChange(event) {
     this.setState({ term: event.target.value });
   }
 
   onFormSubmit(event) {
     event.preventDefault();
+    console.log(this.state);
+    console.log(this.props);
     this.props.fetchRepo(this.state.term);
     this.setState({ term: '' });
   }
