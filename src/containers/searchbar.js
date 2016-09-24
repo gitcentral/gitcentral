@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import fetchRepo from '../actions/index';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import TextField from 'material-ui/TextField';
+
+import AppBar from 'material-ui/AppBar';
 
 class SearchBar extends Component {
   constructor() {
@@ -11,31 +15,33 @@ class SearchBar extends Component {
   }
 
   onInputChange(event) {
+    console.log(event.target.value);
     this.setState({ term: event.target.value });
   }
 
   onFormSubmit(event) {
-    event.preventDefault();
-    console.log(this.state);
-    console.log(this.props);
-    this.props.fetchRepo(this.state.term);
-    this.setState({ term: '' });
+    if(event.keyCode === 13){
+      event.preventDefault();
+      this.props.fetchRepo(this.state.term);
+      this.setState({ term: '' });
+    }
   }
 
   render() {
     return (
-      <form onSubmit={this.onFormSubmit.bind(this)}>
-        <input
-          onChange={this.onInputChange.bind(this)}
-          value={this.state.term}
-          className="search-bar"
-          type="url"
-          placeholder="Enter repo link"
-        />
-        <span className="input-group-btn">
-          <button type="submit" className="btn btn-secondary">Submit</button>
-        </span>
-      </form>
+      <MuiThemeProvider>
+        <AppBar
+          title="Mangonada"
+          iconClassNameRight="muidocs-icon-navigation-expand-more"
+        >
+          <TextField
+            onChange={this.onInputChange.bind(this)}
+            value={this.state.term}
+            onKeyDown={this.onFormSubmit.bind(this)}
+            hintText="Enter Repo URL"
+          />
+        </AppBar>
+      </MuiThemeProvider>
     );
   }
 }
