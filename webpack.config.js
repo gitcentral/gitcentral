@@ -1,3 +1,4 @@
+var path = require('path');
 module.exports = {
   entry: [
     'babel-regenerator-runtime',
@@ -5,8 +6,8 @@ module.exports = {
   ],
   devtool: 'source-map',
   output: {
-    path: __dirname,
-    publicPath: '/',
+    path: path.join(__dirname, 'build') ,
+    publicPath: '/build',
     filename: 'bundle.js',
   },
   module: {
