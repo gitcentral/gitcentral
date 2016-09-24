@@ -3,16 +3,33 @@
 
     <head>
         <title>Tutorial 1: Getting Started</title>
-        <script src="./bower_components/cytoscape/dist/cytoscape.js"></script>
-        <script src="./bower_components/jquery/dist/jquery.js"></script>
-        <link href="index2.css" rel="stylesheet"/>
+        <script src="/example/bower_components/cytoscape/dist/cytoscape.js"></script>
+        <script src="/example/bower_components/jquery/dist/jquery.js"></script>
+         <script src="/example/JSXTransformer.js"></script>
+        <link href="/example/index2.css" rel="stylesheet"/>
     </head>
 
     <body>
-        <div id="cy"></div>
-        <script src="jsonToGitGraph.js"></script>
-        <script src="githubBranchFunction.js"></script>
-        <script src="index2.js">
-        </script>
+
+        <div id="hello">
+            <form>
+                <input id="url-input"
+                       type="url"
+                       placeholder="Enter a repo url"
+                       value="https://github.com/cadeban/mangonada"></input>
+                <input type="submit" value="Go">
+            </form>
+        </div>
+
+        <div>
+            <!-- div container for cytoscape canvas div -->
+            <div id="cy"></div>
+        </div>
+
+        <div>
+            <script src="/example/githubBranchFunction.js"></script>
+            <script src="/example/index2.js"></script>
+        </div>
+
     </body>
 </html>
