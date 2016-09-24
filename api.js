@@ -2,6 +2,8 @@ const express = require('express');
 const request = require('request-promise');
 const router = express.Router();
 
+// module.exports = router;
+
 router.param('userName', function(req, res, next, userLabel) {
   req.user = userLabel;
   next();
@@ -23,6 +25,7 @@ router.route('/repos/:userName/:repoName')
   next();
 })
 .get(function(req, res) {
+
   let gitURL = `https://api.github.com/repos/${req.user}/${req.repo}`;
   let branchesURL = `${gitURL}/branches`;
   let commitsURL = `${gitURL}/commits`;
@@ -33,40 +36,45 @@ router.route('/repos/:userName/:repoName')
   const branchOpt = { uri : `${branchesURL}?${secrets}`, headers : { 'User-Agent' : userAgent } };
   request(branchOpt)
   .then(function (branches) {
+
     branches = JSON.parse(branches);
     var requestBranchCommits = branches.reduce(makeRequestBranchCommits, []);
 
-    Promise.all(requestBranchCommits).then(allCommits => { 
-      allCommits.map((branchCommits) => {
-        const branchCommitArray = JSON.parse(branchCommits);
-        
+
+    Promise.all(requestBranchCommits).then(allCommits => {
+      var requestAllCommits = { accum : [], lookup : {} };
+      let allFlattenCommits = allCommits.reduce( (r, c) => { return r.concat(JSON.parse(c)) }, []);
+
+      allFlattenCommits.sort((lhs, rhs) => {
+        return Date.parse(lhs.committer.date) - Date.parse(rhs.committer.date);
       });
-      res.status(200).end('youooo');
-    });
+
+      allFlattenCommits.reduce((container, branchCommit) => {
+        if (container.lookup[branchCommit.sha] === undefined) {
+          container.lookup[branchCommit.sha] = true;
+          container.accum.push(branchCommit);
+        }
+        return container;
+      }, requestAllCommits);
+
+      res.status(200).json(requestAllCommits.accum);
+
+    }, (reason) => {
+      res.status(401).end('noooooo');
+    }).then( (results) => { console.log(results);});
     
     // functions
     function makeRequestBranchCommits(results, branch, index) {
-      const commitsOpt = { uri : `${commitsURL}?sha=${branch.commit.sha}&${secrets}`, headers : { 'User-Agent' : userAgent } };
+      const commitsOpt = { uri : `${commitsURL}?sha=${branch.commit.sha}&${secrets}`,
+                           headers : { 'User-Agent' : userAgent } };
       const branchPromise = request(commitsOpt);
       results.push(branchPromise);
       return results;
     }
     
     
-  })
-
-
-  /*
-  request({ url : address, headers : { 'User-Agent' : userAgent } },
-          function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      res.status(200).json(body);
-    } else {
-      console.log("invalid", address);
-      res.end();
-    }
   });
-   */
+
 });
 
 

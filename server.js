@@ -23,13 +23,13 @@ app.use(webpackMiddleware(compiler, {
 }));
 */
 app.use(express.static(__dirname + '/'));
-
+app.use('/api', api);
 app.get('*', function(req, res){
   console.log('Serving /');
   res.sendFile(__dirname + '/index.html');
 });
 
-app.use('/api', api);
+
 
 const server = app.listen(port);
 console.log('Listening on port ', port);
