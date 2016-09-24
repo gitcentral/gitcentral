@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 class GithubApiInterface {
   constructor(JSONCommits, JSONBranches) {
     this.JSONCommits = JSONCommits;

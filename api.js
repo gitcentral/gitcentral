@@ -1,3 +1,4 @@
+/* eslint-disable */
 const express = require('express');
 const request = require('request-promise');
 const router = express.Router();
@@ -36,7 +37,7 @@ router.route('/repos/:userName/:repoName')
   const branchOpt = { uri : `${branchesURL}?${secrets}`, headers : { 'User-Agent' : userAgent } };
   request(branchOpt)
   .then(function (branches) {
-
+    console.log(branches); // delete
     branches = JSON.parse(branches);
     var requestBranchCommits = branches.reduce(makeRequestBranchCommits, []);
 
@@ -44,6 +45,11 @@ router.route('/repos/:userName/:repoName')
     Promise.all(requestBranchCommits).then(allCommits => {
       var requestAllCommits = { commits : [], lookup : {} };
       let allFlattenCommits = allCommits.reduce( (r, c) => { return r.concat(JSON.parse(c)) }, []);
+
+      let a = allFlattenCommits.map(function(commit){
+        return commit.sha;
+      });
+      console.log('--------->', a);
 
       allFlattenCommits.sort((lhs, rhs) => {
         return Date.parse(lhs.committer.date) - Date.parse(rhs.committer.date);
@@ -62,7 +68,7 @@ router.route('/repos/:userName/:repoName')
     }, (reason) => {
       res.status(401).end('noooooo');
     }).then( (results) => { console.log(results);});
-    
+
     // functions
     function makeRequestBranchCommits(results, branch, index) {
       const commitsOpt = { uri : `${commitsURL}?sha=${branch.commit.sha}&${secrets}`,
@@ -71,12 +77,11 @@ router.route('/repos/:userName/:repoName')
       results.push(branchPromise);
       return results;
     }
-    
-    
+
+
   });
 
 });
 
 
 module.exports = router;
-

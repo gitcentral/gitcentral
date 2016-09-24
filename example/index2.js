@@ -1,3 +1,4 @@
+/* eslint-disable */
 $(function() {
 
   getGithubApiJSON(); // on ready, call it once
@@ -39,7 +40,7 @@ $(function() {
 
       this.cytoCols = this.JSONbranches.reduce(this.setupMajorBranch, {});
       this.cytoNodes = this.JSONcommits.reverse().map(this.mapNode(this.cytoCols));
-      this.cytoEdges = this.JSONcommits.reduce(this.mapEdge, []);
+      this.cytoEdges = this.JSONcommits.reduce(this.mapEdge, []); // <--
       console.log("cols ", this.cytoCols);
       console.log("nodes", this.cytoNodes);
       console.log("edges", this.cytoEdges);
@@ -49,12 +50,7 @@ $(function() {
 
       const scale = 100;
       const columnPosition = reorder(cytoCols, scale);
-      let printed = false;
       return function(jsonCommit, index) {
-        if ((!printed) && (jsonCommit.commit.message === undefined)) {
-          printed = true;
-          // console.log(777, jsonCommit);
-        }
         const sha1 = jsonCommit.sha;
         const branch = jsonCommit.branch;
         const msg0 = jsonCommit.commit.message.slice(0, 10);
@@ -66,15 +62,20 @@ $(function() {
 
         const node = { data : { id : sha1, branch: branch, name : sha5, message: msg0 },
                        position : { x : x, y: y } };
+
+        // good node: 807ba7177e64eec020d41a0b59cd11224af8f4fe
+        // bad node: a56e73eb92e51b89302a3c802313722831ffcc28
         return node;
       }
 
       function reorder(lookup, scale) {
+        // update to render longest row last **need to generate which is the longest
 
+        // guarantee master is in first row
         const lookupTable = { master : 1 * scale };
 
-        Object.keys(lookup).filter(selectSubBranch).map(assignColumn(lookupTable));
-        Object.keys(lookup).filter(selectBigBranch).map(assignColumn(lookupTable));
+        Object.keys(lookup).filter(selectBigBranch).map(assignRow(lookupTable));
+        Object.keys(lookup).filter(selectSubBranch).map(assignRow(lookupTable));
 
         return lookupTable;
 
@@ -84,16 +85,19 @@ $(function() {
         }
 
         function selectSubBranch(branch) {
-          const openBracket = '[[]'
-          const closeBracket = '[]]'
+          const openBracket = '[[]'; // <- subbranch
+          const closeBracket = '[]]';
           return branch.match(openBracket);
         }
 
-        function assignColumn(lookupTable) {
+        function assignRow(lookupTable) {
           return function(branch) {
             lookupTable[branch] = Object.keys(lookupTable).length * scale;
           }
         }
+
+        // need function to color branches
+
       }
     }
 
@@ -114,12 +118,15 @@ $(function() {
 
 
     mapEdge(edges, jsonCommit) {
-
       return jsonCommit.parents.reduce(function (parentEdges, parent) {
                const target = parent.sha;
                const source = jsonCommit.sha;
+
                const edge = { data : { id : [source, target].join('_'), source : source, target : target } };
                parentEdges.push(edge);
+               if (edge.data.id === '807ba7177e64eec020d41a0b59cd11224af8f4fe_a56e73eb92e51b89302a3c802313722831ffcc28'){
+                 console.log('help!', target, source);
+               }
                return parentEdges;
              }, edges);
 
@@ -136,7 +143,7 @@ $(function() {
           'label': 'data(name)'
         }
       } ];
-      
+
       const data = {
         container: cy_id,
         elements: elements,

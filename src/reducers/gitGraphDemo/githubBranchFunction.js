@@ -1,10 +1,11 @@
-
+/* eslint-disable */
 export default class GithubApiInterface {
   constructor(JSONCommits, JSONBranches) {
     this.JSONCommits = JSONCommits;
     this.JSONBranches = JSONBranches;
     this.SHALookup = {};
     this.branchLookup = {};
+    this.branchLengths = {};
 
     // initialization
     this.setupShaLookup();
@@ -55,18 +56,30 @@ export default class GithubApiInterface {
    * Iterate through each branch that is not master, and name branches
    */
   addBranchName() {
-    this.JSONBranches.filter(branch => branch.name !== 'master')
-                     .forEach((branch) => {
-                       const commit = this.branchLookup[branch.commit.sha];
-                       this.nameBranch(commit);
-                     });
 
-    this.JSONBranches.filter(branch => branch.name === 'master')
-                     .forEach((branch) => {
-                       const commit = this.branchLookup[branch.commit.sha];
-                       this.nameBranch(commit);
-                     });
+    const sortedBranches = this.JSONBranches.map(branch => {
+      const length = this.visitParents(this.SHALookup[branch.commit.sha], () => 1);
+      return { sha: branch.sha, name : branch.name, length : length };
+    }).sort((branchA, branchB) => {
+      // -1 smaller, 0 equal, 1 bigger
+      if (branchA.name === 'master') { return 1; }
+      if (branchB.name === 'master') { return -1; }
+      return branchA.length - branchB.length;
+    });
+
+    sortedBranches.forEach((branch) => {
+      console.log(123, branch);
+      const commit = this.branchLookup[branch.sha];
+      this.nameBranch(commit);
+    });
   }
+
+  visitParents(commit, cb){
+    let val = cb(commit);
+    val += visitParents(this.SHALookup[commit.parents[0].sha], cb);
+    return val;
+  }
+
   /**
    * Assign branch property to each commit object
    * name: name of current branch
@@ -133,4 +146,4 @@ export default class GithubApiInterface {
 }
 
 
-module.exports = GithubApiInterface;
+//module.exports = GithubApiInterface;
