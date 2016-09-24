@@ -57,7 +57,7 @@ router.route('/repos/:userName/:repoName')
         return container;
       }, requestAllCommits);
 
-      res.status(200).json(requestAllCommits.accum);
+      res.status(200).json([branches, requestAllCommits.accum]);
 
     }, (reason) => {
       res.status(401).end('noooooo');
@@ -71,10 +71,7 @@ router.route('/repos/:userName/:repoName')
       results.push(branchPromise);
       return results;
     }
-
-
   });
-
 });
 
 
