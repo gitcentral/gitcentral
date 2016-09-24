@@ -61,8 +61,8 @@ router.route('/repos/:userName/:repoName')
 
     }, (reason) => {
       res.status(401).end('noooooo');
-    }).then( (results) => { console.log(results);});
-    
+    }).then( (results) => { console.log(results);}); // what are we doing with this line?
+
     // functions
     function makeRequestBranchCommits(results, branch, index) {
       const commitsOpt = { uri : `${commitsURL}?sha=${branch.commit.sha}&${secrets}`,
@@ -71,12 +71,11 @@ router.route('/repos/:userName/:repoName')
       results.push(branchPromise);
       return results;
     }
-    
-    
+
+
   });
 
 });
 
 
 module.exports = router;
-
