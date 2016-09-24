@@ -6,7 +6,8 @@ const INITIAL_STATE = currentRepo;
 export default function(state = INITIAL_STATE, action) {
   switch(action.type) {
     case FETCH_REPO:
-      return { currentRepo: action.payload.data }
+      console.log(action.payload.data);
+      return action.payload.data;
     default:
       return state;
   }
