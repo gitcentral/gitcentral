@@ -42,7 +42,7 @@ router.route('/repos/:userName/:repoName')
 
 
     Promise.all(requestBranchCommits).then(allCommits => {
-      var requestAllCommits = { accum : [], lookup : {} };
+      var requestAllCommits = { commits : [], lookup : {} };
       let allFlattenCommits = allCommits.reduce( (r, c) => { return r.concat(JSON.parse(c)) }, []);
 
       allFlattenCommits.sort((lhs, rhs) => {
@@ -52,17 +52,17 @@ router.route('/repos/:userName/:repoName')
       allFlattenCommits.reduce((container, branchCommit) => {
         if (container.lookup[branchCommit.sha] === undefined) {
           container.lookup[branchCommit.sha] = true;
-          container.accum.push(branchCommit);
+          container.commits.push(branchCommit);
         }
         return container;
       }, requestAllCommits);
 
-      res.status(200).json([branches, requestAllCommits.accum]);
+      res.status(200).json([branches, requestAllCommits.commits]);
 
     }, (reason) => {
       res.status(401).end('noooooo');
-    }).then( (results) => { console.log(results);}); // what are we doing with this line?
-
+    }).then( (results) => { console.log(results);});
+    
     // functions
     function makeRequestBranchCommits(results, branch, index) {
       const commitsOpt = { uri : `${commitsURL}?sha=${branch.commit.sha}&${secrets}`,
@@ -71,8 +71,12 @@ router.route('/repos/:userName/:repoName')
       results.push(branchPromise);
       return results;
     }
+    
+    
   });
+
 });
 
 
 module.exports = router;
+
