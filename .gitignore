@@ -3,3 +3,4 @@ example/bower_components/
 node_modules/
 npm-debug.log
 build/
+bundle.js
