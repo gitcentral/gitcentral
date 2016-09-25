@@ -19,6 +19,17 @@ class GithubApiInterface {
    * Set up table to look up commit objects by sha
    * Initialize children array on each commit object
    */
+  getOrFakeShaToCommitLookup(sha) {
+    let commit = this.SHALookup[sha];
+    if (commit === undefined) {
+      console.log("Dan: I miss you so much", sha);
+      commit = { sha : sha,
+                 commit : { message : "hahaha" },
+                 parents : [] };
+      this.SHALookup[sha] = commit;
+    }
+    return commit;
+  }
   setupShaLookup() {
     this.JSONCommits.reduce((results, commit) => {
       results[commit.sha] = commit;
@@ -56,8 +67,8 @@ class GithubApiInterface {
    * Iterate through each branch that is not master, and name branches
    */
   addBranchName() {
-    const sortedBranches = this.JSONBranches.map(branch => {
-      const length = this.visitParents(this.SHALookup[branch.commit.sha], () => 1);
+    const sortedBranches = this.JSONBranches.map((branch) => {
+      const length = this.visitParents(this.getOrFakeShaToCommitLookup(branch.commit.sha), () => 1);
       return { sha: branch.sha, name : branch.name, length : length };
     }).sort((branchA, branchB) => {
       // -1 smaller, 0 equal, 1 bigger
@@ -66,17 +77,16 @@ class GithubApiInterface {
       return branchA.length - branchB.length;
     });
     sortedBranches.forEach((branch) => {
-      const commit = this.branchLookup[branch.sha];
+
+      const commit = this.getOrFakeShaToCommitLookup(branch.sha);
       this.nameBranch(commit);
     });
   }
 
   visitParents(commit, cb){
-    if (commit === undefined) {
-      return;
-    }
     let val = cb(commit);
-    val += this.visitParents(this.SHALookup[commit.parents[0].sha], cb);
+    if (commit.parents.length === 0) { return val; }
+    val += this.visitParents(this.getOrFakeShaToCommitLookup(commit.parents[0].sha), cb);
     return val;
   }
 
