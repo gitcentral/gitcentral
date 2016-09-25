@@ -17,7 +17,6 @@ class RepoDisplay extends Component {
      */
     const gitGraph = new GitGraph(gitGraphOptions);
     let branches = {};
-    console.log(JSONcommits,"shud be arr");
     JSONcommits.reverse().forEach((commitObj)=>{
       //this is a commit
       if(commitObj.parents.length===0){

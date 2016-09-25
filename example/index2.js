@@ -166,6 +166,7 @@ $(function() {
         const node = evt.cyTarget;
         console.log( evt.data.foo, node.id(), node.position() );
       }
+
     }
   }
 
