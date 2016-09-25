@@ -37,19 +37,12 @@ router.route('/repos/:userName/:repoName')
   const branchOpt = { uri : `${branchesURL}?${secrets}`, headers : { 'User-Agent' : userAgent } };
   request(branchOpt)
   .then(function (branches) {
-    console.log(branches); // delete
     branches = JSON.parse(branches);
     var requestBranchCommits = branches.reduce(makeRequestBranchCommits, []);
-
 
     Promise.all(requestBranchCommits).then(allCommits => {
       var requestAllCommits = { commits : [], lookup : {} };
       let allFlattenCommits = allCommits.reduce( (r, c) => { return r.concat(JSON.parse(c)) }, []);
-
-      let a = allFlattenCommits.map(function(commit){
-        return commit.sha;
-      });
-      console.log('--------->', a);
 
       allFlattenCommits.sort((lhs, rhs) => {
         return Date.parse(lhs.committer.date) - Date.parse(rhs.committer.date);
@@ -67,7 +60,7 @@ router.route('/repos/:userName/:repoName')
 
     }, (reason) => {
       res.status(401).end('noooooo');
-    }).then( (results) => { console.log(results);});
+    });
 
     // functions
     function makeRequestBranchCommits(results, branch, index) {
