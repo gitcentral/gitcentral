@@ -56,7 +56,6 @@ class GithubApiInterface {
    * Iterate through each branch that is not master, and name branches
    */
   addBranchName() {
-    console.log(13344, "add Branch Name");
     const sortedBranches = this.JSONBranches.map(branch => {
       const length = this.visitParents(this.SHALookup[branch.commit.sha], () => 1);
       return { sha: branch.sha, name : branch.name, length : length };
@@ -66,9 +65,7 @@ class GithubApiInterface {
       if (branchB.name === 'master') { return -1; }
       return branchA.length - branchB.length;
     });
-    console.log(321, sortedBranches);
     sortedBranches.forEach((branch) => {
-      console.log(123, branch);
       const commit = this.branchLookup[branch.sha];
       this.nameBranch(commit);
     });
