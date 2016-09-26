@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { SHALookup } from '../reducers/gitGraphDemo/jsonTogitGraph';
+// import { SHALookup } from '../reducers/gitGraphDemo/jsonTogitGraph';
+import { SHALookup } from '../reducers/gitGraphDemo/sampleObj';
 
 class RepoDisplay extends Component {
   makeGitGraph() {
@@ -48,6 +49,9 @@ class RepoDisplay extends Component {
         });
       }else if(commitObj.parents.length===2){
         //this is a Merge
+        //LOL
+        if(!SHALookup[commitObj.parents[0].sha]) return;
+
         let parent0Branch =SHALookup[commitObj.parents[0].sha].branch;
         let parent1Branch =SHALookup[commitObj.parents[1].sha].branch;
         let mergeTo = branches[parent0Branch];
