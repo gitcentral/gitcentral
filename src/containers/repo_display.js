@@ -10,7 +10,17 @@ class RepoDisplay extends Component {
       orientation: 'horizontal'
     };
 
-    const JSONcommits = this.props.currentRepo;
+    let JSONcommits;
+    if(this.props.currentRepo.length === 2) {
+      if(this.props.currentRepo[0].length > this.props.currentRepo[1].length) {
+        JSONcommits = this.props.currentRepo[0];
+      } else {
+        JSONcommits = this.props.currentRepo[1];
+      }
+    } else {
+      JSONcommits = this.props.currentRepo;
+    }
+    
 
     /**
      * Loop through each item in commit and render each commit in gitGraph
@@ -19,6 +29,7 @@ class RepoDisplay extends Component {
     let branches = {};
     JSONcommits.reverse().forEach((commitObj)=>{
       //this is a commit
+      console.log(commitObj)
       if(commitObj.parents.length===0){
         const master = gitGraph.branch('master');
         master.commit({message: commitObj.branch +" = "+ commitObj.commit.message, sha1: commitObj.sha});
@@ -29,7 +40,12 @@ class RepoDisplay extends Component {
           branches[commitObj.branch] = gitGraph.branch(commitObj.branch);
           // console.log(commitObj.branch,"commitObj.branch");
         }
-        branches[commitObj.branch].commit({ sha1 : commitObj.sha.slice(0,5), message : commitObj.branch +" = "+ commitObj.commit.message, sha1: commitObj.sha});
+        
+        branches[commitObj.branch].commit({
+          sha1 : commitObj.sha.slice(0,5),
+          message : commitObj.branch +" = "+ commitObj.commit.message,
+          sha1: commitObj.sha
+        });
       }else if(commitObj.parents.length===2){
         //this is a Merge
         let parent0Branch =SHALookup[commitObj.parents[0].sha].branch;
