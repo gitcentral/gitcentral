@@ -160,27 +160,26 @@ class GithubApiInterface {
  */
  addGitCommands(){
    this.JSONCommits.map((commit) => {
-     return analyzeCommit(commit);
+     return this.analyzeCommit(commit);
    });
+   console.log('commits!', this.JSONCommits);
  }
 
 /**
  * Applies universal git commands and checks if commit is a tail
  */
   analyzeCommit(commit){
-    const universalCommands = [];
-    commit.gitCommands = universalCommands.slice(0);
-    if (!commit.children.length){
-      addTailCommands(commit);
-    }
-    return commit;
-  }
+    const universalCommands = `Possible git commands:
+    git checkout [branch name]
+    options:
+    -b: create and check out new branch
+    git branch [branch name]
+    options:
+    -d: delete branch
+    -D: delete branch, suppress warnings
+    git tag [tag name]`;
 
-/**
- * Add tails node commands
- */
-  addTailCommands(commit) {
-    const tailNodeCommands = [
+    const tailCommands = [
       `git reset HEAD(~[n]), [n] = number of commits to reset
        options:
        --hard: obliterate last n commits (can't be undone)
@@ -191,25 +190,20 @@ class GithubApiInterface {
       'git pull',
     ];
 
-    commit.gitCommands = commit.gitCommands.concat(tailNodeCommands);
+    commit.gitCommands = universalCommands;
+
+    if (!commit.children.length){
+      this.addTailCommands(commit, tailCommands);
+    }
     return commit;
   }
 
-  makeConfig (commit) {
-    return {
-      dotColor: branch.color,
-      // ${timestamp()} <-- replace w/ library
-      gitCommands:
-      `Possible git commands:
-      git checkout [branch name]
-      options:
-      -b: create and check out new branch
-      git branch [branch name]
-      options:
-      -d: delete branch
-      -D: delete branch, suppress warnings
-      git tag [tag name]`,
-    };
+/**
+ * Add tails commit commands
+ */
+  addTailCommands(commit, ...commands) {
+     commands.forEach(command => commit.gitCommands += ('\n ' + command));
+    return commit;
   }
 
 }
