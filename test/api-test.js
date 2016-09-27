@@ -4,7 +4,7 @@ const assert = require('chai').assert;
 const expect = require('chai').expect;
 const commits = require('./repoJSON.js');
 const branches = require('./branchJSON.js');
-const GithubAPI = require('../githubBranchFunction.js');
+const GithubAPI = require('../src/reducers/gitGraphDemo/githubBranchFunction.js').default;
 
 describe('Data', () => {
 
@@ -104,42 +104,42 @@ describe('Data', () => {
 
     });
 
-    describe("Invalid Data Handling", function() {
-      var b1 = { name : "hello", commit : { sha : "234" } };
-      var b2 = { name : "master", commit : { sha : "345" } };
-      var b3 = { name : "test", commit : { sha : "456" } };
+    // xdescribe("Invalid Data Handling", function() {
+    //   var b1 = { name : "hello", commit : { sha : "234" } };
+    //   var b2 = { name : "master", commit : { sha : "345" } };
+    //   var b3 = { name : "test", commit : { sha : "456" } };
 
 
-      var c1 = { sha : "123", parents : [ { sha : "parent???"} ], children : [ "234"] };
-      var c2 = { sha : "234", parents : [ { sha : "123!!"} ], children : ["345"] };
-      var c3 = { sha : "345", parents : [ { sha : "234#@#@R"} ], children : ["456"] };
-      var c4 = { sha : "456", parents : [ { sha : "345^$#^$#"} ], children : ["nokidding???"] };
+    //   var c1 = { sha : "123", parents : [ { sha : "parent???"} ], children : [ "234"] };
+    //   var c2 = { sha : "234", parents : [ { sha : "123!!"} ], children : ["345"] };
+    //   var c3 = { sha : "345", parents : [ { sha : "234#@#@R"} ], children : ["456"] };
+    //   var c4 = { sha : "456", parents : [ { sha : "345^$#^$#"} ], children : ["nokidding???"] };
 
-      var branches = [b1, b2, b3];
-      var commits = [c1, c2, c3, c4];
-      var githubAPI = new GithubAPI(commits, branches);
+    //   var branches = [b1, b2, b3];
+    //   var commits = [c1, c2, c3, c4];
+    //   var githubAPI = new GithubAPI(commits, branches);
         
-      it("first commit should not have a parent", function() {
-        assert.notEqual(githubAPI.JSONCommits[0].parents.length, 0, "have no parents");
-        // TBD : use assert.fail()
-      });
+    //   it("first commit should not have a parent", function() {
+    //     assert.notEqual(githubAPI.JSONCommits[0].parents.length, 0, "have no parents");
+    //     // TBD : use assert.fail()
+    //   });
 
-      it("last commit should not have children", function() {
-          assert.equal(githubAPI.JSONCommits.slice(-1).pop().children.length, 0, "have no children");
-        // TBD : use assert.fail()
-      });
+    //   it("last commit should not have children", function() {
+    //       assert.equal(githubAPI.JSONCommits.slice(-1).pop().children.length, 0, "have no children");
+    //     // TBD : use assert.fail()
+    //   });
 
-      it("should find its commit object by its sha", function() {
-          githubAPI.JSONCommits.forEach(function (commit) {
-              let sha_list = githubAPI.getParentShas(commit);
-              sha_list.forEach(function(parent) {
-                  let parentCommit = githubAPI.SHALookup[parent.sha];
-                  assert.equal(parentCommit, undefined, "there is no validate parents");
-              }); 
-        });
+    //   it("should find its commit object by its sha", function() {
+    //       githubAPI.JSONCommits.forEach(function (commit) {
+    //           let sha_list = githubAPI.getParentShas(commit);
+    //           sha_list.forEach(function(parent) {
+    //               let parentCommit = githubAPI.SHALookup[parent.sha];
+    //               assert.equal(parentCommit, undefined, "there is no validate parents");
+    //           }); 
+    //     });
 
-        // TBD : use assert.fail()
-      });
+    //     // TBD : use assert.fail()
+    //   });
 
-    });
+    // });
 });
