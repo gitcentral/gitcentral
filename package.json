@@ -11,6 +11,9 @@
     "postinstall": "webpack -p",
     "lint": "eslint *.js --fix"
   },
+  "engines": {
+    "node": "6.4.0"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
