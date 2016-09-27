@@ -33,6 +33,7 @@ router.route('/repos/:userName/:repoName')
   let userAgent = 'cadeban';
   let secrets = "client_id=423335fdf206466ccd3b&client_secret=bc10a999efc0335d06b6d84d470b76eda5a97b30";
   let branches = [];
+  var count = 0;
 
   // requesting branch list of a repo
   const branchOpt = { uri : `${branchesURL}?${secrets}`, headers : { 'User-Agent' : userAgent } };
@@ -41,21 +42,34 @@ router.route('/repos/:userName/:repoName')
     branches = JSON.parse(branches);
 
     // requesting all the commits of each branch
-    var requestBranchCommits = branches.reduce(makeRequestBranchCommits, []);
-
+    //let requestBranchCommits = branches.reduce(makeRequestBranchCommits, []);
+    //
+    ////branches is an array of branches
+    ///loop through each branch and run recursion func on the first commit sha thing
+    let requestBranchCommits =  [];
+    branches.forEach((branch)=>{
+      requestBranchCommits.push(makeRequestBranchCommits(branch.commit.sha,[]));
+    });
+    console.log(requestBranchCommits,"requestBranchCommits");
     //
     Promise.all(requestBranchCommits).then(allCommits => {
-      var requestAllCommits = { commits : [], lookup : {} };
-      let allFlattenCommits = allCommits.reduce( (r, c) => {
-        console.log(JSON.parse(c).sha, 'length:', JSON.parse(c).length);
-        return r.concat(JSON.parse(c))
-      }, []);
+      // allCommits = ...allCommits;
+      console.log(allCommits.length,"ALL COMMITS");
+      let requestAllCommits = { commits : [], lookup : {} };
+      let allFlattenCommits = [].concat(...allCommits);
+      // let allFlattenCommits = allCommits.reduce( (r, c) => {
+      //   console.log(JSON.parse(c).sha, 'length:', JSON.parse(c).length);
+      //   return r.concat(JSON.parse(c))
+      // }, []);
 
       // sorts the branch's commits
       allFlattenCommits.sort((lhs, rhs) => {
-        return Date.parse(lhs.committer.date) - Date.parse(rhs.committer.date);
+        // console.log(lhs,rhs);
+        // console.log(Date.parse(lsh,committer.date), Date.parse(rhs.committer.date));
+        return Date.parse(lhs.commit.committer.date) - Date.parse(rhs.commit.committer.date);
       });
 
+      // console.log(allFlattenCommits[0]);
       // filters duplicates out of the branch's commits
       allFlattenCommits.reduce((container, branchCommit) => {
         if (container.lookup[branchCommit.sha] === undefined) {
@@ -65,7 +79,10 @@ router.route('/repos/:userName/:repoName')
         return container;
       }, requestAllCommits);
 
+
+
       console.log('unique length', requestAllCommits.commits.length);
+      console.log(requestAllCommits.commits[requestAllCommits.commits.length-2],"flattened?");
 
       res.status(200).json([branches, requestAllCommits.commits]);
 
@@ -74,17 +91,34 @@ router.route('/repos/:userName/:repoName')
     });
 
     // functions
-    function makeRequestBranchCommits(results = [], branch, index) {
-      const commitsOpt = { uri : `${commitsURL}?sha=${branch.commit.sha}&per_page=100&${secrets}`,
-                           headers : { 'User-Agent' : userAgent } };
-      // don't we want to call .then on this request?
-      const branchPromise = request(commitsOpt).then();
-      // save last result's sha and pass it as arg in recursive api GET request
-      // to continue pagination
+    function makeRequestBranchCommits(lastSha) {
 
-      results.push(branchPromise);
-      console.log(branch.name);
-      return results;
+      return new Promise(function(resolve, reject){
+
+        function getNextCommits(lastSha, commitArr = []){
+          let commitsOpt = { uri : `${commitsURL}?sha=${lastSha}&per_page=100&${secrets}`,
+          headers : { 'User-Agent' : userAgent } };
+
+          request(commitsOpt).then((commits)=>{
+            commitObjs = JSON.parse(commits);
+            commitArr.push(...commitObjs);
+
+            if(commitObjs.length < 100 || commitObjs[commitObjs.length-1].parents.length === 0){
+              resolve(commitArr);
+              return;
+            }
+            //maybe a race condition problem here...
+            commitObjs[commitObjs.length-1].parents.forEach((parent)=>{
+              getNextCommits(parent.sha, commitArr);
+            })
+          })
+        };
+
+        getNextCommits(lastSha, []);
+
+      });
+
+
     }});
 
 });
