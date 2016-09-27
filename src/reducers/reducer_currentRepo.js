@@ -1,5 +1,4 @@
 import { FETCH_REPO } from '../actions/index';
-// import currentRepo from './gitGraphDemo/jsonToGitGraph';
 import currentRepo from './gitGraphDemo/sampleObj';
 
 const INITIAL_STATE = currentRepo;

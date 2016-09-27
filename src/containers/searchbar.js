@@ -1,3 +1,11 @@
+/**
+ * This container renders the navigation bar and the drawer. It does not need
+ * access to items in redux state, but needs to dispatch to the redux state.
+ * Uses material-ui for the rendering:
+ * 
+ * http://www.material-ui.com/#/components/text-field
+ */
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -9,35 +17,54 @@ import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Menu from 'material-ui/svg-icons/navigation/menu';
 import AppBar from 'material-ui/AppBar';
+import {orange500, blue500} from 'material-ui/styles/colors';
+
 
 import RaisedButton from 'material-ui/RaisedButton'
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
+/**
+ * SearchBar container
+ * Renders the navigation bar and the drawer
+ */
 class SearchBar extends Component {
   constructor() {
     super();
 
     this.state = { 
-      term: '',
+      urlEntered: '',
       open: false,
     };
   }
 
+  /**
+   * Handles url input from the user into the main searchbar
+   * @param  {Object} event 
+   */
   onInputChange(event) {
     console.log(event.target.value);
-    this.setState({ term: event.target.value });
+    this.setState({ urlEntered: event.target.value });
   }
 
+  /**
+   * Handles when the user presses enter in the url searchbar.
+   * Calls fetchRepo which makes a request to our backend.
+   * @param  {Object} event 
+   */
   onFormSubmit(event) {
     if(event.keyCode === 13){
       event.preventDefault();
-      this.props.fetchRepo(this.state.term);
-      this.setState({ term: '' });
+      this.props.fetchRepo(this.state.urlEntered);
+      this.setState({ urlEntered: '' });
     }
   }
 
+  /**
+   * Handles toggling of the drawer using the hamburger icon
+   * @param  {Object} event
+   */
   handleToggle(event) {
     event.preventDefault();
     console.log(this.state.open);
@@ -45,49 +72,26 @@ class SearchBar extends Component {
     setTimeout(() => console.log(this.state.open), 40);
   }
 
+  /**
+   * Handles closing of the drawer
+   */
   handleClose() {
     this.setState({ open: false });
   }
 
-  //  render() {
-  //   return (
-  //     <div>
-  //       <RaisedButton
-  //         label="Open Drawer"
-  //         onTouchTap={this.handleToggle}
-  //       />
-  //       <Drawer
-  //         docked={false}
-  //         width={200}
-  //         open={this.state.open}
-  //         onRequestChange={(open) => this.setState({open})}
-  //       >
-  //         <MenuItem onTouchTap={this.handleClose}>Menu Item</MenuItem>
-  //         <MenuItem onTouchTap={this.handleClose}>Menu Item 2</MenuItem>
-  //       </Drawer>
-  //     </div>
-  //   );
-  // }
-
   render() {
-    const styles = {
-      title: {
-        cursor: 'pointer',
-      },
-    };
-
     const log = () => console.log('aasdfasd');
-    //fuck
     return (
       <div>
         <MuiThemeProvider>
           <AppBar
-            title={<span style={styles.title}>Mangonada</span>}
+            title={<span>Mangonada</span>}
             iconElementLeft={<IconButton onClick={this.handleToggle.bind(this)}><Menu /></IconButton>}
           >
             <TextField
+              style = {{width: 550}}
               onChange={this.onInputChange.bind(this)}
-              value={this.state.term}
+              value={this.state.urlEntered}
               onKeyDown={this.onFormSubmit.bind(this)}
               hintText="Enter repo URL"
             />
@@ -97,11 +101,34 @@ class SearchBar extends Component {
         <MuiThemeProvider>
           <Drawer
             docked={false}
-            width={200}
+            width={300}
             open={this.state.open}
             onRequestChange={this.handleClose.bind(this)}
             >
-            <MenuItem onClick={log && this.handleClose.bind(this)}>X</MenuItem>
+            <MenuItem onClick={log && this.handleClose.bind(this)}>
+              Search by:
+            </MenuItem>
+            <MenuItem onClick={() => console.log('Author name')}>
+              <TextField
+                floatingLabelText="Author name"
+              />
+            </MenuItem>
+            <MenuItem onClick={() => console.log('Branch')}>
+              <TextField
+                floatingLabelText="Branch"
+              />
+            </MenuItem>
+            <MenuItem onClick={() => console.log('Commit message')}>
+              <TextField
+                floatingLabelText="Commit message"
+              />
+            </MenuItem>
+            <MenuItem onClick={() => console.log('# authors')}>
+              Number of authors: 4
+            </MenuItem>
+            <MenuItem onClick={() => console.log('Total commits')}>
+              Total commits: 492
+            </MenuItem>
           </Drawer>
         </MuiThemeProvider>
       </div>
@@ -109,6 +136,10 @@ class SearchBar extends Component {
   }
 }
 
+/**
+ * SearchBar needs access to the fetchRepo method in order to send
+ * requests for new git repos.
+ */
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({ fetchRepo }, dispatch);
 }
