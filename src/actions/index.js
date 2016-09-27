@@ -1,8 +1,6 @@
 import axios from 'axios';
-
 export const FETCH_REPO = 'FETCH_REPO';
-
-const ROOT_URL = '/api/repos/'; //the root url
+const ROOT_URL = '/api/repos/';
 
 /**
  * Format the get request and return an action with the type

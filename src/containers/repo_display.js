@@ -1,13 +1,22 @@
+/**
+ * This is the container that displays the repo itself. It needs access to the
+ * redux state to receive the commit data returned from the api call. Does not
+ * need to dispatch to the redux state.
+ *
+ * While this is a component, React is not actually being used to manipulate the
+ * DOM here. We simply call a function that will directly go to our canvas and
+ * draw on it, bypassing React.
+ */
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-// import { SHALookup } from '../reducers/gitGraphDemo/jsonTogitGraph';
 import { SHALookup } from '../reducers/gitGraphDemo/sampleObj';
 
 class RepoDisplay extends Component {
   makeGitGraph() {
     const gitGraphOptions = {
-      template: 'metro',      // could be: "blackarrow" or "metro" or `myTemplate` (custom Template object)
+      template: 'metro',
       orientation: 'horizontal'
     };
 
