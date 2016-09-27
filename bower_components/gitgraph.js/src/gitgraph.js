@@ -1,3 +1,4 @@
+/* eslint-disable */
 (function () {
   "use strict";
 
@@ -408,7 +409,6 @@
   GitGraph.prototype.hover = function ( event ) {
     var self = this.gitgraph;
     var isOut = true;
-
     function showCommitTooltip ( commit ) {
       if ( !commit.tooltipDisplay ) {
         return;
@@ -1178,6 +1178,12 @@
     this.context.lineTo( x4, y4 ); // Bottom right
     this.context.fill();
   };
+
+    /* ----------->  MY FUNCTIONS <----------- */
+    Commit.prototype.clickAndDrag = function ( event ) {
+      console.log(event.target);
+    };
+
 
   // --------------------------------------------------------------------
   // -----------------------      Template       ------------------------

@@ -38,7 +38,6 @@ class RepoDisplay extends Component {
     const gitGraph = new GitGraph(gitGraphOptions);
     const branches = {};
     JSONcommits.reverse().forEach((commitObj) => {
-      console.log('obj', commitObj);
       // this is a commit
       if (commitObj.parents.length === 0) {
         const master = gitGraph.branch('master');
@@ -50,7 +49,6 @@ class RepoDisplay extends Component {
         // check if its a new branch
         if (!branches[commitObj.branch]) {
           branches[commitObj.branch] = gitGraph.branch(commitObj.branch);
-          // console.log(commitObj.branch,"commitObj.branch");
         }
 
         branches[commitObj.branch].commit({

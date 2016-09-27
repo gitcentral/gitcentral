@@ -154,7 +154,6 @@ export default class GithubApiInterface {
      this.JSONCommits.map((commit) => {
        return this.analyzeCommit(commit);
      });
-     console.log('commits!', this.JSONCommits);
    }
 
   /**
