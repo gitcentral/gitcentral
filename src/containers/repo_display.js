@@ -21,7 +21,7 @@ class RepoDisplay extends Component {
     } else {
       JSONcommits = this.props.currentRepo;
     }
-    
+
 
     /**
      * Loop through each item in commit and render each commit in gitGraph
@@ -30,7 +30,6 @@ class RepoDisplay extends Component {
     let branches = {};
     JSONcommits.reverse().forEach((commitObj)=>{
       //this is a commit
-      console.log(commitObj)
       if(commitObj.parents.length===0){
         const master = gitGraph.branch('master');
         master.commit({message: commitObj.branch +" = "+ commitObj.commit.message, sha1: commitObj.sha});
@@ -41,7 +40,7 @@ class RepoDisplay extends Component {
           branches[commitObj.branch] = gitGraph.branch(commitObj.branch);
           // console.log(commitObj.branch,"commitObj.branch");
         }
-        
+
         branches[commitObj.branch].commit({
           sha1 : commitObj.sha.slice(0,5),
           message : commitObj.branch +" = "+ commitObj.commit.message,

@@ -58,8 +58,6 @@ export default class GithubApiInterface {
   addBranchName() {
     const sortedBranches = this.JSONBranches.map(branch => {
 
-      console.log(branch)
-
       const length = this.visitParents(this.SHALookup[branch.commit.sha], () => 1);
       return { sha: branch.commit.sha, name : branch.name, length : length };
     }).sort((branchA, branchB) => {
@@ -68,19 +66,16 @@ export default class GithubApiInterface {
       if (branchB.name === 'master') { return -1; }
       return branchA.length - branchB.length;
     });
-    console.log(sortedBranches);
     sortedBranches.forEach((branch) => {
       const commit = this.branchLookup[branch.sha];
       this.nameBranch(commit);
     });
 
-    console.log()
   }
 
   visitParents(commit, cb){
-    if (!commit) return;
+    if (!commit) return 0;
     let val = cb(commit);
-    console.log(commit)
     if (!commit.parents || !commit.parents.length) { return val; }
     val += this.visitParents(this.SHALookup[commit.parents[0].sha], cb);
     return val;
