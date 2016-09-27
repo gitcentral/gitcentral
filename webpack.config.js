@@ -1,8 +1,7 @@
 var path = require('path');
 module.exports = {
   entry: [
-    'babel-regenerator-runtime',
-    './src/index.js',
+    path.join(__dirname, '/src/index.js'),
   ],
   devtool: 'source-map',
   output: {
