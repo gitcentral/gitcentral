@@ -69,7 +69,7 @@ $(function() {
       }
 
       function reorder(lookup, scale) {
-        // update to render longest row last **need to generate which is the longest
+        // update to render longest row last **need to generate which is the longest <- FINISH
 
         // guarantee master is in first row
         const lookupTable = { master : 1 * scale };
@@ -125,7 +125,6 @@ $(function() {
                const edge = { data : { id : [source, target].join('_'), source : source, target : target } };
                parentEdges.push(edge);
                if (edge.data.id === '807ba7177e64eec020d41a0b59cd11224af8f4fe_a56e73eb92e51b89302a3c802313722831ffcc28'){
-                 console.log('help!', target, source);
                }
                return parentEdges;
              }, edges);
