@@ -14,6 +14,8 @@ export default class GithubApiInterface {
     this.addBranchName();
     // json obj transformation
     this.addOrphanBranch();
+    this.addGitCommands();
+    this.formatMessages();
   }
   /**
    * Set up table to look up commit objects by sha
@@ -144,6 +146,80 @@ export default class GithubApiInterface {
         .map(this.getRightParent.bind(this))
         .map(this.renameOrphanParent.bind(this));
   }
+
+  /**
+   * Adds gitCommands property to commit and assigns universal git commands
+   */
+   addGitCommands(){
+     this.JSONCommits.map((commit) => {
+       return this.analyzeCommit(commit);
+     });
+     console.log('commits!', this.JSONCommits);
+   }
+
+  /**
+   * Applies universal git commands and checks if commit is a tail
+   */
+    analyzeCommit(commit){
+      const universalCommands = `Possible git commands:
+      git checkout [branch name]
+      options:
+      -b: create and check out new branch
+      git branch [branch name]
+      options:
+      -d: delete branch
+      -D: delete branch, suppress warnings
+      git tag [tag name]`;
+
+      const tailCommands = [
+        `git reset HEAD(~[n]), [n] = number of commits to reset
+         options:
+         --hard: obliterate last n commits (can't be undone)
+         --soft: remove last n commits but leave working
+                 directory unchanged`,
+        'git merge',
+        'git rebase',
+        'git pull',
+      ];
+
+      commit.gitCommands = universalCommands;
+
+      if (!commit.children.length){
+        this.addTailCommands(commit, tailCommands);
+      }
+      return commit;
+    }
+
+  /**
+   * Add tails commit commands
+   */
+    addTailCommands(commit, ...commands) {
+       commands.forEach(command => commit.gitCommands += ('\n ' + command));
+      return commit;
+    }
+
+    /**
+     * Formats messages
+     */
+    formatMessages(){
+      return this.JSONCommits.map((commitObj) => {
+        commitObj.commit.message = this.addLineBreak(commitObj.commit.message);
+        return commitObj;
+      });
+    }
+
+    addLineBreak(message, tempMessage = ''){
+      let line = [];
+      message.split(' ').forEach((word, i) => {
+        line.push(word);
+        if (i % 5 === 0){
+          tempMessage += `\n${line.join(' ')}`;
+          line = [];
+        }
+      });
+      return tempMessage;
+    }
+
 }
 
 
