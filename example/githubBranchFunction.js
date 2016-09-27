@@ -14,6 +14,7 @@ class GithubApiInterface {
     this.addBranchName();
     // json obj transformation
     this.addOrphanBranch();
+    this.addGitCommands();
   }
   /**
    * Set up table to look up commit objects by sha
@@ -22,7 +23,7 @@ class GithubApiInterface {
   getOrFakeShaToCommitLookup(sha) {
     let commit = this.SHALookup[sha];
     if (commit === undefined) {
-      console.log("Dan: I miss you so much", sha);
+      console.log("undefined commit", sha);
       commit = { sha : sha,
                  commit : { message : "hahaha" },
                  parents : [] };
@@ -78,7 +79,7 @@ class GithubApiInterface {
     });
     sortedBranches.forEach((branch) => {
 
-      const commit = this.getOrFakeShaToCommitLookup(branch.sha);
+      const commit = this.getOrFakeShaToCommitLookup(branch.sha); //here
       this.nameBranch(commit);
     });
   }
@@ -86,7 +87,7 @@ class GithubApiInterface {
   visitParents(commit, cb){
     let val = cb(commit);
     if (commit.parents.length === 0) { return val; }
-    val += this.visitParents(this.getOrFakeShaToCommitLookup(commit.parents[0].sha), cb);
+    val += this.visitParents(this.getOrFakeShaToCommitLookup(commit.parents[0].sha), cb); //here
     return val;
   }
 
@@ -153,7 +154,66 @@ class GithubApiInterface {
         .map(this.getRightParent.bind(this))
         .map(this.renameOrphanParent.bind(this));
   }
+
+/**
+ * Adds gitCommands property to commit and assigns universal git commands
+ */
+ addGitCommands(){
+   this.JSONCommits.map((commit) => {
+     return analyzeCommit(commit);
+   });
+ }
+
+/**
+ * Applies universal git commands and checks if commit is a tail
+ */
+  analyzeCommit(commit){
+    const universalCommands = [];
+    commit.gitCommands = universalCommands.slice(0);
+    if (!commit.children.length){
+      addTailCommands(commit);
+    }
+    return commit;
+  }
+
+/**
+ * Add tails node commands
+ */
+  addTailCommands(commit) {
+    const tailNodeCommands = [
+      `git reset HEAD(~[n]), [n] = number of commits to reset
+       options:
+       --hard: obliterate last n commits (can't be undone)
+       --soft: remove last n commits but leave working
+               directory unchanged`,
+      'git merge',
+      'git rebase',
+      'git pull',
+    ];
+
+    commit.gitCommands = commit.gitCommands.concat(tailNodeCommands);
+    return commit;
+  }
 }
+
+/*
+function makeConfig(branch) {
+  return {
+    dotColor: branch.color,
+    // ${timestamp()} <-- replace w/ library
+    gitCommands:
+`Possible git commands:
+ git checkout [branch name]
+   options:
+   -b: create and check out new branch
+ git branch [branch name]
+   options:
+   -d: delete branch
+   -D: delete branch, suppress warnings
+ git tag [tag name]`,
+  };
+}
+ */
 
 
 //module.exports = GithubApiInterface;
