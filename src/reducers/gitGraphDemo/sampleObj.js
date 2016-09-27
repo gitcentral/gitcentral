@@ -1,13 +1,13 @@
 import GithubApiInterface from './githubBranchFunction';
 
 var JSONbranches = [
-   // {
-   //     "name": "dev",
-   //     "commit": {
-   //         "sha": "8980523966b0becfbf3f5dc5c115403e08172d1a",
-   //         "url": "https://api.github.com/repos/martinkwan/mangonada/commits/8980523966b0becfbf3f5dc5c115403e08172d1a"
-   //     }
-   // },
+   {
+       "name": "dev",
+       "commit": {
+           "sha": "8980523966b0becfbf3f5dc5c115403e08172d1a",
+           "url": "https://api.github.com/repos/martinkwan/mangonada/commits/8980523966b0becfbf3f5dc5c115403e08172d1a"
+       }
+   },
    // {
    //     "name": "feat/npmScript",
    //     "commit": {
@@ -2140,6 +2140,21 @@ html_url: "https://github.com/martinkwan/mangonada/commit/34a97f7302b2f5666011df
 }
 ]
 },
+
+
+
+{
+  sha: "8980523966b0becfbf3f5dc5c115403e08172d1a",
+  test:"",
+  commit: {
+    message: "TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST",
+  },
+  parents:[],
+},
+
+
+
+
 {
 sha: "34a97f7302b2f5666011df7da2abb7f7213f000f",
 commit: {
