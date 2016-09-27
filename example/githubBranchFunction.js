@@ -194,26 +194,24 @@ class GithubApiInterface {
     commit.gitCommands = commit.gitCommands.concat(tailNodeCommands);
     return commit;
   }
-}
 
-/*
-function makeConfig(branch) {
-  return {
-    dotColor: branch.color,
-    // ${timestamp()} <-- replace w/ library
-    gitCommands:
-`Possible git commands:
- git checkout [branch name]
-   options:
-   -b: create and check out new branch
- git branch [branch name]
-   options:
-   -d: delete branch
-   -D: delete branch, suppress warnings
- git tag [tag name]`,
-  };
-}
- */
+  makeConfig (commit) {
+    return {
+      dotColor: branch.color,
+      // ${timestamp()} <-- replace w/ library
+      gitCommands:
+      `Possible git commands:
+      git checkout [branch name]
+      options:
+      -b: create and check out new branch
+      git branch [branch name]
+      options:
+      -d: delete branch
+      -D: delete branch, suppress warnings
+      git tag [tag name]`,
+    };
+  }
 
+}
 
 //module.exports = GithubApiInterface;
