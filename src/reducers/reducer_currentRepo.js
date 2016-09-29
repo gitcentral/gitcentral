@@ -1,10 +1,10 @@
 import { FETCH_REPO } from '../actions/index';
-import currentRepo from './gitGraphDemo/sampleObj';
+import { JSONCommits, JSONBranches } from './gitGraphDemo/sampleObj';
 
-const INITIAL_STATE = currentRepo;
+const INITIAL_STATE = { JSONCommits, JSONBranches };
 
-export default function(state = INITIAL_STATE, action) {
-  switch(action.type) {
+export default function (state = INITIAL_STATE, action) {
+  switch (action.type) {
     case FETCH_REPO:
       console.log(action.payload.data);
       return action.payload.data;
