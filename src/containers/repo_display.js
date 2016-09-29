@@ -20,16 +20,32 @@ d3.tip = tooltip;
 
 class RepoDisplay extends Component {
   makeD3Display () {
+    //remove all svg elements
+    console.log('Displaying repo');
+    d3.select("svg").remove();
+    $('#container').remove();
+    $('body').append('<div id="container"></div>')
+    // $( ".inner" ).append( "<p>Test</p>" );
 
+
+    console.log('Should be removed');
+    console.log('this: ', this);
+    console.log('this.props: ', this.props);
+    console.log('this.props.currentRepo: ', this.props.currentRepo);
 
     let githubTranslator = new GithubApiInterface( this.props.currentRepo.JSONCommits, this.props.currentRepo.JSONBranches);
 
     const { JSONCommits, SHALookup, branchLookup, JSONBranches } = githubTranslator;
 
+    console.log('line 37')
+
     const checkoutSite = 'https://www.atlassian.com/git/tutorials/viewing-old-commits';
     const branchSite = 'https://www.atlassian.com/git/tutorials/using-branches/';
     const rebaseSite = 'https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase';
     const tagSite = 'https://git-scm.com/book/en/v2/Git-Basics-Tagging';
+
+    console.log('line 44');
+
 
     /**
      * Creat an HTML anchor tag
@@ -204,44 +220,42 @@ class RepoDisplay extends Component {
 
     let container = svg.append('g');
 
+    console.log('line 215');
+
     // Make the lines
     d3commits.forEach(commit => {
       commit.children.forEach(child => {
-        let childObj = githubTranslator.getCommit(child); // HERE
-          //implement something for curved lines here,
-          //maybe in an if-else
-          if(commit.y === childObj.y) {
-            svg.append("line")
-              .attr('class', 'line')
-              .attr("x1", commit.x)
-              .attr("y1", commit.y)
-              .attr("x2", childObj.x)
-              .attr("y2", childObj.y)
-              .attr("stroke-width", 1)
-              .attr('stroke', branchLookup[commit.branch].color) //
-              .attr('fill', branchLookup[commit.branch].color)
-          } else {          // http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
+        let childObj = githubTranslator.getCommit(child);
+        //straight lines
+        if(commit.y === childObj.y) {
+          svg.append("line")
+            .attr('class', 'line')
+            .attr("x1", commit.x)
+            .attr("y1", commit.y)
+            .attr("x2", childObj.x)
+            .attr("y2", childObj.y)
+            .attr("stroke-width", 1)
+            .attr('stroke', branchLookup[commit.branch].color) //
+            .attr('fill', branchLookup[commit.branch].color)
+        } else {
+        //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
           var curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
-                  var edge = d3.select("svg").append('g');
-                  var diagonal = d3.svg.diagonal()
-              .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
-              .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
-              .projection(function(d) { return [d.y, d.x]; });
+          var edge = d3.select("svg").append('g');
+          var diagonal = d3.svg.diagonal()
+            .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
+            .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
+            .projection(function(d) { return [d.y, d.x]; });
              
           d3.select("g")
-                .datum(curveData)
-              .append("path")
-                .attr("class", "line")
-                .attr("d", diagonal)
-                .attr("stroke-width", 1)
-              .attr('stroke', branchLookup[commit.branch].color)
-              .attr('fill', 'none')
-                // .attr("stroke", "#444")
-                //   .attr("stroke-width", 2)
-                //   .attr("fill", "none");
-                }
-
-          });
+              .datum(curveData)
+            .append("path")
+              .attr("class", "line")
+              .attr("d", diagonal)
+              .attr("stroke-width", 1)
+            .attr('stroke', branchLookup[commit.branch].color)
+            .attr('fill', 'none')
+        }
+      });
     });
 
     //Make the nodes
