@@ -174,7 +174,7 @@ class RepoDisplay extends Component {
 
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
-      .attr('height', pageHeight / 2)
+      .attr('height', pageHeight)
       .call(zoom);
 
     let container = svg.append('g')
