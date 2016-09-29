@@ -23,6 +23,7 @@ class GithubApiInterface {
    * Initialize children array on each commit object
    */
   setupShaLookup() {
+    console.log('setupShaLookup');
     this.JSONCommits.reduce((results, commit) => {
       results[commit.sha] = commit;
       commit.children = [];
@@ -33,6 +34,7 @@ class GithubApiInterface {
    * Iterate through each commit to link children and parents
    */
   addChildren() {
+    console.log('addChildren');
     this.JSONCommits.forEach((commit) => {
       commit.parents.forEach((parentInfo) => {
         const parentCommit = this.SHALookup[parentInfo.sha];
@@ -44,6 +46,7 @@ class GithubApiInterface {
   }
 
   getParentShas(commit) {
+    console.log('getParentShas');
     return commit.parents.map( parent => parent.sha);
   }
 
@@ -51,6 +54,7 @@ class GithubApiInterface {
    * Set up table to look up branch objects by sha
    */
   setupBranchLookup() {
+    console.log('setupBranchLookup');
     this.JSONBranches.reduce((results, branch) => {
       const branchLookup = results;
       branchLookup[branch.commit.sha] = branch;
@@ -61,13 +65,12 @@ class GithubApiInterface {
   /**
    * Iterate through each branch that is not master, and name branches
    */
-  addBranchName() {
+   addBranchName() {
     const branches = this.JSONBranches.filter((b) => { return (b.name !== "master"); });
-    // console.log("non-master branches", branches);
+
     const sortedBranches = branches.map((branch) => {
-      // console.log("sort branches", branch);
       const length = this.visitParents(this.SHALookup[branch.commit.sha], () => 1);
-      return { sha: branch.commit.sha, name : branch.name, length : length };
+      return { sha: branch.commit.sha, name: branch.name, length: length };
     }).sort((branchA, branchB) => {
       return branchA.length - branchB.length;
     });
@@ -91,7 +94,8 @@ class GithubApiInterface {
   }
 
   visitParents(commit, cb){
-    if (!commit) return 0;
+    console.log('visitParents', commit);
+    if (commit === undefined) return 0;
     let val = cb(commit);
     if (!commit.parents || !commit.parents.length) { return val; }
     val += this.visitParents(this.SHALookup[commit.parents[0].sha], cb);
@@ -120,14 +124,14 @@ class GithubApiInterface {
   }
 
   nameBranch({ name, commit: { sha } }) {
-
     const commit = this.SHALookup[sha];
+
     const checkBranchName = (commitObj) => {
       if (commitObj !== undefined) {
         commitObj.branch = name;
         commitObj.parents.forEach(parent => checkBranchName(this.SHALookup[parent.sha]));
       }
-    }
+    };
     checkBranchName(commit);
   }
 
@@ -136,6 +140,7 @@ class GithubApiInterface {
    * [Filter function]
    */
   filter2Parents(JSONCommitObj) {
+    console.log('filter2Parents');
     return JSONCommitObj.parents.length > 1;
   }
   /**
@@ -143,6 +148,7 @@ class GithubApiInterface {
    * [Map function]
    */
   getRightParent(JSONCommitObj) {
+    console.log('getRightParent');
     return this.SHALookup[JSONCommitObj.parents[1].sha];
   }
   /**
@@ -150,6 +156,7 @@ class GithubApiInterface {
    * [Map function]
    */
   renameOrphanParent(JSONCommitObj) {
+    console.log('renameOrphanParent');
     if (JSONCommitObj.branch) { return; }
     if (JSONCommitObj.children.length > 1) {
       return;
@@ -185,6 +192,7 @@ class GithubApiInterface {
    * Alter JSONCommits object to have Orphan branch names
    */
   addOrphanBranch() {
+    console.log('addOrphanBranch');
     this.JSONCommits
         .filter(this.filter2Parents)
         .map(this.getRightParent.bind(this))
@@ -195,16 +203,19 @@ class GithubApiInterface {
    * Adds gitCommands property to commit and assigns universal git commands
    */
    addGitCommands(){
+     console.log('addGitCommands');
      this.JSONCommits.map((commit) => {
        return this.analyzeCommit(commit);
      });
-     // console.log('commits!', this.JSONCommits);
    }
 
   /**
-   * Applies universal git commands and checks if commit is a tail
+   * [AnalyzeCommit] Applies universal git commands and checks if commit is a tail
+   * [params] commit object
+   * [return value] modified commit
    */
     analyzeCommit(commit){
+      console.log('analyzeCommit');
       const universalCommands = `Possible git commands:
       git checkout [branch name]
       options:
@@ -235,17 +246,22 @@ class GithubApiInterface {
     }
 
   /**
-   * Add tails commit commands
+   * [addTailCommands] Adds possible git commands for most recent branch nodes
+   * to git menu
+   * [params] commit, list of commands
+   * [return value] modified commit
    */
     addTailCommands(commit, ...commands) {
+      console.log('addTailCommands');
        commands.forEach(command => commit.gitCommands += ('\n ' + command));
       return commit;
     }
 
     /**
-     * Formats messages
+     * [formatMessages]Formats messages
      */
     formatMessages(){
+      console.log('formatMessages');
       return this.JSONCommits.map((commitObj) => {
         commitObj.commit.message = this.addLineBreak(commitObj.commit.message);
         return commitObj;
@@ -253,6 +269,7 @@ class GithubApiInterface {
     }
 
     addLineBreak(message, tempMessage = ''){
+      console.log('addLineBreak');
       let line = [];
       message.split(' ').forEach((word, i) => {
         line.push(word);
