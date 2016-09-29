@@ -1,8 +1,63 @@
-.reactContainer {
-  position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
+.commit {
+  /*fill: lightsteelblue;*/
+  /*stroke: steelblue;*/
+  stroke-width: 1.5px;
 }
 
-#git {
-  top: 50%;
+.selected {
+  fill: red;
+  stroke: brown;
+}
+
+.line {
+  /*stroke: lightsteelblue;*/
+  stroke-width: 5px;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: left;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 5px;
+}
+
+#chart div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: black;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: #E5E7E9;
+  color: black;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: #E5E7E9;
+  position: absolute;
+  pointer-events: none;
+}
+
+.d3-tip.s:after {
+  content: "\25B2";
+  margin: 0 0 1px 0;
+  top: -8px;
+  left: 0;
+  text-align: center;
 }

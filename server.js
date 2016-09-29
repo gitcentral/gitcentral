@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const webpackMiddleware = require('webpack-dev-middleware');
 const webpackConfig = require('./webpack.config');
 const api = require('./api');
+
 const app = express();
 const port = process.env.PORT || 8080;
 
@@ -26,10 +27,10 @@ app.use(express.static(__dirname + '/'));
 
 app.use('/api', api);
 
-app.get('*', function(req, res){
+app.get('*', function (req, res) {
   console.log('Serving /');
   res.sendFile(__dirname + '/index.html');
 });
 
-const server = app.listen(port);
+app.listen(port);
 console.log('Listening on port ', port);

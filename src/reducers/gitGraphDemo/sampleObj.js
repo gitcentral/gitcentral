@@ -1,6 +1,6 @@
 import GithubApiInterface from './githubBranchFunction';
 
-var JSONbranches = [
+export const JSONBranches = [
    {
        "name": "dev",
        "commit": {
@@ -59,7 +59,7 @@ var JSONbranches = [
    }
 ];
 
-var JSONcommits = [
+export const JSONCommits = [
 {
 sha: "55aa2b84338818ebd2d2438912c9e4282b56bb2a",
 commit: {
@@ -2143,17 +2143,6 @@ html_url: "https://github.com/martinkwan/mangonada/commit/34a97f7302b2f5666011df
 
 
 
-{
-  sha: "8980523966b0becfbf3f5dc5c115403e08172d1a",
-  test:"",
-  commit: {
-    message: "TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST",
-  },
-  parents:[],
-},
-
-
-
 
 {
 sha: "34a97f7302b2f5666011df7da2abb7f7213f000f",
@@ -2228,10 +2217,10 @@ html_url: "https://github.com/martinkwan/mangonada/commit/9057b7f0b88d073fcc34af
 ];
 
 
-let githubTranslator = new GithubApiInterface(JSONcommits, JSONbranches);
-JSONcommits = githubTranslator.JSONCommits;
-export const SHALookup = githubTranslator.SHALookup;
-var branchLookUp = githubTranslator.branchLookUp;
+// let githubTranslator = new GithubApiInterface(JSONcommits, JSONbranches);
+// JSONcommits = githubTranslator.JSONCommits;
+// export const SHALookup = githubTranslator.SHALookup;
+// var branchLookUp = githubTranslator.branchLookUp;
 
 // export SHALookup;
-export default JSONcommits;
+// export default JSONcommits;

@@ -1,3 +1,4 @@
+/* eslint-disable */
 const express = require('express');
 const request = require('request-promise');
 
@@ -61,7 +62,10 @@ router.route('/repos/:userName/:repoName')
         return container;
       }, requestAllCommits);
 
-      res.status(200).json([branches, requestAllCommits.commits]);
+      res.status(200).json({
+        JSONBranches: branches,
+        JSONCommits: requestAllCommits.commits
+      });
     }, () => {
       res.status(401).end('noooooo');
     });
