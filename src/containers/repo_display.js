@@ -20,6 +20,8 @@ d3.tip = tooltip;
 
 class RepoDisplay extends Component {
   makeD3Display () {
+
+
     let githubTranslator = new GithubApiInterface( this.props.currentRepo.JSONCommits, this.props.currentRepo.JSONBranches);
 
     const { JSONCommits, SHALookup, branchLookup } = githubTranslator;
@@ -72,8 +74,17 @@ class RepoDisplay extends Component {
 
     //https://bl.ocks.org/mbostock/6123708
     function zoomed() {
-      svg.selectAll('g').attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-      svg.selectAll('line').attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+      const translate = d3.event.translate;
+      const scale = d3.event.scale;
+
+      svg.selectAll('g').attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+      svg.selectAll('line').attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
+      svg.selectAll('.tooltip').attr('transform', `translate(${translate})`);
+      infoTip.show();
+      headTip.hide();
+
+      d3.selectAll('dt-tip')
+        .attr('opacity', 0);
     }
 
     function dragstarted(d) {
@@ -109,7 +120,7 @@ class RepoDisplay extends Component {
         "#17A589",  //aqua
         '#839192',  //grey
         '#000000',  //black
-        ];
+      ];
 
       let i = 0;
       for(let branch in branchLookup) {
@@ -158,6 +169,19 @@ class RepoDisplay extends Component {
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
 
+    //tooltip: http://bl.ocks.org/Caged/6476579
+    const headTip = d3.tip()
+      .attr('class', 'd3-tip')
+      .direction('n')
+      .offset([-10, 0])
+      .html('HEAD');
+
+    const infoTip = d3.tip()
+      .attr('class', 'd3-tip')
+      .direction('s')
+      .offset([10, 0])
+      // .html('placeholder');
+
     //https://bl.ocks.org/mbostock/6123708
     const zoom = d3.behavior.zoom()
       .scaleExtent([1, 10])
@@ -169,21 +193,10 @@ class RepoDisplay extends Component {
         .on("drag", dragged)
         .on("dragend", dragended);
 
-    //tooltip: http://bl.ocks.org/Caged/6476579
-    const headTip = d3.tip()
-      .attr('class', 'd3-tip')
-      .offset([-10, 0])
-      .html('HEAD');
-
-    const infoTip = d3.tip()
-      .attr('class', 'd3-tip')
-      .direction('s')
-      .offset([10, 0])
-      .html('placeholder');
-
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
       .attr('height', pageHeight)
+      .on('click', infoTip.hide)
       .call(zoom);
 
     svg.call(headTip);
@@ -197,15 +210,36 @@ class RepoDisplay extends Component {
         let childObj = githubTranslator.getCommit(child); // HERE
           //implement something for curved lines here,
           //maybe in an if-else
-          svg.append("line")
-            .attr('class', 'line')
-            .attr("x1", commit.x)
-            .attr("y1", commit.y)
-            .attr("x2", childObj.x)
-            .attr("y2", childObj.y)
-            .attr("stroke-width", 1)
-            .attr('stroke', branchLookup[commit.branch].color) //
-            .attr('fill', branchLookup[commit.branch].color)
+          if(commit.y === childObj.y) {
+            svg.append("line")
+              .attr('class', 'line')
+              .attr("x1", commit.x)
+              .attr("y1", commit.y)
+              .attr("x2", childObj.x)
+              .attr("y2", childObj.y)
+              .attr("stroke-width", 1)
+              .attr('stroke', branchLookup[commit.branch].color) //
+              .attr('fill', branchLookup[commit.branch].color)
+          } else {          // http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
+          var curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
+                  var edge = d3.select("svg").append('g');
+                  var diagonal = d3.svg.diagonal()
+              .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
+              .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
+              .projection(function(d) { return [d.y, d.x]; });
+             
+          d3.select("g")
+                .datum(curveData)
+              .append("path")
+                .attr("class", "line")
+                .attr("d", diagonal)
+                .attr("stroke-width", 1)
+              .attr('stroke', branchLookup[commit.branch].color)
+              .attr('fill', 'none')
+                // .attr("stroke", "#444")
+                //   .attr("stroke-width", 2)
+                //   .attr("fill", "none");
+                }
 
           });
     });
@@ -250,7 +284,10 @@ Author:  ${authorName}${universalCommands}`;
 
         infoTip.html(`<pre>${tooltipContent}</pre>`);
         infoTip.show();
-      });
+      })
+      .on('click', headTip.show);
+
+
 
     ////////////////////////////////////////////////////////////////////
     //Charts: https://bost.ocks.org/mike/bar/
