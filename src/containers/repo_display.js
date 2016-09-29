@@ -16,12 +16,10 @@ import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
 import d3 from '../reducers/gitD3/d3.js';
 
 class RepoDisplay extends Component {
-  makeGitGraph () {
+  makeD3Display () {
     let githubTranslator = new GithubApiInterface( this.props.currentRepo.JSONCommits, this.props.currentRepo.JSONBranches);
 
-    const JSONCommits = githubTranslator.JSONCommits;
-    const SHALookup = githubTranslator.SHALookup;
-    const branchLookup = githubTranslator.branchLookupByName;
+    const { JSONCommits, SHALookup, branchLookup } = githubTranslator;
 
     const checkoutSite = 'https://www.atlassian.com/git/tutorials/viewing-old-commits';
     const branchSite = 'https://www.atlassian.com/git/tutorials/using-branches/';
@@ -154,12 +152,10 @@ class RepoDisplay extends Component {
     const d3commits = JSONCommits;
     addCoordinates(d3commits);
     addColors(d3commits);
-    console.log(branchLookup);
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
 
     //https://bl.ocks.org/mbostock/6123708
-    console.log('-->', d3);
     const zoom = d3.behavior.zoom()
       .scaleExtent([1, 10])
       .on("zoom", zoomed);
@@ -169,8 +165,6 @@ class RepoDisplay extends Component {
         .on("dragstart", dragstarted)
         .on("drag", dragged)
         .on("dragend", dragended);
-
-    console.log(d3commits);
 
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
@@ -224,21 +218,21 @@ class RepoDisplay extends Component {
         const commitLinkPrefix = `https://github.com/mangonada/mangonada/commit/`;
         const universalCommands = `
 
-    Possible git commands:
-      ${makeAnchor('git checkout', checkoutSite)} ${sha}
-        options:
-          -b: create and check out new branch
-      ${makeAnchor('git branch', branchSite)} [branch name]
-        options:
-          -d: delete branch
-          -D: delete branch, suppress warnings
-      ${makeAnchor('git tag', tagSite)} [tag name]`;
+Possible git commands:
+  ${makeAnchor('git checkout', checkoutSite)} ${sha}
+    options:
+      -b: create and check out new branch
+  ${makeAnchor('git branch', branchSite)} [branch name]
+    options:
+      -d: delete branch
+      -D: delete branch, suppress warnings
+  ${makeAnchor('git tag', tagSite)} [tag name]`;
 
-        const tooltipContent =
-    `Branch:  ${makeAnchor(branch, branchLinkPrefix + branch)}
-    Sha:     ${makeAnchor(sha.slice(0, 9) + '...', commitLinkPrefix + sha)}
-    Message: ${commit.commit.message}
-     -${authorName + universalCommands}`;
+      const tooltipContent =
+  `Branch:  ${makeAnchor(branch, branchLinkPrefix + branch)}
+Sha:     ${makeAnchor(sha.slice(0, 9) + '...', commitLinkPrefix + sha)}
+Message: ${commit.commit.message}
+Author:  ${authorName}${universalCommands}`;
 
         div.transition()
           .duration(500)
@@ -251,10 +245,6 @@ class RepoDisplay extends Component {
         div.html(`<pre>${tooltipContent}</pre>`)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY + 20) + "px");
-      })
-      //potentially remove this. even if mouse is not removed, tooltip disappears
-      .on('mouseout', () => {
-        setTimeout(() => div.transition().duration(500).style("opacity", 0), 5000);
       });
 
     ////////////////////////////////////////////////////////////////////
@@ -328,13 +318,12 @@ class RepoDisplay extends Component {
     //       }
     //     });
     // }
-    console.log('finished');
   }
 
   render() {
     return (
       <div>
-        {this.makeGitGraph()}
+        {this.makeD3Display()}
       </div>
     );
   }
