@@ -62,8 +62,6 @@ router.route('/repos/:userName/:repoName')
         return container;
       }, requestAllCommits);
 
-      console.log(requestAllCommits.commits);
-
       res.status(200).json({
         JSONBranches: branches,
         JSONCommits: requestAllCommits.commits
