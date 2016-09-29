@@ -23,9 +23,9 @@ $(function() {
     const uri = `/api/repos/${user}/${repo}`;
     // console.log(123, user, repo, uri);
     $.get(uri, function (data) {
-      console.log(456, data[0], data[1]);
-      const tx = new GithubApiInterface(data[1], data[0]);
-      console.log(789, tx.JSONBranches, tx.JSONCommits);
+      // console.log(456, data.JSONBranches, data.JSONCommits);
+      const tx = new GithubApiInterface(data.JSONCommits, data.JSONBranches);
+      // console.log(789, tx.JSONBranches, tx.JSONCommits);
       const rx = new CytoGraph(tx.JSONBranches, tx.JSONCommits);
       rx.addGraph('cy');
     });
@@ -73,7 +73,7 @@ $(function() {
 
         const node = { data : { id : sha1, branch: branch, name : sha5, message: msg0 },
                        position : { x : -x, y: -y } };
-        console.log(node, columnPosition, jsonCommit);
+        // console.log(node, columnPosition, jsonCommit);
         // good node: 807ba7177e64eec020d41a0b59cd11224af8f4fe
         // bad node: a56e73eb92e51b89302a3c802313722831ffcc28
         return node;

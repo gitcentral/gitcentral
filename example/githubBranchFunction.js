@@ -161,8 +161,9 @@ class GithubApiInterface {
     if (JSONCommitObj.children.length > 1) {
       return;
     }
-    let child = JSONCommitObj.children.reduce(this.findChildrenBranchName, child);
-    const orphanBranchName = child.branch + "[" + JSONCommitObj.sha.slice(0, 5) + "]";
+    let child = JSONCommitObj.children.reduce(this.findChildrenBranchName);
+    const uniqueBranchName = child.branch || "orphan";
+    const orphanBranchName = uniqueBranchName + "[" + JSONCommitObj.sha.slice(0, 5) + "]";
     JSONCommitObj.branch =  orphanBranchName;
     const checkOrphan = (commitObj, branchName) => {
       if (commitObj === undefined) {
