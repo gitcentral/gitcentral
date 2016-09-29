@@ -65,7 +65,7 @@ $(function() {
         const sha1 = jsonCommit.sha;
         const branch = jsonCommit.branch;
         const msg0 = jsonCommit.commit.message.slice(0, 10);
-        const sha5 = branch + "[" +sha1.slice(0, 5) + "]";
+        const sha5 = branch + "/" +sha1.slice(0, 5);
 
 
         const x = (index  + 1) * scale;

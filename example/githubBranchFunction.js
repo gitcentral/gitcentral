@@ -13,79 +13,68 @@ class GithubApiInterface {
     this.setupBranchLookup();
     this.addChildren();
     this.addBranchName();
+
     // json obj transformation
     this.addOrphanBranch();
-    this.addGitCommands();
-    this.formatMessages();
   }
   /**
    * Set up table to look up commit objects by sha
    * Initialize children array on each commit object
    */
   setupShaLookup() {
-    console.log('setupShaLookup');
-    this.JSONCommits.reduce((results, commit) => {
-      results[commit.sha] = commit;
-      commit.children = [];
-      return results;
-    }, this.SHALookup);
+    this.JSONCommits.forEach(commit => this.SHALookup[commit.sha] = commit);
   }
-  /**
-   * Iterate through each commit to link children and parents
-   */
+
+  //Iterate through each commit to link children and parents
   addChildren() {
-    console.log('addChildren');
-    this.JSONCommits.forEach((commit) => {
-      commit.parents.forEach((parentInfo) => {
-        const parentCommit = this.SHALookup[parentInfo.sha];
+    this.JSONCommits.forEach(commit => commit.children = []);
+    this.JSONCommits.forEach(commit => {
+      commit.parents.forEach(parent => {
+        const parentCommit = this.SHALookup[parent.sha];
         if (parentCommit !== undefined) {
-          parentCommit.children.push(commit.sha);
+            parentCommit.children.push(commit.sha);
         }
       });
     });
   }
 
-  getParentShas(commit) {
-    console.log('getParentShas');
-    return commit.parents.map( parent => parent.sha);
+  getCommit(sha){
+    return this.SHALookup[sha];
   }
 
-  /**
-   * Set up table to look up branch objects by sha
-   */
-  setupBranchLookup() {
-    console.log('setupBranchLookup');
-    this.JSONBranches.reduce((results, branch) => {
-      const branchLookup = results;
-      branchLookup[branch.commit.sha] = branch;
-      return branchLookup;
-    }, this.branchLookup);
+  setupBranchLookup(){
+    this.JSONBranches.forEach(branch => this.branchLookup[branch.name] = branch);
+  }
+
+  getParentShas(commit) {
+    return commit.parents.map(parent => parent.sha);
   }
 
   /**
    * Iterate through each branch that is not master, and name branches
    */
    addBranchName() {
-    const branches = this.JSONBranches.filter((b) => { return (b.name !== "master"); });
+    const nonMasterBranches = this.JSONBranches.filter((b) => { return (b.name !== "master"); });
 
-    const sortedBranches = branches.map((branch) => {
+    const sortedBranches = nonMasterBranches.map((branch) => {
       const length = this.visitParents(this.SHALookup[branch.commit.sha], () => 1);
       return { sha: branch.commit.sha, name: branch.name, length: length };
     }).sort((branchA, branchB) => {
       return branchA.length - branchB.length;
     });
     sortedBranches.forEach((branch) => {
-      const commit = this.branchLookup[branch.sha];
+      const commit = this.branchLookup[branch.name];
       this.nameMainBranch(commit);
     });
 
     const masterBranch = this.JSONBranches.filter((b) => { return (b.name === "master"); })[0];
     this.nameMainBranch(masterBranch);
-
+    sortedBranches.push(masterBranch);
     // rename orphan branches
     this.JSONCommits.filter(this.filter2Parents)
         .map(this.setOrphanName);
-    this.JSONBranches = sortedBranches; 
+    this.JSONBranches = sortedBranches;
+    this.setupBranchLookup();
   }
 
   setOrphanName(commit) {
@@ -157,6 +146,12 @@ class GithubApiInterface {
    * Rename Orphan branches
    * [Map function]
    */
+  urlParser(url, replacementSha){
+    let splitUrl = url.split('/');
+    splitUrl[splitUrl.length - 1] = replacementSha;
+    return splitUrl.join('/');
+  }
+
   renameOrphanParent(JSONCommitObj) {
     const rightParentCommitObj = this.getRightParent(JSONCommitObj);
     if (rightParentCommitObj.branch) { return; }
@@ -166,8 +161,9 @@ class GithubApiInterface {
 
     const tempBranchName = JSONCommitObj.branch ||"orphan";
     const orphanBranchName = tempBranchName + "[" + rightParentCommitObj.sha.slice(0, 5) + "]";
-    this.JSONBranches[rightParentCommitObj.sha] = { name : orphanBranchName,
-                                                    commit : { sha : rightParentCommitObj.sha } };
+    const orphanBranchObj = { name : orphanBranchName, commit : { sha : rightParentCommitObj.sha } };
+    this.JSONBranches[rightParentCommitObj.sha] = orphanBranchObj;
+    this.branchLookup[orphanBranchName] = orphanBranchObj;
     rightParentCommitObj.branch =  orphanBranchName;
 
     const checkOrphan = (commitObj, branchName) => {
@@ -182,14 +178,6 @@ class GithubApiInterface {
     checkOrphan(leftParent, orphanBranchName);
   }
 
-  findChildrenBranchName(ans, kid) {
-    const kidCommit =  this.SHALookup[kid];
-    if (kidCommit && kidCommit.parents.includes(kid)) {
-      return kidCommit;
-    } else {
-      return ans;
-    }
-  }
   /**
    * Alter JSONCommits object to have Orphan branch names
    */
@@ -253,32 +241,7 @@ class GithubApiInterface {
    */
     addTailCommands(commit, ...commands) {
       console.log('addTailCommands');
-       commands.forEach(command => commit.gitCommands += ('\n ' + command));
+      commands.forEach(command => commit.gitCommands += ('\n ' + command));
       return commit;
     }
-
-    /**
-     * [formatMessages]Formats messages
-     */
-    formatMessages(){
-      console.log('formatMessages');
-      return this.JSONCommits.map((commitObj) => {
-        commitObj.commit.message = this.addLineBreak(commitObj.commit.message);
-        return commitObj;
-      });
-    }
-
-    addLineBreak(message, tempMessage = ''){
-      console.log('addLineBreak');
-      let line = [];
-      message.split(' ').forEach((word, i) => {
-        line.push(word);
-        if (i % 5 === 0){
-          tempMessage += `\n${line.join(' ')}`;
-          line = [];
-        }
-      });
-      return tempMessage;
-    }
-
 }

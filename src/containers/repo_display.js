@@ -24,7 +24,7 @@ class RepoDisplay extends Component {
 
     let githubTranslator = new GithubApiInterface( this.props.currentRepo.JSONCommits, this.props.currentRepo.JSONBranches);
 
-    const { JSONCommits, SHALookup, branchLookup } = githubTranslator;
+    const { JSONCommits, SHALookup, branchLookup, JSONBranches } = githubTranslator;
 
     const checkoutSite = 'https://www.atlassian.com/git/tutorials/viewing-old-commits';
     const branchSite = 'https://www.atlassian.com/git/tutorials/using-branches/';
