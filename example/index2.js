@@ -38,31 +38,42 @@ $(function() {
       this.JSONbranches = JSONbranches;
       this.JSONcommits = JSONcommits;
 
-      this.cytoCols = this.JSONbranches.reduce(this.setupMajorBranch, {});
-      this.cytoNodes = this.JSONcommits.reverse().map(this.mapNode(this.cytoCols));
+      // console.log("json commits", this.JSONcommits);
+      this.cytoBranches = this.JSONbranches.reduce(this.setupMajorBranch, {});
+      this.JSONcommits.map(this.addSubBranchLookup(this.cytoBranches));
+      this.cytoNodes = this.JSONcommits.reverse().map(this.mapNode(this.cytoBranches));
       this.cytoEdges = this.JSONcommits.reduce(this.mapEdge, []); // <--
-      console.log("cols ", this.cytoCols);
+      console.log("branches ", this.cytoBranches);
       console.log("nodes", this.cytoNodes);
       console.log("edges", this.cytoEdges);
     }
 
-    mapNode(cytoCols) {
+    addSubBranchLookup(branchLookup) {
+      const scale = 100;
+      return function(commit) {
+        if (branchLookup[commit.branch] === undefined) {
+          branchLookup[commit.branch] = Object.keys(branchLookup).length * scale;
+        }
+      };
+    }
+    mapNode(cytoBranches) {
 
       const scale = 100;
-      const columnPosition = reorder(cytoCols, scale);
+      // const columnPosition = reorder(cytoBranches, scale);
+      const columnPosition = cytoBranches;
       return function(jsonCommit, index) {
         const sha1 = jsonCommit.sha;
         const branch = jsonCommit.branch;
         const msg0 = jsonCommit.commit.message.slice(0, 10);
-        const sha5 = branch;// + ': ' + sha1.slice(0, 5);
+        const sha5 = branch + "[" +sha1.slice(0, 5) + "]";
 
 
         const x = (index  + 1) * scale;
-        const y = -columnPosition[branch];
+        const y = columnPosition[branch];
 
         const node = { data : { id : sha1, branch: branch, name : sha5, message: msg0 },
-                       position : { x : x, y: y } };
-
+                       position : { x : -x, y: -y } };
+        console.log(node, columnPosition, jsonCommit);
         // good node: 807ba7177e64eec020d41a0b59cd11224af8f4fe
         // bad node: a56e73eb92e51b89302a3c802313722831ffcc28
         return node;
@@ -119,13 +130,11 @@ $(function() {
 
     mapEdge(edges, jsonCommit) {
       return jsonCommit.parents.reduce(function (parentEdges, parent) {
-               const target = parent.sha;
-               const source = jsonCommit.sha;
-
+               const source = parent.sha;
+               const target = jsonCommit.sha;
+               // console.log("source", source, "target", target);
                const edge = { data : { id : [source, target].join('_'), source : source, target : target } };
                parentEdges.push(edge);
-               if (edge.data.id === '807ba7177e64eec020d41a0b59cd11224af8f4fe_a56e73eb92e51b89302a3c802313722831ffcc28'){
-               }
                return parentEdges;
              }, edges);
 
@@ -135,6 +144,12 @@ $(function() {
       const cy_id = document.getElementById(elementId);
       const elements = this.cytoNodes.concat(this.cytoEdges);
       const layout =  { name: 'preset' };
+      const nodeStyles = {
+        "master" : { selector : "master" , 'background-color' : '#999' },
+        "hey" : { selector : "hey", 'background-color' : '#7F7' },
+        "hello" : { selector : "hello", 'background-color' : '#111' },
+        "onelinechange" : { selector : "onelinechange", 'background-color' : '#f0f' }
+      };
       const styles = [ {
         selector: 'node',
         style: {
@@ -163,7 +178,7 @@ $(function() {
 
       function showEvent(evt){
         const node = evt.cyTarget;
-        console.log( evt.data.foo, node.id(), node.position() );
+        console.log("showEvent", evt.data.foo, node.id(), node.position() );
       }
 
     }
