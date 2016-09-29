@@ -14,6 +14,9 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
 import d3 from '../reducers/gitD3/d3.js';
+import tooltip from '../reducers/gitD3/d3tip.js';
+
+d3.tip = tooltip;
 
 class RepoDisplay extends Component {
   makeD3Display () {
@@ -166,13 +169,27 @@ class RepoDisplay extends Component {
         .on("drag", dragged)
         .on("dragend", dragended);
 
+    //tooltip: http://bl.ocks.org/Caged/6476579
+    const headTip = d3.tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html('HEAD');
+
+    const infoTip = d3.tip()
+      .attr('class', 'd3-tip')
+      .direction('s')
+      .offset([10, 0])
+      .html('placeholder');
+
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
       .attr('height', pageHeight)
       .call(zoom);
 
-    let container = svg.append('g')
-      // .call(drag);
+    svg.call(headTip);
+    svg.call(infoTip);
+
+    let container = svg.append('g');
 
     // Make the lines
     d3commits.forEach(commit => {
@@ -193,11 +210,6 @@ class RepoDisplay extends Component {
           });
     });
 
-    //tooltip: http://bl.ocks.org/d3noob/c37cb8e630aaef7df30d
-    let div = d3.select("body").append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
-
     //Make the nodes
     const nodes = svg.append('g')
       .attr('class', 'commit')
@@ -216,6 +228,8 @@ class RepoDisplay extends Component {
         const { branch, sha, author: { login: authorName } } = commit;
         const branchLinkPrefix = `https://github.com/mangonada/mangonada/commits/`;
         const commitLinkPrefix = `https://github.com/mangonada/mangonada/commit/`;
+        const checkoutButton = `<button class="btn" onClick="headTip.show()">Checkout</button>`;
+
         const universalCommands = `
 
 Possible git commands:
@@ -230,21 +244,12 @@ Possible git commands:
 
       const tooltipContent =
   `Branch:  ${makeAnchor(branch, branchLinkPrefix + branch)}
-Sha:     ${makeAnchor(sha.slice(0, 9) + '...', commitLinkPrefix + sha)}
+Sha:     ${makeAnchor(sha.slice(0, 9) + '...', commitLinkPrefix + sha)}   ${checkoutButton}
 Message: ${commit.commit.message}
 Author:  ${authorName}${universalCommands}`;
 
-        div.transition()
-          .duration(500)
-          .style("opacity", 0);
-
-        div.transition()
-          .duration(200)
-          .style("opacity", .9);
-
-        div.html(`<pre>${tooltipContent}</pre>`)
-          .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY + 20) + "px");
+        infoTip.html(`<pre>${tooltipContent}</pre>`);
+        infoTip.show();
       });
 
     ////////////////////////////////////////////////////////////////////
