@@ -6,7 +6,7 @@ const INITIAL_STATE = { JSONCommits, JSONBranches };
 export default function (state = INITIAL_STATE, action) {
   switch (action.type) {
     case FETCH_REPO:
-      console.log(action.payload.data);
+      console.log('reducer_current repo: ', action.payload.data);
       return action.payload.data;
     default:
       return state;

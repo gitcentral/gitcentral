@@ -15,15 +15,22 @@ import { bindActionCreators } from 'redux';
 import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
 import d3 from '../reducers/gitD3/d3.js';
 import tooltip from '../reducers/gitD3/d3tip.js';
+import _  from 'lodash';
 
 d3.tip = tooltip;
 
 class RepoDisplay extends Component {
   makeD3Display () {
+    // remove all svg elements
+    d3.select("svg").remove();
+    $('#container').remove();
+    $('body').append('<div id="container"></div>')
 
 
-    let githubTranslator = new GithubApiInterface( this.props.currentRepo.JSONCommits, this.props.currentRepo.JSONBranches);
-
+    const githubTranslator = new GithubApiInterface(
+      this.props.currentRepo.JSONCommits,
+      this.props.currentRepo.JSONBranches
+    );
     const { JSONCommits, SHALookup, branchLookup, JSONBranches } = githubTranslator;
 
     const checkoutSite = 'https://www.atlassian.com/git/tutorials/viewing-old-commits';
@@ -46,30 +53,89 @@ class RepoDisplay extends Component {
      * Generate an x-value for each commit. Each commit sent in will
      * have a higher x-value than the one before it. Useful for placing
      * elements in order.
-     * @param  {Object} commit - the commit for which we want an x-value
-     * @return {Number} - x-value
      */
-    function generateX(commit) {
-      return 20 + numCommits++ * 30;
+    function generateX(node) {
+     return 40 + numCommits++ * 30;
     }
 
     /**
-     * Generate a y-value for each commit. Each commit sent in will
-     * have a the save value as the rest of the commits with the same branch
-     * property. Useful for separating branches.
-     *
-     //////////////////////////////////////////////////////////////
-     //NOTE: THIS IS NOT SUITABLE FOR EVERY INPUT. MUST REFACTOR //
-     //////////////////////////////////////////////////////////////
-     *
-     * @param  {Object} commit - the commit for which we want a y-value
-     * @return {Number} - y-value
+     * branchXCoordinates will contain the start and end x-values for
+     * each commit.
+     * @type {Object}
      */
-    function generateY(commit) {
-      if(commit.branch === 'master') {
-        return 360;
+    const branchXCoordinates = {};
+
+    /**
+     * branchYCoordinates will the y-coordinate of each branch.
+     * @type {Object}
+     */
+    const branchYCoordinates = { master: 360 };
+
+    /**
+     * Generate the x and y-coordinates for each commit. Place them as properties
+     * on the commit.
+     */
+    function generateCoordinates() {
+      JSONCommits.forEach(commit => { 
+        commit.x = generateX(commit);
+
+        //if it's the first time we're processing a commit from this branch, create an object
+        if(!branchXCoordinates[commit.branch]) {
+          branchXCoordinates[commit.branch] = { start: commit.x };
+        }
+
+        branchXCoordinates[commit.branch].end = commit.x;
+      });
+
+      /**
+       * List the positions that are taken. Properties of each object are
+       * a y-value and the range (start and end) of the x-values taken for that
+       * y-value.
+       * @type {Array}
+       */
+      const taken = [{ 
+        y: 360,
+        start: branchXCoordinates['master'].start,
+        end: branchXCoordinates['master'].end,
+      }];
+
+      /**
+       * Determine if the y-position we're checking will have overlaps. If so,
+       * put in a different place. Recursively checks the next y-value if the current
+       * one is already taken.
+       * @param  {String} branch - the branch name
+       * @param  {Number} y - the y-value we're checking. Is set automatically,
+       *                    or recursively.
+       * @return {Numver} - the y position.
+       */
+      function getY(branch, y = 360) {
+        let overlap = false;
+        const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
+
+        taken.forEach(set => {
+          if(set.y === y) {
+            if((set.start <= thisBranchStartPoint && thisBranchStartPoint <= set.end) || 
+              (set.start <= thisBranchEndPoint && thisBranchEndPoint <= set.end)) {
+              overlap = true;
+            }
+          }
+        });
+
+        return overlap ? getY(branch, y + 40) : y;
       }
-      return 400;
+
+      //get the y-coordinates for each branch
+      Object.keys(branchLookup).forEach(branch => {
+        if(!branchXCoordinates[branch] || branch === 'master') return;
+
+        const { start, end } = branchXCoordinates[branch];
+        const yCoordinate = getY(branch);
+        branchYCoordinates[branch] = yCoordinate;
+        taken.push({ start, end, y: yCoordinate});
+      });
+
+      //map the branchYCoordinates values over to their commits
+      d3commits.forEach(commit => commit.y = branchYCoordinates[commit.branch]);
     }
 
     //https://bl.ocks.org/mbostock/6123708
@@ -164,7 +230,24 @@ class RepoDisplay extends Component {
     }
 
     const d3commits = JSONCommits;
-    addCoordinates(d3commits);
+    // addCoordinates(d3commits);
+    generateCoordinates();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     addColors(d3commits);
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -204,44 +287,42 @@ class RepoDisplay extends Component {
 
     let container = svg.append('g');
 
+    console.log('line 215');
+
     // Make the lines
     d3commits.forEach(commit => {
       commit.children.forEach(child => {
-        let childObj = githubTranslator.getCommit(child); // HERE
-          //implement something for curved lines here,
-          //maybe in an if-else
-          if(commit.y === childObj.y) {
-            svg.append("line")
-              .attr('class', 'line')
-              .attr("x1", commit.x)
-              .attr("y1", commit.y)
-              .attr("x2", childObj.x)
-              .attr("y2", childObj.y)
-              .attr("stroke-width", 1)
-              .attr('stroke', branchLookup[commit.branch].color) //
-              .attr('fill', branchLookup[commit.branch].color)
-          } else {          // http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
+        let childObj = githubTranslator.getCommit(child);
+        //straight lines
+        if(commit.y === childObj.y) {
+          svg.append("line")
+            .attr('class', 'line')
+            .attr("x1", commit.x)
+            .attr("y1", commit.y)
+            .attr("x2", childObj.x)
+            .attr("y2", childObj.y)
+            .attr("stroke-width", 1)
+            .attr('stroke', branchLookup[commit.branch].color) //
+            .attr('fill', branchLookup[commit.branch].color)
+        } else {
+        //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
           var curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
-                  var edge = d3.select("svg").append('g');
-                  var diagonal = d3.svg.diagonal()
-              .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
-              .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
-              .projection(function(d) { return [d.y, d.x]; });
+          var edge = d3.select("svg").append('g');
+          var diagonal = d3.svg.diagonal()
+            .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
+            .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
+            .projection(function(d) { return [d.y, d.x]; });
              
           d3.select("g")
-                .datum(curveData)
-              .append("path")
-                .attr("class", "line")
-                .attr("d", diagonal)
-                .attr("stroke-width", 1)
-              .attr('stroke', branchLookup[commit.branch].color)
-              .attr('fill', 'none')
-                // .attr("stroke", "#444")
-                //   .attr("stroke-width", 2)
-                //   .attr("fill", "none");
-                }
-
-          });
+              .datum(curveData)
+            .append("path")
+              .attr("class", "line")
+              .attr("d", diagonal)
+              .attr("stroke-width", 1)
+            .attr('stroke', branchLookup[commit.branch].color)
+            .attr('fill', 'none')
+        }
+      });
     });
 
     //Make the nodes
@@ -360,6 +441,10 @@ Author:  ${authorName}${universalCommands}`;
     //       }
     //     });
     // }
+  }
+
+  componentWillUnmount() {
+    console.log('unmounting')
   }
 
   render() {
