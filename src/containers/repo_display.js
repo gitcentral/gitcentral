@@ -16,6 +16,7 @@ import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
 import d3 from '../reducers/gitD3/d3.js';
 import tooltip from '../reducers/gitD3/d3tip.js';
 import _  from 'lodash';
+import $ from 'jquery';
 
 d3.tip = tooltip;
 
@@ -24,7 +25,10 @@ class RepoDisplay extends Component {
     // remove all svg elements
     d3.select("svg").remove();
     $('#container').remove();
-    $('body').append('<div id="container"></div>')
+    $('body').append('<div id="container"></div>');
+
+    const pageWidth = window.innerWidth;
+    const pageHeight = window.innerHeight - 32;
 
 
     const githubTranslator = new GithubApiInterface(
@@ -39,7 +43,7 @@ class RepoDisplay extends Component {
     const tagSite = 'https://git-scm.com/book/en/v2/Git-Basics-Tagging';
 
     /**
-     * Creat an HTML anchor tag
+     * Create an HTML anchor tag
      * @param  {String} linkedText - the text you wish to appear
      * @param  {String} site - the site to link to
      * @return {String} - the anchor HTML element
@@ -48,34 +52,86 @@ class RepoDisplay extends Component {
       return `<a href="${site}" target="_blank">${linkedText}</a>`;
     }
 
-    let numCommits = 0;
-    /**
-     * Generate an x-value for each commit. Each commit sent in will
-     * have a higher x-value than the one before it. Useful for placing
-     * elements in order.
-     */
-    function generateX(node) {
-     return 40 + numCommits++ * 30;
-    }
-
-    /**
-     * branchXCoordinates will contain the start and end x-values for
-     * each commit.
-     * @type {Object}
-     */
-    const branchXCoordinates = {};
-
-    /**
-     * branchYCoordinates will the y-coordinate of each branch.
-     * @type {Object}
-     */
-    const branchYCoordinates = { master: 360 };
-
     /**
      * Generate the x and y-coordinates for each commit. Place them as properties
      * on the commit.
+     * //BUG//////////BUG///////////BUG///////////BUG//
+     * ///BUG//////////BUG//////////////BUG////////////
+     * /////////BUG///////////BUG////////////////BUG///
+     * BUG: Some branches overlap.  BUG///////////BUG//
+     * Need to check if the branch  BUG///////////BUG//
+     * is on the same level as all  BUG///////////BUG//
+     * of its parents.              BUG///////////BUG//
+     * ///BUG//////////BUG//////////////BUG////////////
+     * //BUG//////////BUG///////////BUG///////////BUG//
+     * ///BUG//////////BUG//////////////BUG////////////
      */
     function generateCoordinates() {
+      /**
+       * Generate an x-value for each commit. Each commit sent in will
+       * have a higher x-value than the one before it. Useful for placing
+       * elements in order. If the next commit will flow off of the screen,
+       * reset the x-value.
+       */
+      function generateX(node) {
+        const nextValue = 40 + numCommits++ * 30;
+        // if(nextValue + 60 > pageWidth) resetXandY();
+        return nextValue;
+      }
+
+      function resetXandY() {
+        numCommits = 1;
+        firstCheckForY += 80;
+      }
+
+      /**
+       * Determine if the y-position we're checking will have overlaps. If so,
+       * put in a different place. Recursively checks the next y-value if the current
+       * one is already taken.
+       * @param  {String} branch - the branch name
+       * @param  {Number} y - the y-value we're checking. Is set automatically,
+       *                    or recursively.
+       * @return {Number} - the y position.
+       */
+      function generateY(branch, y = firstCheckForY) {
+        //if we're at a new branch we need to jump to another level        
+        if(branch !== lastBranch) {
+          lastBranch = branch;
+          return generateY(branch, y + 40);
+        }
+
+        let overlap = false;
+
+        const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
+
+        taken.forEach(set => {
+          if(set.y === y) {
+            if((set.start <= thisBranchStartPoint && thisBranchStartPoint <= set.end) || 
+              (set.start <= thisBranchEndPoint && thisBranchEndPoint <= set.end)) {
+              overlap = true;
+            }
+          }
+        });
+
+        return overlap ? generateY(branch, y + 40) : y;
+      }
+
+     /**
+       * branchXCoordinates will contain the start and end x-values for
+       * each commit.
+       * @type {Object}
+       */
+      const branchXCoordinates = {};
+
+      /**
+       * branchYCoordinates will the y-coordinate of each branch.
+       * @type {Object}
+       */
+      const branchYCoordinates = { master: 360 };
+      let firstCheckForY = 360;
+      let numCommits = 0;
+
+      //Create the x-value for each commit.
       JSONCommits.forEach(commit => { 
         commit.x = generateX(commit);
 
@@ -90,7 +146,7 @@ class RepoDisplay extends Component {
       /**
        * List the positions that are taken. Properties of each object are
        * a y-value and the range (start and end) of the x-values taken for that
-       * y-value.
+       * y-value. Initialize with a hard-coded master.
        * @type {Array}
        */
       const taken = [{ 
@@ -100,38 +156,21 @@ class RepoDisplay extends Component {
       }];
 
       /**
-       * Determine if the y-position we're checking will have overlaps. If so,
-       * put in a different place. Recursively checks the next y-value if the current
-       * one is already taken.
-       * @param  {String} branch - the branch name
-       * @param  {Number} y - the y-value we're checking. Is set automatically,
-       *                    or recursively.
-       * @return {Numver} - the y position.
+       * A variable to store the last branch location. Every commit, when being
+       * placed, will be compared to the last commit to see if the branch was
+       * different. If it was different, the new branch will be placed lower.
        */
-      function getY(branch, y = 360) {
-        let overlap = false;
-        const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
-
-        taken.forEach(set => {
-          if(set.y === y) {
-            if((set.start <= thisBranchStartPoint && thisBranchStartPoint <= set.end) || 
-              (set.start <= thisBranchEndPoint && thisBranchEndPoint <= set.end)) {
-              overlap = true;
-            }
-          }
-        });
-
-        return overlap ? getY(branch, y + 40) : y;
-      }
+      let lastBranch;
 
       //get the y-coordinates for each branch
       Object.keys(branchLookup).forEach(branch => {
         if(!branchXCoordinates[branch] || branch === 'master') return;
 
         const { start, end } = branchXCoordinates[branch];
-        const yCoordinate = getY(branch);
+        const yCoordinate = generateY(branch);
+        lastBranch = branch;
         branchYCoordinates[branch] = yCoordinate;
-        taken.push({ start, end, y: yCoordinate});
+        taken.push({ start, end, y: yCoordinate });
       });
 
       //map the branchYCoordinates values over to their commits
@@ -145,9 +184,15 @@ class RepoDisplay extends Component {
 
       svg.selectAll('g').attr("transform", "translate(" + translate + ")scale(" + scale + ")");
       svg.selectAll('line').attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
-      svg.selectAll('.tooltip').attr('transform', `translate(${translate})`);
-      infoTip.show();
-      headTip.hide();
+
+      ///BUG//////////BUG//////////////BUG////////////
+      /////////BUG///////////BUG////////////////BUG///
+      //BUG//////////BUG///////////BUG///////////BUG//
+      infoTip.hide();/////////////////////////////////
+      headTip.hide();/////////////////////////////////
+      //BUG//////////BUG///////////BUG///////////BUG//
+      ///BUG//////////BUG//////////////BUG////////////
+      ///BUG//////////BUG//////////////BUG////////////
 
       d3.selectAll('dt-tip')
         .attr('opacity', 0);
@@ -230,27 +275,8 @@ class RepoDisplay extends Component {
     }
 
     const d3commits = JSONCommits;
-    // addCoordinates(d3commits);
-    generateCoordinates();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     addColors(d3commits);
-    const pageWidth = window.innerWidth;
-    const pageHeight = window.innerHeight;
+    generateCoordinates();
 
     //tooltip: http://bl.ocks.org/Caged/6476579
     const headTip = d3.tip()
@@ -271,10 +297,10 @@ class RepoDisplay extends Component {
       .on("zoom", zoomed);
 
     const drag = d3.behavior.drag()
-        .origin(function(d) { return d; })
-        .on("dragstart", dragstarted)
-        .on("drag", dragged)
-        .on("dragend", dragended);
+      .origin(function(d) { return d; })
+      .on("dragstart", dragstarted)
+      .on("drag", dragged)
+      .on("dragend", dragended);
 
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
@@ -286,42 +312,33 @@ class RepoDisplay extends Component {
     svg.call(infoTip);
 
     let container = svg.append('g');
-
-    console.log('line 215');
+    const straightLineLocations = [];
 
     // Make the lines
     d3commits.forEach(commit => {
       commit.children.forEach(child => {
         let childObj = githubTranslator.getCommit(child);
-        //straight lines
+
         if(commit.y === childObj.y) {
-          svg.append("line")
-            .attr('class', 'line')
-            .attr("x1", commit.x)
-            .attr("y1", commit.y)
-            .attr("x2", childObj.x)
-            .attr("y2", childObj.y)
-            .attr("stroke-width", 1)
-            .attr('stroke', branchLookup[commit.branch].color) //
-            .attr('fill', branchLookup[commit.branch].color)
-        } else {
-        //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
-          var curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
-          var edge = d3.select("svg").append('g');
-          var diagonal = d3.svg.diagonal()
-            .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
-            .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
-            .projection(function(d) { return [d.y, d.x]; });
-             
-          d3.select("g")
-              .datum(curveData)
-            .append("path")
-              .attr("class", "line")
-              .attr("d", diagonal)
-              .attr("stroke-width", 1)
-            .attr('stroke', branchLookup[commit.branch].color)
-            .attr('fill', 'none')
+          straightLineLocations.push({ y:commit.y, xStart: commit.x, xEnd: childObj.x });
         }
+
+      //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
+        const curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
+        const edge = d3.select("svg").append('g');
+        const diagonal = d3.svg.diagonal()
+          .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
+          .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
+          .projection(function(d) { return [d.y, d.x]; });
+           
+        d3.select("g")
+            .datum(curveData)
+          .append("path")
+            .attr("class", "line")
+            .attr("d", diagonal)
+            .attr("stroke-width", 1)
+          .attr('stroke', branchLookup[commit.branch].color)
+          .attr('fill', 'none');
       });
     });
 

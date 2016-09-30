@@ -21,7 +21,8 @@ export default class GithubApiInterface {
     // json obj transformation
     this.addOrphanBranch();
     this.analyzeRepo();
-    console.log(this.stats);
+    this.addParentObj();
+    this.addBranchParents();
   }
   /**
    * Set up table to look up commit objects by sha
@@ -287,4 +288,22 @@ export default class GithubApiInterface {
       this.stats = stats;
     }
 
+    /**
+     * Make the parent property of each commit point to the actual parent object
+     */
+    addParentObj() {
+      this.JSONCommits.forEach(commit => {
+        commit.parents = commit.parents.map(parent => {
+          return this.SHALookup[parent.sha];
+        });
+      });
+    }
+
+    addBranchParents() {
+
+      // this.JSONBranches.forEach(branch => {
+      //   const branchHeadCommit = this.JSONCommits.
+      //   console.log(branch)
+      // });
+    }
 }
