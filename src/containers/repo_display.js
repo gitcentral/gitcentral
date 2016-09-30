@@ -25,8 +25,9 @@ class RepoDisplay extends Component {
     // remove all svg elements
     d3.select("svg").remove();
     $('#container').remove();
+    $('.d3-tip').remove();
     $('body').append('<div id="container"></div>');
-
+ 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight - 32;
 
@@ -55,16 +56,6 @@ class RepoDisplay extends Component {
     /**
      * Generate the x and y-coordinates for each commit. Place them as properties
      * on the commit.
-     * //BUG//////////BUG///////////BUG///////////BUG//
-     * ///BUG//////////BUG//////////////BUG////////////
-     * /////////BUG///////////BUG////////////////BUG///
-     * BUG: Some branches overlap.  BUG///////////BUG//
-     * Need to check if the branch  BUG///////////BUG//
-     * is on the same level as all  BUG///////////BUG//
-     * of its parents.              BUG///////////BUG//
-     * ///BUG//////////BUG//////////////BUG////////////
-     * //BUG//////////BUG///////////BUG///////////BUG//
-     * ///BUG//////////BUG//////////////BUG////////////
      */
     function generateCoordinates() {
       /**
@@ -188,9 +179,9 @@ class RepoDisplay extends Component {
         taken.push({ start, end, y: yCoordinate });
       });
 
-      /////////////////////////////////////////////////////////////////////
-      //if there are 2 branches connected and on the same line, move one //
-      /////////////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////////////
+      // if there are 2 branches connected and on the same line, move one //
+      //////////////////////////////////////////////////////////////////////
       let changed = false;
       do{
         changed = false;
@@ -241,23 +232,17 @@ class RepoDisplay extends Component {
 
     //https://bl.ocks.org/mbostock/6123708
     function zoomed() {
-      const translate = d3.event.translate;
-      const scale = d3.event.scale;
+      const { translate, scale } = d3.event;
+      svg.selectAll('g')
+        .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+      svg.selectAll('line')
+        .attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
 
-      svg.selectAll('g').attr("transform", "translate(" + translate + ")scale(" + scale + ")");
-      svg.selectAll('line').attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
-
-      ///BUG//////////BUG//////////////BUG////////////
-      /////////BUG///////////BUG////////////////BUG///
-      //BUG//////////BUG///////////BUG///////////BUG//
-      infoTip.hide();/////////////////////////////////
-      headTip.hide();/////////////////////////////////
-      //BUG//////////BUG///////////BUG///////////BUG//
-      ///BUG//////////BUG//////////////BUG////////////
-      ///BUG//////////BUG//////////////BUG////////////
-
-      d3.selectAll('dt-tip')
-        .attr('opacity', 0);
+      //To make the tip essentially disappear from the page we remove its HTML.
+      //It is still present on the page, but now consists of a tiny square.
+      d3.selectAll('.d3-tip')
+        .style('opacity', 0)
+        .html('');
     }
 
     function dragstarted(d) {
@@ -341,21 +326,14 @@ class RepoDisplay extends Component {
     generateCoordinates();
 
     //tooltip: http://bl.ocks.org/Caged/6476579
-    const headTip = d3.tip()
-      .attr('class', 'd3-tip')
-      .direction('n')
-      .offset([-10, 0])
-      .html('HEAD');
-
     const infoTip = d3.tip()
       .attr('class', 'd3-tip')
       .direction('s')
-      .offset([10, 0])
-      // .html('placeholder');
+      .offset([10, 0]);
 
     //https://bl.ocks.org/mbostock/6123708
     const zoom = d3.behavior.zoom()
-      .scaleExtent([0.25, 10])
+      .scaleExtent([0.1, 10])
       .on("zoom", zoomed);
 
     const drag = d3.behavior.drag()
@@ -370,7 +348,6 @@ class RepoDisplay extends Component {
       .on('click', infoTip.hide)
       .call(zoom);
 
-    svg.call(headTip);
     svg.call(infoTip);
 
     let container = svg.append('g');
@@ -417,12 +394,11 @@ class RepoDisplay extends Component {
       .attr('fill', commit => branchLookup[commit.branch].color)
       .call(drag);
 
-      //show the tooltip on hover
+      //show the tool on hover
       nodes.on("mouseover", function(commit) {
         const { branch, sha, author: { login: authorName } } = commit;
         const branchLinkPrefix = `https://github.com/mangonada/mangonada/commits/`;
         const commitLinkPrefix = `https://github.com/mangonada/mangonada/commit/`;
-        const checkoutButton = `<button class="btn" onClick="headTip.show()">Checkout</button>`;
 
         const universalCommands = `
 
@@ -438,16 +414,13 @@ Possible git commands:
 
       const tooltipContent =
   `Branch:  ${makeAnchor(branch, branchLinkPrefix + branch)}
-Sha:     ${makeAnchor(sha.slice(0, 9) + '...', commitLinkPrefix + sha)}   ${checkoutButton}
+Sha:     ${makeAnchor(sha.slice(0, 9) + '...', commitLinkPrefix + sha)}
 Message: ${commit.commit.message}
 Author:  ${authorName}${universalCommands}`;
 
         infoTip.html(`<pre>${tooltipContent}</pre>`);
         infoTip.show();
-      })
-      .on('click', headTip.show);
-
-
+      });
 
     ////////////////////////////////////////////////////////////////////
     //Charts: https://bost.ocks.org/mike/bar/
