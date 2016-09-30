@@ -68,6 +68,19 @@ class RepoDisplay extends Component {
      */
     function generateCoordinates() {
       /**
+       * Given a range of start and end values, determine if there is any
+       * overlap.
+       * @param  {Object} range1 - the first range, an object with properties
+       *                         start and end
+       * @param  {Object} range2 - the 2nd range, same properties
+       * @return {Boolean} - whether or not they overlap
+       */
+      function checkOverlap(range1, range2) {
+        return (range2.start <= range1.start && range1.start <= range2.end) ||
+          (range2.start <= range1.end && range1.end <= range2.end);
+      }
+
+      /**
        * Generate an x-value for each commit. Each commit sent in will
        * have a higher x-value than the one before it. Useful for placing
        * elements in order. If the next commit will flow off of the screen,
@@ -97,7 +110,7 @@ class RepoDisplay extends Component {
         //if we're at a new branch we need to jump to another level        
         if(branch !== lastBranch) {
           lastBranch = branch;
-          return generateY(branch, y + 40);
+          return generateY(branch, y + yOffset);
         }
 
         let overlap = false;
@@ -113,7 +126,7 @@ class RepoDisplay extends Component {
           }
         });
 
-        return overlap ? generateY(branch, y + 40) : y;
+        return overlap ? generateY(branch, y + yOffset) : y;
       }
 
      /**
@@ -130,6 +143,7 @@ class RepoDisplay extends Component {
       const branchYCoordinates = { master: 360 };
       let firstCheckForY = 360;
       let numCommits = 0;
+      const yOffset = 40;
 
       //Create the x-value for each commit.
       JSONCommits.forEach(commit => { 
@@ -142,6 +156,7 @@ class RepoDisplay extends Component {
 
         branchXCoordinates[commit.branch].end = commit.x;
       });
+
 
       /**
        * List the positions that are taken. Properties of each object are
@@ -172,6 +187,53 @@ class RepoDisplay extends Component {
         branchYCoordinates[branch] = yCoordinate;
         taken.push({ start, end, y: yCoordinate });
       });
+
+      /////////////////////////////////////////////////////////////////////
+      //if there are 2 branches connected and on the same line, move one //
+      /////////////////////////////////////////////////////////////////////
+      let changed = false;
+      do{
+        changed = false;
+        d3commits.forEach(commit => {
+          commit.children.forEach(child => {
+            const childObj = SHALookup[child];
+            if(childObj && commit.branch !== childObj.branch) {
+              if(branchYCoordinates[commit.branch] === branchYCoordinates[childObj.branch]) {
+                branchYCoordinates[childObj.branch] += yOffset;
+                changed = true;
+              }
+            }
+          }); 
+        });
+      } while(changed);
+
+      //////////////////////////////////////////////////
+      //If there are 2 branches overlapping, move one //
+      //////////////////////////////////////////////////
+      const allBranches = Object.keys(branchXCoordinates);
+      let altered = false;
+      do{
+        altered = false;
+        allBranches.forEach(thisBranch => {
+          const thisBranchSet = branchXCoordinates[thisBranch];
+          allBranches.forEach(branchToCheck => {
+            //make sure it's not the same branch
+            if(thisBranch !== branchToCheck){
+              //make sure they have the same y-coordinate
+              if(branchYCoordinates[thisBranch] === branchYCoordinates[branchToCheck]){
+                const branchToCheckSet = branchXCoordinates[branchToCheck];
+
+                //Make sure they overlap somewhere along their x-coordinates
+                if(thisBranch !== branchToCheck && checkOverlap(thisBranchSet, branchToCheckSet)) {
+                  branchYCoordinates[branchToCheck] += yOffset;
+                  altered = true;
+                }
+              }
+            }
+          });
+        });
+      } while(altered);
+
 
       //map the branchYCoordinates values over to their commits
       d3commits.forEach(commit => commit.y = branchYCoordinates[commit.branch]);
@@ -293,7 +355,7 @@ class RepoDisplay extends Component {
 
     //https://bl.ocks.org/mbostock/6123708
     const zoom = d3.behavior.zoom()
-      .scaleExtent([1, 10])
+      .scaleExtent([0.25, 10])
       .on("zoom", zoomed);
 
     const drag = d3.behavior.drag()

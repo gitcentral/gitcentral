@@ -2,7 +2,9 @@
 
 export default class GithubApiInterface {
   constructor(JSONCommits, JSONBranches) {
-    this.JSONCommits = JSONCommits;
+    console.log(JSONCommits)
+    this.JSONCommits = JSONCommits
+      // .sort((a, b) => new Date(b.commit.author.date) - new Date(a.commit.author.date));
     this.JSONBranches = JSONBranches;
     this.SHALookup = {};
     this.branchLookup = {};
@@ -22,7 +24,7 @@ export default class GithubApiInterface {
     this.addOrphanBranch();
     this.analyzeRepo();
     this.addParentObj();
-    this.addBranchParents();
+    // this.addBranchParents();
   }
   /**
    * Set up table to look up commit objects by sha
@@ -69,6 +71,7 @@ export default class GithubApiInterface {
     }).sort((branchA, branchB) => {
       return branchA.length - branchB.length;
     });
+
     sortedBranches.forEach((branch) => {
       const commit = this.branchLookup[branch.name];
       this.nameMainBranch(commit);
@@ -155,8 +158,13 @@ export default class GithubApiInterface {
     return splitUrl.join('/');
   }
 
+  /////////////////////////////////////////////////////////////
+  //BUG HERE FOR SOME REPOS - SOMETHING BREAKS HERE  //////////
+  /////////////////////////////////////////////////////////////
   renameOrphanParent(JSONCommitObj) {
     const rightParentCommitObj = this.getRightParent(JSONCommitObj);
+    if (rightParentCommitObj === undefined) { return; }
+    
     if (rightParentCommitObj.branch) { return; }
     // if (rightParentCommitObj.children.length > 1) { return; }
     if (rightParentCommitObj === undefined) { return; }
@@ -300,10 +308,16 @@ export default class GithubApiInterface {
     }
 
     addBranchParents() {
-
-      // this.JSONBranches.forEach(branch => {
-      //   const branchHeadCommit = this.JSONCommits.
-      //   console.log(branch)
-      // });
+      const commitBranches = this.JSONCommits.map(commit => commit.branch);
+      this.JSONBranches.forEach(branch => {
+        const branchHeadCommit = this.JSONCommits[commitBranches.indexOf(branch)];
+        if(branchHeadCommit) {
+          const branchParentFinalCommit = branchHeadCommit.parents[0];
+          if(branchParentFinalCommit) {
+            const parentBranch = this.branchLookup[branchParentFinalCommit.branch];
+            branch.parent = parentBranch;
+          }
+        }
+      });
     }
 }
