@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+
+    <head>
+        <title>Tutorial 1: Getting Started</title>
+        <script src="/example/bower_components/cytoscape/dist/cytoscape.js"></script>
+        <script src="/example/bower_components/jquery/dist/jquery.js"></script>
+         <script src="/example/JSXTransformer.js"></script>
+        <link href="/example/index2.css" rel="stylesheet"/>
+    </head>
+
+    <body>
+
+        <div id="hello">
+            <form>
+                <input id="url-input"
+                       type="url"
+                       placeholder="Enter a repo url"
+                       value="https://github.com/timoweave/test7"></input>
+                <input type="submit" value="Go">
+            </form>
+        </div>
+
+        <div>
+            <!-- div container for cytoscape canvas div -->
+            <div id="cy"></div>
+        </div>
+
+        <div>
+            <script src="/example/githubBranchFunction.js"></script>
+            <script src="/example/index2.js"></script>
+        </div>
+
+    </body>
+</html>

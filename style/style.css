@@ -1,0 +1,77 @@
+.reactContainer {
+   position: fixed;
+   top: 0; right: 0; bottom: 0; left: 0;
+ }
+ 
+ #git {
+   top: 50%;
+ }
+
+.selected {
+  fill: red;
+  stroke: brown;
+}
+
+.line {
+  stroke-width: 4px;
+}
+
+div.tooltip { 
+    position: absolute;     
+    text-align: left;     
+    padding: 2px;
+    font: 12px sans-serif;    
+    background: lightsteelblue; 
+    border: 0px;    
+    border-radius: 5px;     
+}
+
+#chart div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: black;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: #E5E7E9;
+  color: black;
+  border-radius: 6px;
+  pointer-events: none;
+  font-family: 'Open Sans', sans-serif;
+  /*font-size: 80%;*/
+ }
+
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: #E5E7E9;
+  position: absolute;
+  pointer-events: none;
+}
+
+.d3-tip.s:after {
+  content: "\25B2";
+  margin: 0 0 1px 0;
+  top: -8px;
+  left: 0;
+  text-align: center;
+}
+
+/*https://perishablepress.com/perfect-pre-tags/*/
+pre {
+  max-width: 300px;                      /* specify width  */
+  white-space: pre-wrap;                 /* CSS3 browsers  */
+  white-space: -moz-pre-wrap !important; /* 1999+ Mozilla  */
+  white-space: -pre-wrap;                /* Opera 4 thru 6 */
+  white-space: -o-pre-wrap;              /* Opera 7 and up */
+  word-wrap: break-word;                 /* IE 5.5+ and up */
+}

@@ -1,0 +1,23 @@
+{
+  "name": "example",
+  "description": "",
+  "main": "githubBranchFunction.js",
+  "authors": [
+    "Timothy Shiu <timoweave@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/timoweave/mangonada",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "cytoscape": "^2.7.9",
+    "jquery": "^3.1.1",
+    "babel-standalone": "^6.14.0",
+    "react": "^15.3.2"
+  }
+}
