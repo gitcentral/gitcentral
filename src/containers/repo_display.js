@@ -90,7 +90,7 @@ class RepoDisplay extends Component {
       /**
        * List the positions that are taken. Properties of each object are
        * a y-value and the range (start and end) of the x-values taken for that
-       * y-value.
+       * y-value. Hard-code master.
        * @type {Array}
        */
       const taken = [{ 
@@ -230,27 +230,10 @@ class RepoDisplay extends Component {
     }
 
     const d3commits = JSONCommits;
-    // addCoordinates(d3commits);
     generateCoordinates();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     addColors(d3commits);
     const pageWidth = window.innerWidth;
-    const pageHeight = window.innerHeight;
+    const pageHeight = window.innerHeight - 32;
 
     //tooltip: http://bl.ocks.org/Caged/6476579
     const headTip = d3.tip()
@@ -271,10 +254,10 @@ class RepoDisplay extends Component {
       .on("zoom", zoomed);
 
     const drag = d3.behavior.drag()
-        .origin(function(d) { return d; })
-        .on("dragstart", dragstarted)
-        .on("drag", dragged)
-        .on("dragend", dragended);
+      .origin(function(d) { return d; })
+      .on("dragstart", dragstarted)
+      .on("drag", dragged)
+      .on("dragend", dragended);
 
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
@@ -286,8 +269,6 @@ class RepoDisplay extends Component {
     svg.call(infoTip);
 
     let container = svg.append('g');
-
-    console.log('line 215');
 
     // Make the lines
     d3commits.forEach(commit => {
