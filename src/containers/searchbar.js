@@ -1,8 +1,9 @@
+/* eslint-disable */
 /**
  * This container renders the navigation bar and the drawer. It does not need
  * access to items in redux state, but needs to dispatch to the redux state.
  * Uses material-ui for the rendering:
- * 
+ *
  * http://www.material-ui.com/#/components/text-field
  */
 
@@ -18,6 +19,11 @@ import IconButton from 'material-ui/IconButton';
 import Menu from 'material-ui/svg-icons/navigation/menu';
 import AppBar from 'material-ui/AppBar';
 import {orange500, blue500} from 'material-ui/styles/colors';
+import {Tabs, Tab} from 'material-ui/Tabs';
+import FontIcon from 'material-ui/FontIcon';
+import Timeline from 'material-ui/svg-icons/action/Timeline';
+import Equalizer from 'material-ui/svg-icons/av/Equalizer';
+import NavTabs from '../components/tabs';
 
 
 import RaisedButton from 'material-ui/RaisedButton'
@@ -33,7 +39,7 @@ class SearchBar extends Component {
   constructor() {
     super();
 
-    this.state = { 
+    this.state = {
       urlEntered: '',
       open: false,
     };
@@ -41,7 +47,7 @@ class SearchBar extends Component {
 
   /**
    * Handles url input from the user into the main searchbar
-   * @param  {Object} event 
+   * @param  {Object} event
    */
   onInputChange(event) {
     console.log(event.target.value);
@@ -51,7 +57,7 @@ class SearchBar extends Component {
   /**
    * Handles when the user presses enter in the url searchbar.
    * Calls fetchRepo which makes a request to our backend.
-   * @param  {Object} event 
+   * @param  {Object} event
    */
   onFormSubmit(event) {
     if(event.keyCode === 13){
@@ -81,15 +87,24 @@ class SearchBar extends Component {
 
   render() {
     const log = () => console.log('aasdfasd');
+    // let myTabs = (
+    //    <Tabs style={{padding: 5}}>
+    //        <Tab icon={<Timeline />} style={{'padding-left': 5, 'padding-right': 5}}/>
+    //        <Tab icon={<Equalizer />} tyle={{'padding-left': 5, 'padding-right': 5}}/>
+    //    </Tabs>
+    // );
+
     return (
       <div>
         <MuiThemeProvider>
           <AppBar
             title={<span>Mangonada</span>}
-            iconElementLeft={<IconButton onClick={this.handleToggle.bind(this)}><Menu /></IconButton>}
+            iconElementLeft={<IconButton onClick={this.handleToggle.bind(this)}><Menu /></IconButton>
+           }
           >
+          {/* myTabs */}
             <TextField
-              style = {{width: 550}}
+              style = {{width: 400}}
               onChange={this.onInputChange.bind(this)}
               value={this.state.urlEntered}
               onKeyDown={this.onFormSubmit.bind(this)}
@@ -97,7 +112,9 @@ class SearchBar extends Component {
             />
           </AppBar>
         </MuiThemeProvider>
-
+        <MuiThemeProvider>
+          <NavTabs />
+        </MuiThemeProvider> 
         <MuiThemeProvider>
           <Drawer
             docked={false}
