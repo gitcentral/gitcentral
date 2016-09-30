@@ -7,6 +7,10 @@ export default class GithubApiInterface {
     this.SHALookup = {};
     this.branchLookup = {};
     this.branchLengths = {};
+    this.stats = {
+      branches: {},
+      contributors: {},
+    };
 
     // initialization
     this.setupShaLookup();
@@ -16,6 +20,8 @@ export default class GithubApiInterface {
 
     // json obj transformation
     this.addOrphanBranch();
+    this.analyzeRepo();
+    console.log(this.stats);
   }
   /**
    * Set up table to look up commit objects by sha
@@ -239,4 +245,46 @@ export default class GithubApiInterface {
       commands.forEach(command => commit.gitCommands += ('\n ' + command));
       return commit;
     }
+
+    // analyze repo to obtain stats
+    //Create an object with some statistics for the commits passed in
+    // this.stats = {
+    //   branches: {},
+    //   contributors: {},
+    // };
+    analyzeRepo() {
+      const commits = this.JSONCommits;
+      const stats = {
+        branches: {},
+        contributors: {},
+      };
+
+      function countCommitsPerAuthor(author) {
+        return commits.reduce((authorCount, commit) => {
+          if(commit.author.login === author) authorCount++;
+          return authorCount;
+        }, 0);
+      }
+
+      function countCommitsPerBranch(branch) {
+        return commits.reduce((branchCount, commit) => {
+          if(commit.branch === branch) branchCount++;
+          return branchCount;
+        }, 0);
+      }
+
+      const { branches, contributors } = stats;
+
+      for(let branch in this.branchLookup) {
+        branches[branch] = branches[branch] || countCommitsPerBranch(branch);
+      }
+
+      commits.forEach((commit) => {
+        const author = commit.author.login;
+        contributors[author] = contributors[author] || countCommitsPerAuthor(author);
+      });
+
+      this.stats = stats;
+    }
+
 }
