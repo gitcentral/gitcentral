@@ -102,7 +102,7 @@ class SearchBar extends Component {
             iconElementLeft={<IconButton onClick={this.handleToggle.bind(this)}><Menu /></IconButton>
            }
           >
-          {/* myTabs */}
+          <NavTabs />
             <TextField
               style = {{width: 400}}
               onChange={this.onInputChange.bind(this)}
@@ -112,9 +112,6 @@ class SearchBar extends Component {
             />
           </AppBar>
         </MuiThemeProvider>
-        <MuiThemeProvider>
-          <NavTabs />
-        </MuiThemeProvider> 
         <MuiThemeProvider>
           <Drawer
             docked={false}

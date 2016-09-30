@@ -16,21 +16,33 @@ function handleActive(tab) {
   alert(`A tab with this route property ${tab.props['data-route']} was activated.`);
 }
 
+
 export default class NavTabs extends Component {
+  // need to refactor to use react properly at some point
+  getGitGraph(){
+    console.log('get graph');
+    document.getElementById('stats').className="hidden";
+    document.getElementById('container').classList.remove("hidden");
+  }
+
+  getStats(){
+    console.log('get stats');
+    document.getElementById('container').className="hidden";
+    document.getElementById('stats').classList.remove("hidden");
+  }
+  
   render (){
     return (
       <Tabs>
-      <Tab label="Git Graph" >
-        <div id='container'>hihihihihi</div>
+      <Tab
+        label="Git Graph"
+        style={{padding: 5}}
+        onActive={this.getGitGraph} >
       </Tab>
-      <Tab label="Stats" >
-        <div>
-          <h2 style={styles.headline}>Tab Two</h2>
-          <p>
-            This is another example tab.
-            {console.log('hey sup Martin')}
-          </p>
-        </div>
+      <Tab
+        label="Stats"
+        style={{padding: 5}}
+        onActive={this.getStats} >
       </Tab>
     </Tabs>
   )}
