@@ -108,7 +108,7 @@ class RepoDisplay extends Component {
        *                    or recursively.
        * @return {Numver} - the y position.
        */
-      function getY(branch, y = 360) {
+      function getY(branch, y = 400) {
         let overlap = false;
         const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
 
@@ -145,9 +145,15 @@ class RepoDisplay extends Component {
 
       svg.selectAll('g').attr("transform", "translate(" + translate + ")scale(" + scale + ")");
       svg.selectAll('line').attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
-      svg.selectAll('.tooltip').attr('transform', `translate(${translate})`);
-      infoTip.show();
-      headTip.hide();
+
+      ///BUG//////////BUG//////////////BUG////////////
+      /////////BUG///////////BUG////////////////BUG///
+      //BUG//////////BUG///////////BUG///////////BUG//
+      infoTip.hide();/////////////////////////////////
+      headTip.hide();/////////////////////////////////
+      //BUG//////////BUG///////////BUG///////////BUG//
+      ///BUG//////////BUG//////////////BUG////////////
+      ///BUG//////////BUG//////////////BUG////////////
 
       d3.selectAll('dt-tip')
         .attr('opacity', 0);
@@ -274,35 +280,23 @@ class RepoDisplay extends Component {
     d3commits.forEach(commit => {
       commit.children.forEach(child => {
         let childObj = githubTranslator.getCommit(child);
-        //straight lines
-        if(commit.y === childObj.y) {
-          svg.append("line")
-            .attr('class', 'line')
-            .attr("x1", commit.x)
-            .attr("y1", commit.y)
-            .attr("x2", childObj.x)
-            .attr("y2", childObj.y)
+
+      //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
+        const curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
+        const edge = d3.select("svg").append('g');
+        const diagonal = d3.svg.diagonal()
+          .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
+          .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
+          .projection(function(d) { return [d.y, d.x]; });
+           
+        d3.select("g")
+            .datum(curveData)
+          .append("path")
+            .attr("class", "line")
+            .attr("d", diagonal)
             .attr("stroke-width", 1)
-            .attr('stroke', branchLookup[commit.branch].color) //
-            .attr('fill', branchLookup[commit.branch].color)
-        } else {
-        //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
-          var curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
-          var edge = d3.select("svg").append('g');
-          var diagonal = d3.svg.diagonal()
-            .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
-            .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
-            .projection(function(d) { return [d.y, d.x]; });
-             
-          d3.select("g")
-              .datum(curveData)
-            .append("path")
-              .attr("class", "line")
-              .attr("d", diagonal)
-              .attr("stroke-width", 1)
-            .attr('stroke', branchLookup[commit.branch].color)
-            .attr('fill', 'none')
-        }
+          .attr('stroke', branchLookup[commit.branch].color)
+          .attr('fill', 'none');
       });
     });
 
