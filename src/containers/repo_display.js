@@ -25,6 +25,7 @@ class RepoDisplay extends Component {
     // remove all svg elements
     d3.select("svg").remove();
     $('#container').remove();
+    $('.d3-tip').remove();
     $('body').append('<div id="container"></div>');
  
     const pageWidth = window.innerWidth;
@@ -332,7 +333,7 @@ class RepoDisplay extends Component {
 
     //https://bl.ocks.org/mbostock/6123708
     const zoom = d3.behavior.zoom()
-      .scaleExtent([0.25, 10])
+      .scaleExtent([0.1, 10])
       .on("zoom", zoomed);
 
     const drag = d3.behavior.drag()
