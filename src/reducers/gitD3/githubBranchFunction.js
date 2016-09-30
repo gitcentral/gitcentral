@@ -158,8 +158,13 @@ export default class GithubApiInterface {
     return splitUrl.join('/');
   }
 
+  /////////////////////////////////////////////////////////////
+  //BUG HERE FOR SOME REPOS - SOMETHING BREAKS HERE  //////////
+  /////////////////////////////////////////////////////////////
   renameOrphanParent(JSONCommitObj) {
     const rightParentCommitObj = this.getRightParent(JSONCommitObj);
+    if (rightParentCommitObj === undefined) { return; }
+    
     if (rightParentCommitObj.branch) { return; }
     // if (rightParentCommitObj.children.length > 1) { return; }
     if (rightParentCommitObj === undefined) { return; }

@@ -110,7 +110,7 @@ class RepoDisplay extends Component {
         //if we're at a new branch we need to jump to another level        
         if(branch !== lastBranch) {
           lastBranch = branch;
-          return generateY(branch, y + 40);
+          return generateY(branch, y + yOffset);
         }
 
         let overlap = false;
@@ -126,7 +126,7 @@ class RepoDisplay extends Component {
           }
         });
 
-        return overlap ? generateY(branch, y + 40) : y;
+        return overlap ? generateY(branch, y + yOffset) : y;
       }
 
      /**
@@ -143,6 +143,7 @@ class RepoDisplay extends Component {
       const branchYCoordinates = { master: 360 };
       let firstCheckForY = 360;
       let numCommits = 0;
+      const yOffset = 40;
 
       //Create the x-value for each commit.
       JSONCommits.forEach(commit => { 
@@ -155,6 +156,7 @@ class RepoDisplay extends Component {
 
         branchXCoordinates[commit.branch].end = commit.x;
       });
+
 
       /**
        * List the positions that are taken. Properties of each object are
@@ -197,7 +199,7 @@ class RepoDisplay extends Component {
             const childObj = SHALookup[child];
             if(childObj && commit.branch !== childObj.branch) {
               if(branchYCoordinates[commit.branch] === branchYCoordinates[childObj.branch]) {
-                branchYCoordinates[childObj.branch] += 40;
+                branchYCoordinates[childObj.branch] += yOffset;
                 changed = true;
               }
             }
@@ -223,7 +225,7 @@ class RepoDisplay extends Component {
 
                 //Make sure they overlap somewhere along their x-coordinates
                 if(thisBranch !== branchToCheck && checkOverlap(thisBranchSet, branchToCheckSet)) {
-                  branchYCoordinates[branchToCheck] += 40;
+                  branchYCoordinates[branchToCheck] += yOffset;
                   altered = true;
                 }
               }
