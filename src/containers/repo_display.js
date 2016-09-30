@@ -15,37 +15,24 @@ import { bindActionCreators } from 'redux';
 import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
 import d3 from '../reducers/gitD3/d3.js';
 import tooltip from '../reducers/gitD3/d3tip.js';
+import _  from 'lodash';
 
 d3.tip = tooltip;
 
 class RepoDisplay extends Component {
   makeD3Display () {
-    //remove all svg elements
-    console.log('Displaying repo');
+    // remove all svg elements
     d3.select("svg").remove();
     $('#container').remove();
     $('body').append('<div id="container"></div>')
-    // $( ".inner" ).append( "<p>Test</p>" );
-
-
-    console.log('Should be removed');
-    console.log('this: ', this);
-    console.log('this.props: ', this.props);
-    console.log('this.props.currentRepo: ', this.props.currentRepo);
-
-    let githubTranslator = new GithubApiInterface( this.props.currentRepo.JSONCommits, this.props.currentRepo.JSONBranches);
 
     const { JSONCommits, SHALookup, branchLookup, JSONBranches } = githubTranslator;
-
-    console.log('line 37')
+    const githubTranslator = new GithubApiInterface( this.props.currentRepo.JSONCommits, this.props.currentRepo.JSONBranches );
 
     const checkoutSite = 'https://www.atlassian.com/git/tutorials/viewing-old-commits';
     const branchSite = 'https://www.atlassian.com/git/tutorials/using-branches/';
     const rebaseSite = 'https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase';
     const tagSite = 'https://git-scm.com/book/en/v2/Git-Basics-Tagging';
-
-    console.log('line 44');
-
 
     /**
      * Creat an HTML anchor tag
@@ -62,30 +49,89 @@ class RepoDisplay extends Component {
      * Generate an x-value for each commit. Each commit sent in will
      * have a higher x-value than the one before it. Useful for placing
      * elements in order.
-     * @param  {Object} commit - the commit for which we want an x-value
-     * @return {Number} - x-value
      */
-    function generateX(commit) {
-      return 20 + numCommits++ * 30;
+    function generateX(node) {
+     return 40 + numCommits++ * 30;
     }
 
     /**
-     * Generate a y-value for each commit. Each commit sent in will
-     * have a the save value as the rest of the commits with the same branch
-     * property. Useful for separating branches.
-     *
-     //////////////////////////////////////////////////////////////
-     //NOTE: THIS IS NOT SUITABLE FOR EVERY INPUT. MUST REFACTOR //
-     //////////////////////////////////////////////////////////////
-     *
-     * @param  {Object} commit - the commit for which we want a y-value
-     * @return {Number} - y-value
+     * branchXCoordinates will contain the start and end x-values for
+     * each commit.
+     * @type {Object}
      */
-    function generateY(commit) {
-      if(commit.branch === 'master') {
-        return 360;
+    const branchXCoordinates = {};
+
+    /**
+     * branchYCoordinates will the y-coordinate of each branch.
+     * @type {Object}
+     */
+    const branchYCoordinates = { master: 360 };
+
+    /**
+     * Generate the x and y-coordinates for each commit. Place them as properties
+     * on the commit.
+     */
+    function generateCoordinates() {
+      JSONCommits.forEach(commit => { 
+        commit.x = generateX(commit);
+
+        //if it's the first time we're processing a commit from this branch, create an object
+        if(!branchXCoordinates[commit.branch]) {
+          branchXCoordinates[commit.branch] = { start: commit.x };
+        }
+
+        branchXCoordinates[commit.branch].end = commit.x;
+      });
+
+      /**
+       * List the positions that are taken. Properties of each object are
+       * a y-value and the range (start and end) of the x-values taken for that
+       * y-value.
+       * @type {Array}
+       */
+      const taken = [{ 
+        y: 360,
+        start: branchXCoordinates['master'].start,
+        end: branchXCoordinates['master'].end,
+      }];
+
+      /**
+       * Determine if the y-position we're checking will have overlaps. If so,
+       * put in a different place. Recursively checks the next y-value if the current
+       * one is already taken.
+       * @param  {String} branch - the branch name
+       * @param  {Number} y - the y-value we're checking. Is set automatically,
+       *                    or recursively.
+       * @return {Numver} - the y position.
+       */
+      function getY(branch, y = 360) {
+        let overlap = false;
+        const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
+
+        taken.forEach(set => {
+          if(set.y === y) {
+            if((set.start <= thisBranchStartPoint && thisBranchStartPoint <= set.end) || 
+              (set.start <= thisBranchEndPoint && thisBranchEndPoint <= set.end)) {
+              overlap = true;
+            }
+          }
+        });
+
+        return overlap ? getY(branch, y + 40) : y;
       }
-      return 400;
+
+      //get the y-coordinates for each branch
+      Object.keys(branchLookup).forEach(branch => {
+        if(!branchXCoordinates[branch] || branch === 'master') return;
+
+        const { start, end } = branchXCoordinates[branch];
+        const yCoordinate = getY(branch);
+        branchYCoordinates[branch] = yCoordinate;
+        taken.push({ start, end, y: yCoordinate});
+      });
+
+      //map the branchYCoordinates values over to their commits
+      d3commits.forEach(commit => commit.y = branchYCoordinates[commit.branch]);
     }
 
     //https://bl.ocks.org/mbostock/6123708
@@ -180,7 +226,24 @@ class RepoDisplay extends Component {
     }
 
     const d3commits = JSONCommits;
-    addCoordinates(d3commits);
+    // addCoordinates(d3commits);
+    generateCoordinates();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     addColors(d3commits);
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -374,6 +437,10 @@ Author:  ${authorName}${universalCommands}`;
     //       }
     //     });
     // }
+  }
+
+  componentWillUnmount() {
+    console.log('unmounting')
   }
 
   render() {
