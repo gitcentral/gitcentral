@@ -55,6 +55,16 @@ class RepoDisplay extends Component {
     /**
      * Generate the x and y-coordinates for each commit. Place them as properties
      * on the commit.
+     * //BUG//////////BUG///////////BUG///////////BUG//
+     * ///BUG//////////BUG//////////////BUG////////////
+     * /////////BUG///////////BUG////////////////BUG///
+     * BUG: Some branches overlap.  BUG///////////BUG//
+     * Need to check if the branch  BUG///////////BUG//
+     * is on the same level as all  BUG///////////BUG//
+     * of its parents.              BUG///////////BUG//
+     * ///BUG//////////BUG//////////////BUG////////////
+     * //BUG//////////BUG///////////BUG///////////BUG//
+     * ///BUG//////////BUG//////////////BUG////////////
      */
     function generateCoordinates() {
       /**
@@ -84,13 +94,14 @@ class RepoDisplay extends Component {
        * @return {Number} - the y position.
        */
       function generateY(branch, y = firstCheckForY) {
-        //if we're at a new branch we need to jump to another level
+        //if we're at a new branch we need to jump to another level        
         if(branch !== lastBranch) {
           lastBranch = branch;
           return generateY(branch, y + 40);
         }
 
         let overlap = false;
+
         const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
 
         taken.forEach(set => {
@@ -144,6 +155,11 @@ class RepoDisplay extends Component {
         end: branchXCoordinates['master'].end,
       }];
 
+      /**
+       * A variable to store the last branch location. Every commit, when being
+       * placed, will be compared to the last commit to see if the branch was
+       * different. If it was different, the new branch will be placed lower.
+       */
       let lastBranch;
 
       //get the y-coordinates for each branch
@@ -154,7 +170,7 @@ class RepoDisplay extends Component {
         const yCoordinate = generateY(branch);
         lastBranch = branch;
         branchYCoordinates[branch] = yCoordinate;
-        taken.push({ start, end, y: yCoordinate});
+        taken.push({ start, end, y: yCoordinate });
       });
 
       //map the branchYCoordinates values over to their commits
@@ -259,8 +275,8 @@ class RepoDisplay extends Component {
     }
 
     const d3commits = JSONCommits;
-    generateCoordinates();
     addColors(d3commits);
+    generateCoordinates();
 
     //tooltip: http://bl.ocks.org/Caged/6476579
     const headTip = d3.tip()
@@ -296,11 +312,16 @@ class RepoDisplay extends Component {
     svg.call(infoTip);
 
     let container = svg.append('g');
+    const straightLineLocations = [];
 
     // Make the lines
     d3commits.forEach(commit => {
       commit.children.forEach(child => {
         let childObj = githubTranslator.getCommit(child);
+
+        if(commit.y === childObj.y) {
+          straightLineLocations.push({ y:commit.y, xStart: commit.x, xEnd: childObj.x });
+        }
 
       //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
         const curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
