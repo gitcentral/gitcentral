@@ -16,6 +16,7 @@ import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
 import d3 from '../reducers/gitD3/d3.js';
 import tooltip from '../reducers/gitD3/d3tip.js';
 import _  from 'lodash';
+import $ from 'jquery';
 
 d3.tip = tooltip;
 
@@ -24,7 +25,10 @@ class RepoDisplay extends Component {
     // remove all svg elements
     d3.select("svg").remove();
     $('#container').remove();
-    $('body').append('<div id="container"></div>')
+    $('body').append('<div id="container"></div>');
+
+    const pageWidth = window.innerWidth;
+    const pageHeight = window.innerHeight - 32;
 
 
     const githubTranslator = new GithubApiInterface(
@@ -39,7 +43,7 @@ class RepoDisplay extends Component {
     const tagSite = 'https://git-scm.com/book/en/v2/Git-Basics-Tagging';
 
     /**
-     * Creat an HTML anchor tag
+     * Create an HTML anchor tag
      * @param  {String} linkedText - the text you wish to appear
      * @param  {String} site - the site to link to
      * @return {String} - the anchor HTML element
@@ -48,34 +52,75 @@ class RepoDisplay extends Component {
       return `<a href="${site}" target="_blank">${linkedText}</a>`;
     }
 
-    let numCommits = 0;
-    /**
-     * Generate an x-value for each commit. Each commit sent in will
-     * have a higher x-value than the one before it. Useful for placing
-     * elements in order.
-     */
-    function generateX(node) {
-     return 40 + numCommits++ * 30;
-    }
-
-    /**
-     * branchXCoordinates will contain the start and end x-values for
-     * each commit.
-     * @type {Object}
-     */
-    const branchXCoordinates = {};
-
-    /**
-     * branchYCoordinates will the y-coordinate of each branch.
-     * @type {Object}
-     */
-    const branchYCoordinates = { master: 360 };
-
     /**
      * Generate the x and y-coordinates for each commit. Place them as properties
      * on the commit.
      */
     function generateCoordinates() {
+      /**
+       * Generate an x-value for each commit. Each commit sent in will
+       * have a higher x-value than the one before it. Useful for placing
+       * elements in order. If the next commit will flow off of the screen,
+       * reset the x-value.
+       */
+      function generateX(node) {
+        const nextValue = 40 + numCommits++ * 30;
+        // if(nextValue + 60 > pageWidth) resetXandY();
+        return nextValue;
+      }
+
+      function resetXandY() {
+        numCommits = 1;
+        firstCheckForY += 80;
+      }
+
+      /**
+       * Determine if the y-position we're checking will have overlaps. If so,
+       * put in a different place. Recursively checks the next y-value if the current
+       * one is already taken.
+       * @param  {String} branch - the branch name
+       * @param  {Number} y - the y-value we're checking. Is set automatically,
+       *                    or recursively.
+       * @return {Number} - the y position.
+       */
+      function generateY(branch, y = firstCheckForY) {
+        //if we're at a new branch we need to jump to another level
+        if(branch !== lastBranch) {
+          lastBranch = branch;
+          return generateY(branch, y + 40);
+        }
+
+        let overlap = false;
+        const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
+
+        taken.forEach(set => {
+          if(set.y === y) {
+            if((set.start <= thisBranchStartPoint && thisBranchStartPoint <= set.end) || 
+              (set.start <= thisBranchEndPoint && thisBranchEndPoint <= set.end)) {
+              overlap = true;
+            }
+          }
+        });
+
+        return overlap ? generateY(branch, y + 40) : y;
+      }
+
+     /**
+       * branchXCoordinates will contain the start and end x-values for
+       * each commit.
+       * @type {Object}
+       */
+      const branchXCoordinates = {};
+
+      /**
+       * branchYCoordinates will the y-coordinate of each branch.
+       * @type {Object}
+       */
+      const branchYCoordinates = { master: 360 };
+      let firstCheckForY = 360;
+      let numCommits = 0;
+
+      //Create the x-value for each commit.
       JSONCommits.forEach(commit => { 
         commit.x = generateX(commit);
 
@@ -90,7 +135,7 @@ class RepoDisplay extends Component {
       /**
        * List the positions that are taken. Properties of each object are
        * a y-value and the range (start and end) of the x-values taken for that
-       * y-value. Hard-code master.
+       * y-value. Initialize with a hard-coded master.
        * @type {Array}
        */
       const taken = [{ 
@@ -99,37 +144,15 @@ class RepoDisplay extends Component {
         end: branchXCoordinates['master'].end,
       }];
 
-      /**
-       * Determine if the y-position we're checking will have overlaps. If so,
-       * put in a different place. Recursively checks the next y-value if the current
-       * one is already taken.
-       * @param  {String} branch - the branch name
-       * @param  {Number} y - the y-value we're checking. Is set automatically,
-       *                    or recursively.
-       * @return {Numver} - the y position.
-       */
-      function getY(branch, y = 400) {
-        let overlap = false;
-        const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
-
-        taken.forEach(set => {
-          if(set.y === y) {
-            if((set.start <= thisBranchStartPoint && thisBranchStartPoint <= set.end) || 
-              (set.start <= thisBranchEndPoint && thisBranchEndPoint <= set.end)) {
-              overlap = true;
-            }
-          }
-        });
-
-        return overlap ? getY(branch, y + 40) : y;
-      }
+      let lastBranch;
 
       //get the y-coordinates for each branch
       Object.keys(branchLookup).forEach(branch => {
         if(!branchXCoordinates[branch] || branch === 'master') return;
 
         const { start, end } = branchXCoordinates[branch];
-        const yCoordinate = getY(branch);
+        const yCoordinate = generateY(branch);
+        lastBranch = branch;
         branchYCoordinates[branch] = yCoordinate;
         taken.push({ start, end, y: yCoordinate});
       });
@@ -238,8 +261,6 @@ class RepoDisplay extends Component {
     const d3commits = JSONCommits;
     generateCoordinates();
     addColors(d3commits);
-    const pageWidth = window.innerWidth;
-    const pageHeight = window.innerHeight - 32;
 
     //tooltip: http://bl.ocks.org/Caged/6476579
     const headTip = d3.tip()
