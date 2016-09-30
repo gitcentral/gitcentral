@@ -2,9 +2,7 @@
 
 export default class GithubApiInterface {
   constructor(JSONCommits, JSONBranches) {
-    console.log(JSONCommits)
-    this.JSONCommits = JSONCommits
-      // .sort((a, b) => new Date(b.commit.author.date) - new Date(a.commit.author.date));
+    this.JSONCommits = JSONCommits;
     this.JSONBranches = JSONBranches;
     this.SHALookup = {};
     this.branchLookup = {};
@@ -24,6 +22,38 @@ export default class GithubApiInterface {
     this.addOrphanBranch();
     this.analyzeRepo();
     this.addParentObj();
+    this.validateCommits();
+  }
+
+  sortByDepth(a, b) {
+    return a.depth - b.depth;
+  }
+  
+  validateCommits() {
+    // check what we add on top of original JSONCommits from github API
+    this.JSONCommits.forEach(function(commit) {
+      if (commit.sha === undefined) {
+        console.log("commit has no sha!!!!!!, really bad");
+      }
+      if (commit.parents === undefined) {
+        console.log("commit has no parents", commit.sha.slice(0, 5));
+      }
+      if (commit.branch === undefined) {
+        console.log("commit has no branch", commit.sha.slice(0, 5));
+      }
+      if (commit.depth === undefined) {
+        console.log("commit has no depth", commit.sha.slice(0, 5));
+      }
+      if (commit.children === undefined) {
+        console.log("commit has no children", commit.sha.slice(0, 5));
+      }
+      if (commit.gitCommands === undefined) {
+        console.log("commit has no git-command", commit.sha.slice(0, 5));
+      }
+      if (commit.parentReferences === undefined) {
+        console.log("commit has no parent references", commit.sha.slice(0, 5));
+      }
+    });
   }
   /**
    * Set up table to look up commit objects by sha
@@ -97,6 +127,7 @@ export default class GithubApiInterface {
     let val = cb(commit);
     if (!commit.parents || !commit.parents.length) { return val; }
     val += this.visitParents(this.SHALookup[commit.parents[0].sha], cb);
+    commit.depth = val;
     return val;
   }
 

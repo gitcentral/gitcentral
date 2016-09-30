@@ -7,6 +7,10 @@ class GithubApiInterface {
     this.SHALookup = {};
     this.branchLookup = {};
     this.branchLengths = {};
+    this.stats = {
+      branches: {},
+      contributors: {},
+    };
 
     // initialization
     this.setupShaLookup();
@@ -16,6 +20,40 @@ class GithubApiInterface {
 
     // json obj transformation
     this.addOrphanBranch();
+    this.analyzeRepo();
+    this.addParentObj();
+    this.validateCommits();
+  }
+
+  sortByDepth(a, b) {
+    return a.depth - b.depth;
+  }
+  
+  validateCommits() {
+    // check what we add on top of original JSONCommits from github API
+    this.JSONCommits.forEach(function(commit) {
+      if (commit.sha === undefined) {
+        console.log("commit has no sha!!!!!!, really bad");
+      }
+      if (commit.parents === undefined) {
+        console.log("commit has no parents", commit.sha.slice(0, 5));
+      }
+      if (commit.branch === undefined) {
+        console.log("commit has no branch", commit.sha.slice(0, 5));
+      }
+      if (commit.depth === undefined) {
+        console.log("commit has no depth", commit.sha.slice(0, 5));
+      }
+      if (commit.children === undefined) {
+        console.log("commit has no children", commit.sha.slice(0, 5));
+      }
+      if (commit.gitCommands === undefined) {
+        console.log("commit has no git-command", commit.sha.slice(0, 5));
+      }
+      if (commit.parentReferences === undefined) {
+        console.log("commit has no parent references", commit.sha.slice(0, 5));
+      }
+    });
   }
   /**
    * Set up table to look up commit objects by sha
@@ -62,6 +100,7 @@ class GithubApiInterface {
     }).sort((branchA, branchB) => {
       return branchA.length - branchB.length;
     });
+
     sortedBranches.forEach((branch) => {
       const commit = this.branchLookup[branch.name];
       this.nameMainBranch(commit);
@@ -88,6 +127,7 @@ class GithubApiInterface {
     let val = cb(commit);
     if (!commit.parents || !commit.parents.length) { return val; }
     val += this.visitParents(this.SHALookup[commit.parents[0].sha], cb);
+    commit.depth = val;
     return val;
   }
 
@@ -156,7 +196,6 @@ class GithubApiInterface {
     const rightParentCommitObj = this.getRightParent(JSONCommitObj);
     if (rightParentCommitObj === undefined) { return; }
     if (rightParentCommitObj.branch) { return; }
-    // if (rightParentCommitObj.children.length > 1) { return; }
     if (rightParentCommitObj.branch !== undefined) { return; /* already labeled */}
 
     const newBranchName = JSONCommitObj.branch ||"orphan";
@@ -262,5 +301,71 @@ class GithubApiInterface {
     addTailCommands(commit, ...commands) {
       commands.forEach(command => commit.gitCommands += ('\n ' + command));
       return commit;
+    }
+
+    // analyze repo to obtain stats
+    //Create an object with some statistics for the commits passed in
+    // this.stats = {
+    //   branches: {},
+    //   contributors: {},
+    // };
+    analyzeRepo() {
+      const commits = this.JSONCommits;
+      const stats = {
+        branches: {},
+        contributors: {},
+      };
+
+      function countCommitsPerAuthor(author) {
+        return commits.reduce((authorCount, commit) => {
+          if(commit.author.login === author) authorCount++;
+          return authorCount;
+        }, 0);
+      }
+
+      function countCommitsPerBranch(branch) {
+        return commits.reduce((branchCount, commit) => {
+          if(commit.branch === branch) branchCount++;
+          return branchCount;
+        }, 0);
+      }
+
+      const { branches, contributors } = stats;
+
+      for(let branch in this.branchLookup) {
+        branches[branch] = branches[branch] || countCommitsPerBranch(branch);
+      }
+
+      commits.forEach((commit) => {
+        const author = commit.author.login;
+        contributors[author] = contributors[author] || countCommitsPerAuthor(author);
+      });
+
+      this.stats = stats;
+    }
+
+    /**
+     * Make the parent property of each commit point to the actual parent object
+     */
+    addParentObj() {
+      this.JSONCommits.forEach(commit => {
+        commit.parentReferences = commit.parents.map(parent => {
+          return this.SHALookup[parent.sha];
+        });
+      });
+    }
+
+    addBranchParents() {
+      const commitBranches = this.JSONCommits.map(commit => commit.branch);
+      this.JSONBranches.forEach(branch => {
+        const branchHeadCommit = this.JSONCommits[commitBranches.indexOf(branch)];
+        if(branchHeadCommit) {
+          const branchParentFinalCommit = branchHeadCommit.parents[0];
+          if(branchParentFinalCommit) {
+            const parentBranch = this.branchLookup[branchParentFinalCommit.branch];
+            branch.parent = parentBranch;
+          }
+        }
+      });
     }
 }
