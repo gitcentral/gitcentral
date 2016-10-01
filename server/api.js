@@ -3,6 +3,13 @@ const express = require('express');
 const request = require('request-promise');
 
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
+const jsonFileName = path.join(__dirname, "database.json");
+const jsonFile = fs.readFileSync(jsonFileName);
+const jsonContent = JSON.parse(jsonFile);
+let jsonRoutes = Object.keys(jsonContent);
+
 
 router.param('userName', (req, res, next, userLabel) => {
   req.user = userLabel;
@@ -23,7 +30,18 @@ router.route('/repos/:userName/:repoName')
 .all((req, res, next) => {
   next();
 })
-.get((req, res) => {
+.get((req, res, next) => {
+  // json file cache
+  const routePath = "" + req.user + "/" + req.repo;
+  if (jsonRoutes.includes(routePath)) {
+    res.status(200).json(jsonContent[routePath]);
+  } else {
+    next();
+  }
+},
+
+(req, res) => {
+  // github api 
   const gitURL = `https://api.github.com/repos/${req.user}/${req.repo}`;
   const branchesURL = `${gitURL}/branches`;
   const commitsURL = `${gitURL}/commits`;
@@ -62,10 +80,13 @@ router.route('/repos/:userName/:repoName')
         return container;
       }, requestAllCommits);
 
-      res.status(200).json({
-        JSONBranches: branches,
-        JSONCommits: requestAllCommits.commits
-      });
+      const value = { JSONBranches: branches, JSONCommits: requestAllCommits.commits };
+      const routePath = "" + req.user + "/" + req.repo;
+      jsonContent[routePath] = value;
+      jsonRoutes = Object.keys(jsonContent);
+      fs.writeFile(jsonFileName, JSON.stringify(jsonContent, null, 2), 'utf-8', function() {
+        res.status(200).json(value);
+      })
     }, () => {
       res.status(401).end('noooooo');
     });
