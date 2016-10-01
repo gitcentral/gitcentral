@@ -36,7 +36,8 @@ class RepoDisplay extends Component {
       this.props.currentRepo.JSONCommits,
       this.props.currentRepo.JSONBranches
     );
-    const { JSONCommits, SHALookup, branchLookup, JSONBranches } = githubTranslator;
+    const { JSONCommits, SHALookup, branchLookup,
+      JSONBranches, originalBranches } = githubTranslator;
 
     /**
      * Create an HTML anchor tag
@@ -115,7 +116,7 @@ class RepoDisplay extends Component {
         return overlap ? generateY(branch, y + yOffset) : y;
       }
 
-     /**
+      /**
        * branchXCoordinates will contain the start and end x-values for
        * each commit.
        * @type {Object}
@@ -436,14 +437,13 @@ class RepoDisplay extends Component {
       nodes.on("mouseover", function(commit) {
         const { branch, sha, html_url: url, author: { login: authorName } } = commit;
         const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
-        ///////////////////////////////////////////////////////
-        //BUG: MOST LINKS DON'T WORK FOR BRANCH; ONLY MASTER //
-        ///////////////////////////////////////////////////////
+        
+        //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
+        //then make it a hyperlink; otherwise, don't display branch name
         const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
 
         const tooltipContent =
-`Branch:  ${makeAnchor(branch, branchLink)}
-Sha:     ${makeAnchor(sha.slice(0, 9) + '...', url)}
+`${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }Sha:     ${makeAnchor(sha.slice(0, 9) + '...', url)}
 Author:  ${authorName}
 
 Message: ${commit.commit.message}`;
@@ -453,78 +453,6 @@ Message: ${commit.commit.message}`;
       });
 
       // flipXY();
-
-    ////////////////////////////////////////////////////////////////////
-    //Charts: https://bost.ocks.org/mike/bar/
-
-    // const repoStats = analyzeRepo(d3commits);
-    // console.log(repoStats);
-    //
-    // let chart = d3.select('#chart');
-    //
-    // function entries(obj){
-    //   const arr = [];
-    //   Object.keys(obj).forEach(key =>
-    //     arr.push( [key, obj[key]] )
-    //   );
-    //   return arr;
-    // }
-    //
-    // function values(obj){
-    //   const arr = [];
-    //   Object.keys(obj).forEach((key) =>
-    //     arr.push(obj[key])
-    //   );
-    //   return arr;
-    // }
-    //
-    // const branchEntries = entries(repoStats.branches);
-    // const branchNames = Object.keys(repoStats.branches);
-    // const branchValues = entries(repoStats.branches);
-    //
-    // d3.select('#chart')
-    //   .selectAll('div')
-    //   .data(branchEntries)
-    //   .enter().append('div')
-    //   .style("width", d => d[1] * 10 + "px")
-    //   .text(d => d[0]);
-    //
-    // let scale = d3.scale.linear()
-    //     .domain([0, d3.max(branchValues)])
-    //     .range([0, 420]);
-    //
-    // d3.select("#chart")
-    //   .selectAll("div")
-    //     .data(branchEntries)
-    //   .enter().append("div")
-    //     .style("width", function(d) { return scale(d[1]) + "px"; })
-    //     .text(function(d) { return d[1]; });
-    //
-    // function filterRepo(event) {
-    //   event.preventDefault();
-    //   console.log(event)
-    //
-    //   //make all of them the correct color (not red)
-    //   d3.selectAll('circle')
-    //     .each(function(node){
-    //       d3.select(this)
-    //         .classed('selected', false);
-    //     });
-    //
-    //   //consistently use toLowerCase() to remove case-sensitivity
-    //   const term = event.target.value.toLowerCase();
-    //
-    //   //if empty string, return
-    //   if(!term) return;
-    //
-    //   d3.selectAll('circle')
-    //     .each(function(node){
-    //       if(JSON.stringify(node).toLowerCase().includes(term)) {
-    //         d3.select(this)
-    //           .classed('selected', true);
-    //       }
-    //     });
-    // }
   }
 
   componentWillUnmount() {
