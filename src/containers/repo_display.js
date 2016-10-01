@@ -4,7 +4,7 @@
  * redux state to receive the commit data returned from the api call. Does not
  * need to dispatch to the redux state.
  *
- * While this is a component, React is not actually being used to manipulate the
+ * While this is a container, React is not actually being used to manipulate the
  * DOM here. We simply call a function that will directly go to our canvas and
  * draw on it, bypassing React.
  */
@@ -29,8 +29,7 @@ class RepoDisplay extends Component {
     $('body').append('<div id="container"></div>');
 
     const pageWidth = window.innerWidth;
-    const pageHeight = window.innerHeight - 32;
-
+    const pageHeight = window.innerHeight;
 
     const githubTranslator = new GithubApiInterface(
       this.props.currentRepo.JSONCommits,
@@ -340,11 +339,40 @@ class RepoDisplay extends Component {
       });
     }
 
+    function startLoadAnimation() {
+      console.log('loading...')
+      d3.selectAll('circle')
+        .each(function(node) {
+          d3.select(this)
+            .transition()
+            .duration(5000)
+            .attr('cy', pageHeight * 2);
+        });
+    }
+
+    function showToolTip(commit) {
+      const { branch, sha, html_url: url, author: { login: authorName } } = commit;
+      const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
+
+      //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
+      //then make it a hyperlink; otherwise, don't display branch name
+      const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
+
+      const tooltipContent =
+`${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:     ${makeAnchor(sha.slice(0, 9) + '...', url)}
+Author:  ${authorName}
+
+Message: ${commit.commit.message}`;
+
+      infoTip.html(`<pre>${tooltipContent}</pre>`);
+      infoTip.show();
+    }
+
     const d3commits = JSONCommits;
     addColors(d3commits);
     generateCoordinates();
 
-    //tooltip: http://bl.ocks.org/Caged/6476579
+    //http://bl.ocks.org/Caged/6476579
     const infoTip = d3.tip()
       .attr('class', 'd3-tip')
       .direction('s')
@@ -410,25 +438,10 @@ class RepoDisplay extends Component {
       .attr('cy', commit => commit.y)
       .attr('stroke', commit => branchLookup[commit.branch].color)
       .attr('fill', commit => branchLookup[commit.branch].color);
-      
+
       //show the tool on hover
-      nodes.on("mouseover", function(commit) {
-        const { branch, sha, html_url: url, author: { login: authorName } } = commit;
-        const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
-
-        //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
-        //then make it a hyperlink; otherwise, don't display branch name
-        const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
-
-        const tooltipContent =
-`${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }Sha:     ${makeAnchor(sha.slice(0, 9) + '...', url)}
-Author:  ${authorName}
-
-Message: ${commit.commit.message}`;
-
-        infoTip.html(`<pre>${tooltipContent}</pre>`);
-        infoTip.show();
-      });
+      nodes.on('mouseover', showToolTip)
+        .on('click', showToolTip);
   }
 
   render() {
