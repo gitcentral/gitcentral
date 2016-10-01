@@ -38,11 +38,6 @@ class RepoDisplay extends Component {
     );
     const { JSONCommits, SHALookup, branchLookup, JSONBranches } = githubTranslator;
 
-    const checkoutSite = 'https://www.atlassian.com/git/tutorials/viewing-old-commits';
-    const branchSite = 'https://www.atlassian.com/git/tutorials/using-branches/';
-    const rebaseSite = 'https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase';
-    const tagSite = 'https://git-scm.com/book/en/v2/Git-Basics-Tagging';
-
     /**
      * Create an HTML anchor tag
      * @param  {String} linkedText - the text you wish to appear
@@ -239,12 +234,13 @@ class RepoDisplay extends Component {
         .attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
 
       //To make the tip essentially disappear from the page we remove its HTML.
-      //It is still present on the page, but now consists of a tiny square.
+      //It is still present on the page, but now consists of a tiny invisible square.
       d3.selectAll('.d3-tip')
         .style('opacity', 0)
         .html('');
     }
 
+    //https://bl.ocks.org/mbostock/6123708
     function dragstarted(d) {
       d3.event.sourceEvent.stopPropagation();
       d3.select(this).classed("dragging", true);
@@ -321,6 +317,42 @@ class RepoDisplay extends Component {
       return stats;
     }
 
+    function flipXY() {
+      d3.selectAll('circle')
+        .each(function(node) {
+          const x = node.y;
+          const y = node.x;
+          d3.select(this)
+            .attr('cx', x)
+            .attr('cy', y);
+        });
+
+      d3.selectAll('.line')
+        .remove();
+
+      d3commits.forEach(commit => {
+        commit.children.forEach(child => {
+          let childObj = githubTranslator.getCommit(child);
+          //this is where the magic happens. Just flip x and y.
+          const curveData = [ { x:commit.y, y:commit.x },{x:childObj.y,  y:childObj.x }];
+          const edge = d3.select("svg").append('g');
+          const diagonal = d3.svg.diagonal()
+            .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
+            .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
+            .projection(function(d) { return [d.y, d.x]; });
+             
+          d3.select("g")
+              .datum(curveData)
+            .append("path")
+              .attr("class", "line")
+              .attr("d", diagonal)
+              .attr("stroke-width", 1)
+            .attr('stroke', branchLookup[commit.branch].color)
+            .attr('fill', 'none');
+        });
+      });
+    }
+
     const d3commits = JSONCommits;
     addColors(d3commits);
     generateCoordinates();
@@ -345,7 +377,11 @@ class RepoDisplay extends Component {
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
       .attr('height', pageHeight)
-      .on('click', infoTip.hide)
+      .on('click', function() {
+        d3.selectAll('.d3-tip')
+          .style('opacity', 0)
+          .html('');
+      })
       .call(zoom);
 
     svg.call(infoTip);
@@ -398,31 +434,25 @@ class RepoDisplay extends Component {
 
       //show the tool on hover
       nodes.on("mouseover", function(commit) {
-        const { branch, sha, author: { login: authorName } } = commit;
-        const branchLinkPrefix = `https://github.com/mangonada/mangonada/commits/`;
-        const commitLinkPrefix = `https://github.com/mangonada/mangonada/commit/`;
+        const { branch, sha, html_url: url, author: { login: authorName } } = commit;
+        const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
+        ///////////////////////////////////////////////////////
+        //BUG: MOST LINKS DON'T WORK FOR BRANCH; ONLY MASTER //
+        ///////////////////////////////////////////////////////
+        const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
 
-        const universalCommands = `
+        const tooltipContent =
+`Branch:  ${makeAnchor(branch, branchLink)}
+Sha:     ${makeAnchor(sha.slice(0, 9) + '...', url)}
+Author:  ${authorName}
 
-Possible git commands:
-  ${makeAnchor('git checkout', checkoutSite)} ${sha}
-    options:
-      -b: create and check out new branch
-  ${makeAnchor('git branch', branchSite)} [branch name]
-    options:
-      -d: delete branch
-      -D: delete branch, suppress warnings
-  ${makeAnchor('git tag', tagSite)} [tag name]`;
-
-      const tooltipContent =
-  `Branch:  ${makeAnchor(branch, branchLinkPrefix + branch)}
-Sha:     ${makeAnchor(sha.slice(0, 9) + '...', commitLinkPrefix + sha)}
-Message: ${commit.commit.message}
-Author:  ${authorName}${universalCommands}`;
+Message: ${commit.commit.message}`;
 
         infoTip.html(`<pre>${tooltipContent}</pre>`);
         infoTip.show();
       });
+
+      // flipXY();
 
     ////////////////////////////////////////////////////////////////////
     //Charts: https://bost.ocks.org/mike/bar/
