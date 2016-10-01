@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .reactContainer {
    top: 0; right: 0; bottom: 0; left: 0;
  }
@@ -19,16 +23,6 @@
   stroke-width: 4px;
 }
 
-div.tooltip {
-    position: absolute;
-    text-align: left;
-    padding: 2px;
-    font: 12px sans-serif;
-    background: lightsteelblue;
-    border: 0px;
-    border-radius: 5px;
-}
-
 #chart div {
   font: 10px sans-serif;
   background-color: steelblue;
@@ -47,7 +41,6 @@ div.tooltip {
   border-radius: 6px;
   pointer-events: none;
   font-family: 'Open Sans', sans-serif;
-  /*font-size: 80%;*/
  }
 
 .d3-tip:after {

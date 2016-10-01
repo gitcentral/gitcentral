@@ -47,9 +47,9 @@ export default class GithubApiInterface {
       if (commit.children === undefined) {
         console.log("commit has no children", commit.sha.slice(0, 5));
       }
-      if (commit.gitCommands === undefined) {
-        console.log("commit has no git-command", commit.sha.slice(0, 5));
-      }
+      // if (commit.gitCommands === undefined) {
+      //   console.log("commit has no git-command", commit.sha.slice(0, 5));
+      // }
       if (commit.parentReferences === undefined) {
         console.log("commit has no parent references", commit.sha.slice(0, 5));
       }
