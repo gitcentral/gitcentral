@@ -1,10 +1,12 @@
+/**
+ * display_helpers.js
+ *
+ * Contains helper function used in repo_display.js
+ */
+
 import generateCoordinates from './coordinate_generator';
 
 export default {
-  /**
-   * Generate the x and y-coordinates for each commit. Place them as properties
-   * on the commit.
-   */
   generateCoordinates,
 
   /**
@@ -18,7 +20,7 @@ export default {
   },
 
   //https://bl.ocks.org/mbostock/6123708
-  zoomed: function() {
+  zoomed: function(svg) {
     const { translate, scale } = d3.event;
     svg.selectAll('g')
       .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
@@ -52,7 +54,8 @@ export default {
     }
   },
 
-  //Create an object with some statistics for the commits passed in
+  //Create an object with some statistics for the 
+  //commits and branches passed in
   analyzeRepo: function(commits, branchLookup) {
     function countCommitsPerAuthor(author) {
       return commits.reduce((authorCount, commit) => {
@@ -90,6 +93,10 @@ export default {
   //////////////////////////////////////////////////////////////////
   // NOT DRY. COPIED FROM ORIGINAL LINE RENDERING IN repo_display //
   //////////////////////////////////////////////////////////////////
+  /**
+   * Flip the x and y-values of each node to make the graph vertical.
+   * Delete all lines, then re-render lines.
+   */
   flipXY: function() {
     d3.selectAll('circle')
       .each(function(node) {
@@ -131,8 +138,9 @@ export default {
     });
   },
 
-  //Confusing indentation due to the string literal:
+  //Confusing indentation due to the string interpolation:
   //-----------------------------------------------------------------------------
+  //Show the tooltip with proper commit content.
   showToolTip: function(commit) {
     const { branch, sha, html_url: url, author: { login: authorName } } = commit;
     const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);

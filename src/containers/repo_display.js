@@ -1,5 +1,7 @@
 /* eslint-disable */
 /**
+ * repo_display.js
+ * 
  * This is the container that displays the repo itself. It needs access to the
  * redux state to receive the commit data returned from the api call. Does not
  * need to dispatch to the redux state.
@@ -68,7 +70,7 @@ class RepoDisplay extends Component {
     //https://bl.ocks.org/mbostock/6123708
     const zoom = d3.behavior.zoom()
       .scaleExtent([0.1, 10])
-      .on("zoom", zoomed);
+      .on("zoom", () => zoomed(svg));
 
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
