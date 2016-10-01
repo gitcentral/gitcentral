@@ -175,9 +175,7 @@ class RepoDisplay extends Component {
         taken.push({ start, end, y: yCoordinate });
       });
 
-      //////////////////////////////////////////////////////////////////////
-      // if there are 2 branches connected and on the same line, move one //
-      //////////////////////////////////////////////////////////////////////
+      // if there are 2 branches connected and on the same line, move one
       let changed = false;
       do{
         changed = false;
@@ -194,9 +192,7 @@ class RepoDisplay extends Component {
         });
       } while(changed);
 
-      //////////////////////////////////////////////////
-      //If there are 2 branches overlapping, move one //
-      //////////////////////////////////////////////////
+      //If there are 2 branches overlapping, move one
       const allBranches = Object.keys(branchXCoordinates);
       let altered = false;
       do{
@@ -239,20 +235,6 @@ class RepoDisplay extends Component {
       d3.selectAll('.d3-tip')
         .style('opacity', 0)
         .html('');
-    }
-
-    //https://bl.ocks.org/mbostock/6123708
-    function dragstarted(d) {
-      d3.event.sourceEvent.stopPropagation();
-      d3.select(this).classed("dragging", true);
-    }
-
-    function dragged(d) {
-      d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
-    }
-
-    function dragended(d) {
-      d3.select(this).classed("dragging", false);
     }
 
     //add x and y values to each commit
@@ -318,6 +300,9 @@ class RepoDisplay extends Component {
       return stats;
     }
 
+    ////////////////////////////////////////////////////////
+    //NOT DRY. COPIED FROM ORIGINAL LINE RENDERING BELOW. //
+    ////////////////////////////////////////////////////////
     function flipXY() {
       d3.selectAll('circle')
         .each(function(node) {
@@ -334,6 +319,7 @@ class RepoDisplay extends Component {
       d3commits.forEach(commit => {
         commit.children.forEach(child => {
           let childObj = githubTranslator.getCommit(child);
+
           //this is where the magic happens. Just flip x and y.
           const curveData = [ { x:commit.y, y:commit.x },{x:childObj.y,  y:childObj.x }];
           const edge = d3.select("svg").append('g');
@@ -369,12 +355,6 @@ class RepoDisplay extends Component {
       .scaleExtent([0.1, 10])
       .on("zoom", zoomed);
 
-    const drag = d3.behavior.drag()
-      .origin(function(d) { return d; })
-      .on("dragstart", dragstarted)
-      .on("drag", dragged)
-      .on("dragend", dragended);
-
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
       .attr('height', pageHeight)
@@ -402,7 +382,6 @@ class RepoDisplay extends Component {
 
       //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
         const curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
-        // const edge = d3.select("svg").append('g');
         const edge = svg.append('g');
         const diagonal = d3.svg.diagonal()
           .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })
@@ -430,14 +409,13 @@ class RepoDisplay extends Component {
       .attr('cx', commit => commit.x)
       .attr('cy', commit => commit.y)
       .attr('stroke', commit => branchLookup[commit.branch].color)
-      .attr('fill', commit => branchLookup[commit.branch].color)
-      .call(drag);
-
+      .attr('fill', commit => branchLookup[commit.branch].color);
+      
       //show the tool on hover
       nodes.on("mouseover", function(commit) {
         const { branch, sha, html_url: url, author: { login: authorName } } = commit;
         const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
-        
+
         //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
         //then make it a hyperlink; otherwise, don't display branch name
         const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
@@ -451,12 +429,6 @@ Message: ${commit.commit.message}`;
         infoTip.html(`<pre>${tooltipContent}</pre>`);
         infoTip.show();
       });
-
-      // flipXY();
-  }
-
-  componentWillUnmount() {
-    console.log('unmounting')
   }
 
   render() {
