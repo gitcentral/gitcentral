@@ -4,6 +4,7 @@ export default class GithubApiInterface {
   constructor(JSONCommits, JSONBranches) {
     this.JSONCommits = JSONCommits;
     this.JSONBranches = JSONBranches;
+    this.originalBranches = JSONBranches.map(branch => branch.name);
     this.SHALookup = {};
     this.branchLookup = {};
     this.branchLengths = {};

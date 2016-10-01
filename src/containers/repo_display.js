@@ -4,7 +4,7 @@
  * redux state to receive the commit data returned from the api call. Does not
  * need to dispatch to the redux state.
  *
- * While this is a component, React is not actually being used to manipulate the
+ * While this is a container, React is not actually being used to manipulate the
  * DOM here. We simply call a function that will directly go to our canvas and
  * draw on it, bypassing React.
  */
@@ -29,14 +29,14 @@ class RepoDisplay extends Component {
     $('body').append('<div id="container"></div>');
 
     const pageWidth = window.innerWidth;
-    const pageHeight = window.innerHeight - 32;
-
+    const pageHeight = window.innerHeight;
 
     const githubTranslator = new GithubApiInterface(
       this.props.currentRepo.JSONCommits,
       this.props.currentRepo.JSONBranches
     );
-    const { JSONCommits, SHALookup, branchLookup, JSONBranches } = githubTranslator;
+    const { JSONCommits, SHALookup, branchLookup,
+      JSONBranches, originalBranches } = githubTranslator;
 
     /**
      * Create an HTML anchor tag
@@ -115,7 +115,7 @@ class RepoDisplay extends Component {
         return overlap ? generateY(branch, y + yOffset) : y;
       }
 
-     /**
+      /**
        * branchXCoordinates will contain the start and end x-values for
        * each commit.
        * @type {Object}
@@ -174,9 +174,7 @@ class RepoDisplay extends Component {
         taken.push({ start, end, y: yCoordinate });
       });
 
-      //////////////////////////////////////////////////////////////////////
-      // if there are 2 branches connected and on the same line, move one //
-      //////////////////////////////////////////////////////////////////////
+      // if there are 2 branches connected and on the same line, move one
       let changed = false;
       do{
         changed = false;
@@ -193,9 +191,7 @@ class RepoDisplay extends Component {
         });
       } while(changed);
 
-      //////////////////////////////////////////////////
-      //If there are 2 branches overlapping, move one //
-      //////////////////////////////////////////////////
+      //If there are 2 branches overlapping, move one
       const allBranches = Object.keys(branchXCoordinates);
       let altered = false;
       do{
@@ -238,20 +234,6 @@ class RepoDisplay extends Component {
       d3.selectAll('.d3-tip')
         .style('opacity', 0)
         .html('');
-    }
-
-    //https://bl.ocks.org/mbostock/6123708
-    function dragstarted(d) {
-      d3.event.sourceEvent.stopPropagation();
-      d3.select(this).classed("dragging", true);
-    }
-
-    function dragged(d) {
-      d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
-    }
-
-    function dragended(d) {
-      d3.select(this).classed("dragging", false);
     }
 
     //add x and y values to each commit
@@ -317,6 +299,9 @@ class RepoDisplay extends Component {
       return stats;
     }
 
+    ////////////////////////////////////////////////////////
+    //NOT DRY. COPIED FROM ORIGINAL LINE RENDERING BELOW. //
+    ////////////////////////////////////////////////////////
     function flipXY() {
       d3.selectAll('circle')
         .each(function(node) {
@@ -333,6 +318,7 @@ class RepoDisplay extends Component {
       d3commits.forEach(commit => {
         commit.children.forEach(child => {
           let childObj = githubTranslator.getCommit(child);
+
           //this is where the magic happens. Just flip x and y.
           const curveData = [ { x:commit.y, y:commit.x },{x:childObj.y,  y:childObj.x }];
           const edge = d3.select("svg").append('g');
@@ -353,11 +339,40 @@ class RepoDisplay extends Component {
       });
     }
 
+    function startLoadAnimation() {
+      console.log('loading...')
+      d3.selectAll('circle')
+        .each(function(node) {
+          d3.select(this)
+            .transition()
+            .duration(5000)
+            .attr('cy', pageHeight * 2);
+        });
+    }
+
+    function showToolTip(commit) {
+      const { branch, sha, html_url: url, author: { login: authorName } } = commit;
+      const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
+
+      //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
+      //then make it a hyperlink; otherwise, don't display branch name
+      const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
+
+      const tooltipContent =
+`${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:     ${makeAnchor(sha.slice(0, 9) + '...', url)}
+Author:  ${authorName}
+
+Message: ${commit.commit.message}`;
+
+      infoTip.html(`<pre>${tooltipContent}</pre>`);
+      infoTip.show();
+    }
+
     const d3commits = JSONCommits;
     addColors(d3commits);
     generateCoordinates();
 
-    //tooltip: http://bl.ocks.org/Caged/6476579
+    //http://bl.ocks.org/Caged/6476579
     const infoTip = d3.tip()
       .attr('class', 'd3-tip')
       .direction('s')
@@ -367,12 +382,6 @@ class RepoDisplay extends Component {
     const zoom = d3.behavior.zoom()
       .scaleExtent([0.1, 10])
       .on("zoom", zoomed);
-
-    const drag = d3.behavior.drag()
-      .origin(function(d) { return d; })
-      .on("dragstart", dragstarted)
-      .on("drag", dragged)
-      .on("dragend", dragended);
 
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
@@ -401,7 +410,6 @@ class RepoDisplay extends Component {
 
       //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
         const curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
-        // const edge = d3.select("svg").append('g');
         const edge = svg.append('g');
         const diagonal = d3.svg.diagonal()
           .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })
@@ -429,106 +437,11 @@ class RepoDisplay extends Component {
       .attr('cx', commit => commit.x)
       .attr('cy', commit => commit.y)
       .attr('stroke', commit => branchLookup[commit.branch].color)
-      .attr('fill', commit => branchLookup[commit.branch].color)
-      .call(drag);
+      .attr('fill', commit => branchLookup[commit.branch].color);
 
       //show the tool on hover
-      nodes.on("mouseover", function(commit) {
-        const { branch, sha, html_url: url, author: { login: authorName } } = commit;
-        const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
-        ///////////////////////////////////////////////////////
-        //BUG: MOST LINKS DON'T WORK FOR BRANCH; ONLY MASTER //
-        ///////////////////////////////////////////////////////
-        const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
-
-        const tooltipContent =
-`Branch:  ${makeAnchor(branch, branchLink)}
-Sha:     ${makeAnchor(sha.slice(0, 9) + '...', url)}
-Author:  ${authorName}
-
-Message: ${commit.commit.message}`;
-
-        infoTip.html(`<pre>${tooltipContent}</pre>`);
-        infoTip.show();
-      });
-
-      // flipXY();
-
-    ////////////////////////////////////////////////////////////////////
-    //Charts: https://bost.ocks.org/mike/bar/
-
-    // const repoStats = analyzeRepo(d3commits);
-    // console.log(repoStats);
-    //
-    // let chart = d3.select('#chart');
-    //
-    // function entries(obj){
-    //   const arr = [];
-    //   Object.keys(obj).forEach(key =>
-    //     arr.push( [key, obj[key]] )
-    //   );
-    //   return arr;
-    // }
-    //
-    // function values(obj){
-    //   const arr = [];
-    //   Object.keys(obj).forEach((key) =>
-    //     arr.push(obj[key])
-    //   );
-    //   return arr;
-    // }
-    //
-    // const branchEntries = entries(repoStats.branches);
-    // const branchNames = Object.keys(repoStats.branches);
-    // const branchValues = entries(repoStats.branches);
-    //
-    // d3.select('#chart')
-    //   .selectAll('div')
-    //   .data(branchEntries)
-    //   .enter().append('div')
-    //   .style("width", d => d[1] * 10 + "px")
-    //   .text(d => d[0]);
-    //
-    // let scale = d3.scale.linear()
-    //     .domain([0, d3.max(branchValues)])
-    //     .range([0, 420]);
-    //
-    // d3.select("#chart")
-    //   .selectAll("div")
-    //     .data(branchEntries)
-    //   .enter().append("div")
-    //     .style("width", function(d) { return scale(d[1]) + "px"; })
-    //     .text(function(d) { return d[1]; });
-    //
-    // function filterRepo(event) {
-    //   event.preventDefault();
-    //   console.log(event)
-    //
-    //   //make all of them the correct color (not red)
-    //   d3.selectAll('circle')
-    //     .each(function(node){
-    //       d3.select(this)
-    //         .classed('selected', false);
-    //     });
-    //
-    //   //consistently use toLowerCase() to remove case-sensitivity
-    //   const term = event.target.value.toLowerCase();
-    //
-    //   //if empty string, return
-    //   if(!term) return;
-    //
-    //   d3.selectAll('circle')
-    //     .each(function(node){
-    //       if(JSON.stringify(node).toLowerCase().includes(term)) {
-    //         d3.select(this)
-    //           .classed('selected', true);
-    //       }
-    //     });
-    // }
-  }
-
-  componentWillUnmount() {
-    console.log('unmounting')
+      nodes.on('mouseover', showToolTip)
+        .on('click', showToolTip);
   }
 
   render() {
