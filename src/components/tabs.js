@@ -36,7 +36,7 @@ export default class NavTabs extends Component {
 
   render (){
     return (
-      <Tabs inkBarStyle={{background: 'white'}}>
+      <Tabs inkBarStyle={{background: 'none'}}>
       <Tab
         icon={<Timeline />}
         style={{padding: 5}}
