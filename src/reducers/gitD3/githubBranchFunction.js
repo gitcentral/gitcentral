@@ -319,7 +319,7 @@ export default class GithubApiInterface {
 
       function countCommitsPerAuthor(author) {
         return commits.reduce((authorCount, commit) => {
-          if(commit.author.login === author) authorCount++;
+          if((commit.author) && (commit.author.login === author)) authorCount++;
           return authorCount;
         }, 0);
       }
@@ -338,7 +338,8 @@ export default class GithubApiInterface {
       }
 
       commits.forEach((commit) => {
-        const author = commit.author.login;
+        let author = "";
+        if (commit.author) { author = commit.author.login; }
         contributors[author] = contributors[author] || countCommitsPerAuthor(author);
       });
 
