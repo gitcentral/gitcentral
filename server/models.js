@@ -24,8 +24,22 @@ var UserSchema = Schema({
 });
 
 var GithubDataSchema = Schema({
-  userRepo : String,  // "user/repo"
-  jsonData : { // { JSONBranches : [], JSONCommits : [] }
+  repo : String,  // userRepo : "user_name/repo_name"
+  updated_at : String, // last updated at
+  branches : { // JSONBranches : []
+    type: String,
+    get: function(data) {
+      try {
+        return JSON.parse(data);
+      } catch(err) {
+        return data;
+      }
+    },
+    set: function(data) {
+      return JSON.stringify(data);
+    }
+  },
+  commits : { // JSONCommits : []
     type: String,
     get: function(data) {
       try { 
