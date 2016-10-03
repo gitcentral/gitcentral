@@ -1,12 +1,13 @@
-
+/**
+ * coordinate_generator.js
+ * 
+ * This is the file that contains the logic for generating x and y-values
+ * for each commit. The values will be placed on that commit as properties.
+ */
 
 /**
- * Given a range of start and end values, determine if there is any
- * overlap.
- * @param  {Object} range1 - the first range, an object with properties
- *                         start and end
- * @param  {Object} range2 - the 2nd range, same properties
- * @return {Boolean} - whether or not they overlap
+ * Given two start and end values, determine if there is any
+ * overlap. Expects { start: m, end: n }
  */
 function checkOverlap(range1, range2) {
   return (range2.start <= range1.start && range1.start <= range2.end) ||
@@ -15,9 +16,7 @@ function checkOverlap(range1, range2) {
 
 /**
  * Generate an x-value for each commit. Each commit sent in will
- * have a higher x-value than the one before it. Useful for placing
- * elements in order. If the next commit will flow off of the screen,
- * reset the x-value.
+ * have a higher x-value than the one before it.
  */
 function generateX(numCommits) {
   return 40 + numCommits * 30;
@@ -27,10 +26,6 @@ function generateX(numCommits) {
  * Determine if the y-position we're checking will have overlaps. If so,
  * put in a different place. Recursively checks the next y-value if the current
  * one is already taken.
- * @param  {String} branch - the branch name
- * @param  {Number} y - the y-value we're checking. Is set automatically,
- *                    or recursively.
- * @return {Number} - the y position.
  */
 function generateY(branch, branchXCoordinates, takenXCoordinates, y, yOffset) {
   let overlap = false;
@@ -46,10 +41,16 @@ function generateY(branch, branchXCoordinates, takenXCoordinates, y, yOffset) {
     }
   });
 
-  return overlap ? generateY(branch, branchXCoordinates, takenXCoordinates, y + yOffset, yOffset) : y;
+  if(overlap) {
+    return generateY(branch, branchXCoordinates, takenXCoordinates, y + yOffset, yOffset);
+  }
+
+  return y;
 }
 
-// if there are 2 branches connected and on the same line, move one
+//Edit the y-coordinates for branches that are
+//connected but on the same y-value. If there are 2 branches
+//connected and on the same line, move one.
 function shiftChildrenFromParents(commitsArr, commitsObj, branchYCoordinates, yOffset) {
   let changed = false;
   commitsArr.forEach(commit => {
@@ -64,14 +65,22 @@ function shiftChildrenFromParents(commitsArr, commitsObj, branchYCoordinates, yO
     });
   });
 
+  //Recursively call until there are no more changes to be made.
   if(changed) {
     shiftChildrenFromParents(commitsArr, commitsObj, branchYCoordinates, yOffset);
   }
 }
 
-//If there are 2 branches overlapping, move one. Meant to fix problems
-//caused by shiftChildrenFromParents
-function shiftOverlappingBranches(branchXCoordinates, branchYCoordinates) {
+/**
+ * Given a set of branches and their x and y-coordinate values,
+ * fix any overlaps. Recursively call until there are no overlaps. Meant
+ * to fix any overlaps created by shiftChildrenFromParents.
+ * @param  {Object} xCoordinates - the x-coordinates (start and end) for
+ *                               each branch
+ * @param  {Object} yCoordinates - the y-coordinate for each branch
+ * @param  {Number} yOffset - tells us how far to shift an overlapping branch
+ */
+function shiftOverlappingBranches(branchXCoordinates, branchYCoordinates, yOffset) {
   const allBranches = Object.keys(branchXCoordinates);
   let altered = false;
   allBranches.forEach(thisBranch => {
@@ -94,7 +103,7 @@ function shiftOverlappingBranches(branchXCoordinates, branchYCoordinates) {
   });
 
   if(altered){
-    shiftOverlappingBranches(branchXCoordinates, branchYCoordinates);
+    shiftOverlappingBranches(branchXCoordinates, branchYCoordinates, yOffset);
   }
 }
 
@@ -164,7 +173,7 @@ export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
 
   // if there are 2 branches connected and on the same line, move one
   shiftChildrenFromParents(commitsArr, commitsObj, branchYCoordinates, yOffset);
-  shiftOverlappingBranches(branchObj, branchXCoordinates, branchYCoordinates)
+  shiftOverlappingBranches(branchXCoordinates, branchYCoordinates, yOffset)
 
   //map the branchYCoordinates values over to their commits
   commitsArr.forEach(commit => commit.y = branchYCoordinates[commit.branch]);
