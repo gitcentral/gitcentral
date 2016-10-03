@@ -14,56 +14,47 @@ function checkOverlap(range1, range2) {
 }
 
 /**
+ * Generate an x-value for each commit. Each commit sent in will
+ * have a higher x-value than the one before it. Useful for placing
+ * elements in order. If the next commit will flow off of the screen,
+ * reset the x-value.
+ */
+function generateX(numCommits) {
+  return 40 + numCommits * 30;
+}
+
+/**
+ * Determine if the y-position we're checking will have overlaps. If so,
+ * put in a different place. Recursively checks the next y-value if the current
+ * one is already taken.
+ * @param  {String} branch - the branch name
+ * @param  {Number} y - the y-value we're checking. Is set automatically,
+ *                    or recursively.
+ * @return {Number} - the y position.
+ */
+function generateY(branch, branchXCoordinates, takenXCoordinates, y, yOffset) {
+  let overlap = false;
+
+  const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
+
+  takenXCoordinates.forEach(set => {
+    if(set.y === y) {
+      if((set.start <= thisBranchStartPoint && thisBranchStartPoint <= set.end) ||
+        (set.start <= thisBranchEndPoint && thisBranchEndPoint <= set.end)) {
+        overlap = true;
+      }
+    }
+  });
+
+  return overlap ? generateY(branch, branchXCoordinates, takenXCoordinates, y + yOffset, yOffset) : y;
+}
+
+/**
  * Generate the x and y-coordinates for each commit. Place them as properties
  * on the commit.
  */
 export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
-  /**
-   * Generate an x-value for each commit. Each commit sent in will
-   * have a higher x-value than the one before it. Useful for placing
-   * elements in order. If the next commit will flow off of the screen,
-   * reset the x-value.
-   */
-  function generateX(numCommits) {
-    return 40 + numCommits * 30;
-  }
 
-  function resetXandY() {
-    numCommits = 1;
-    firstCheckForY += 80;
-  }
-
-  /**
-   * Determine if the y-position we're checking will have overlaps. If so,
-   * put in a different place. Recursively checks the next y-value if the current
-   * one is already taken.
-   * @param  {String} branch - the branch name
-   * @param  {Number} y - the y-value we're checking. Is set automatically,
-   *                    or recursively.
-   * @return {Number} - the y position.
-   */
-  function generateY(branch, y = firstCheckForY) {
-    //if we're at a new branch we need to jump to another level
-    if(branch !== lastBranch) {
-      lastBranch = branch;
-      return generateY(branch, y + yOffset);
-    }
-
-    let overlap = false;
-
-    const { start: thisBranchStartPoint, end: thisBranchEndPoint } = branchXCoordinates[branch];
-
-    taken.forEach(set => {
-      if(set.y === y) {
-        if((set.start <= thisBranchStartPoint && thisBranchStartPoint <= set.end) ||
-          (set.start <= thisBranchEndPoint && thisBranchEndPoint <= set.end)) {
-          overlap = true;
-        }
-      }
-    });
-
-    return overlap ? generateY(branch, y + yOffset) : y;
-  }
 
   /**
    * branchXCoordinates will contain the start and end x-values for
@@ -118,7 +109,13 @@ export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
     if(!branchXCoordinates[branch] || branch === 'master') return;
 
     const { start, end } = branchXCoordinates[branch];
-    const yCoordinate = generateY(branch);
+
+    let yToCheck = firstCheckForY;
+    if(branch !== lastBranch) {
+      yToCheck += yOffset;
+    }
+
+    const yCoordinate = generateY(branch, branchXCoordinates, taken, yToCheck, yOffset);
     lastBranch = branch;
     branchYCoordinates[branch] = yCoordinate;
     taken.push({ start, end, y: yCoordinate });
