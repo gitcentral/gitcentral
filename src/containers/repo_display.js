@@ -18,6 +18,7 @@ import tooltip from '../reducers/gitD3/d3tip.js';
 import _  from 'lodash';
 import $ from 'jquery';
 import displayHelpers from './display_helpers';
+import generateCoordinates from './coordinate_generator';
 
 d3.tip = tooltip;
 
@@ -52,7 +53,6 @@ class RepoDisplay extends Component {
       startLoadAnimation,
       addColors,
       analyzeRepo,
-      generateCoordinates,
     } = displayHelpers;
 
     addColors(branchLookup);
