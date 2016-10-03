@@ -17,6 +17,7 @@ import d3 from '../reducers/gitD3/d3.js';
 import tooltip from '../reducers/gitD3/d3tip.js';
 import _  from 'lodash';
 import $ from 'jquery';
+import displayHelpers from './display_helpers';
 
 d3.tip = tooltip;
 
@@ -35,8 +36,19 @@ class RepoDisplay extends Component {
       this.props.currentRepo.JSONCommits,
       this.props.currentRepo.JSONBranches
     );
-    const { JSONCommits, SHALookup, branchLookup,
-      JSONBranches, originalBranches } = githubTranslator;
+
+    const {
+      JSONBranches,
+      SHALookup,
+      branchLookup,
+      originalBranches,
+      JSONCommits: d3commits
+    } = githubTranslator;
+
+    const {
+      showToolTip,
+      
+    } = displayHelpers;
 
     /**
      * Create an HTML anchor tag
@@ -132,7 +144,7 @@ class RepoDisplay extends Component {
       const yOffset = 40;
 
       //Create the x-value for each commit.
-      JSONCommits.forEach(commit => {
+      d3commits.forEach(commit => {
         commit.x = generateX(commit);
 
         //if it's the first time we're processing a commit from this branch, create an object
@@ -350,25 +362,6 @@ class RepoDisplay extends Component {
         });
     }
 
-    function showToolTip(commit) {
-      const { branch, sha, html_url: url, author: { login: authorName } } = commit;
-      const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
-
-      //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
-      //then make it a hyperlink; otherwise, don't display branch name
-      const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
-
-      const tooltipContent =
-`${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:     ${makeAnchor(sha.slice(0, 9) + '...', url)}
-Author:  ${authorName}
-
-Message: ${commit.commit.message}`;
-
-      infoTip.html(`<pre>${tooltipContent}</pre>`);
-      infoTip.show();
-    }
-
-    const d3commits = JSONCommits;
     addColors(d3commits);
     generateCoordinates();
 
@@ -440,8 +433,7 @@ Message: ${commit.commit.message}`;
       .attr('fill', commit => branchLookup[commit.branch].color);
 
       //show the tool on hover
-      nodes.on('mouseover', showToolTip)
-        .on('click', showToolTip);
+      nodes.on('mouseover', node => showToolTip(node, originalBranches));
   }
 
   render() {
