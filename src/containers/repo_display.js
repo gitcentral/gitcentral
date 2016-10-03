@@ -47,18 +47,8 @@ class RepoDisplay extends Component {
 
     const {
       showToolTip,
-      
+      makeAnchor,
     } = displayHelpers;
-
-    /**
-     * Create an HTML anchor tag
-     * @param  {String} linkedText - the text you wish to appear
-     * @param  {String} site - the site to link to
-     * @return {String} - the anchor HTML element
-     */
-    function makeAnchor(linkedText, site) {
-      return `<a href="${site}" target="_blank">${linkedText}</a>`;
-    }
 
     /**
      * Generate the x and y-coordinates for each commit. Place them as properties
@@ -433,7 +423,7 @@ class RepoDisplay extends Component {
       .attr('fill', commit => branchLookup[commit.branch].color);
 
       //show the tool on hover
-      nodes.on('mouseover', node => showToolTip(node, originalBranches));
+      nodes.on('mouseover', node => showToolTip(node, originalBranches, infoTip));
   }
 
   render() {
