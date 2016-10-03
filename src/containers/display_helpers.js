@@ -50,81 +50,6 @@ function addColors(branches) {
   }
 }
 
-//Create an object with some statistics for the commits passed in
-function analyzeRepo(commits) {
-  function countCommitsPerAuthor(author) {
-    return commits.reduce((authorCount, commit) => {
-      if(commit.author.login === author) authorCount++;
-      return authorCount;
-    }, 0);
-  }
-
-  function countCommitsPerBranch(branch) {
-    return commits.reduce((branchCount, commit) => {
-      if(commit.branch === branch) branchCount++;
-      return branchCount;
-    }, 0);
-  }
-
-  const stats = {
-    branches: {},
-    contributors: {},
-  };
-
-  const { branches, contributors } = stats;
-
-  for(let branch in branchObj) {
-    branches[branch] = branches[branch] || countCommitsPerBranch(branch);
-  }
-
-  commits.forEach((commit) => {
-    const author = commit.author.login;
-    contributors[author] = contributors[author] || countCommitsPerAuthor(author);
-  });
-
-  return stats;
-}
-
-////////////////////////////////////////////////////////
-//NOT DRY. COPIED FROM ORIGINAL LINE RENDERING BELOW. //
-////////////////////////////////////////////////////////
-function flipXY() {
-  d3.selectAll('circle')
-    .each(function(node) {
-      const x = node.y;
-      const y = node.x;
-      d3.select(this)
-        .attr('cx', x)
-        .attr('cy', y);
-    });
-
-  d3.selectAll('.line')
-    .remove();
-
-  d3commits.forEach(commit => {
-    commit.children.forEach(child => {
-      let childObj = githubTranslator.getCommit(child);
-
-      //this is where the magic happens. Just flip x and y.
-      const curveData = [ { x:commit.y, y:commit.x },{x:childObj.y,  y:childObj.x }];
-      const edge = d3.select("svg").append('g');
-      const diagonal = d3.svg.diagonal()
-        .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })            
-        .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
-        .projection(function(d) { return [d.y, d.x]; });
-         
-      d3.select("g")
-          .datum(curveData)
-        .append("path")
-          .attr("class", "line")
-          .attr("d", diagonal)
-          .attr("stroke-width", 1)
-        .attr('stroke', branchLookup[commit.branch].color)
-        .attr('fill', 'none');
-    });
-  });
-}
-
 function startLoadAnimation() {
   console.log('loading...')
   d3.selectAll('circle')
@@ -158,8 +83,6 @@ export default {
   makeAnchor,
   zoomed,
   addColors,
-  analyzeRepo,
-  flipXY,
   startLoadAnimation,
   showToolTip,
 };

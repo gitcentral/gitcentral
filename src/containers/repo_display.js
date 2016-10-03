@@ -50,9 +50,8 @@ class RepoDisplay extends Component {
       showToolTip,
       makeAnchor,
       zoomed,
-      startLoadAnimation,
+      // startLoadAnimation,
       addColors,
-      analyzeRepo,
     } = displayHelpers;
 
     addColors(branchLookup);

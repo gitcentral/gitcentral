@@ -116,14 +116,21 @@ export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
   const yOffset = 40;
   let numCommits = 0;
 
-  // branchXCoordinates will contain the start and end x-values for
-  // each commit.
+  /**
+   * branchXCoordinates will contain the start and end x-values for
+   * each commit.
+   * @type {Object}, format:
+   *       { branchname1: { start: i, end: j }, branchname2: { start: m, end: n }, ...}
+   */
   const branchXCoordinates = {};
 
-  //branchYCoordinates will the y-coordinate of each branch.
+  /**
+   * branchYCoordinates will the y-coordinate of each branch.
+   * @type {Object}, format: { branchname1: n, branchname2: m, ...}
+   */
   const branchYCoordinates = { master: 360 };
 
-  //Create the x-value for each commit.
+  //Create the x-value for each commit. Simple and linear.
   commitsArr.forEach(commit => {
     commit.x = generateX(numCommits++);
 
@@ -154,7 +161,7 @@ export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
    */
   let lastBranch;
 
-  //get the y-coordinates for each branch
+  //Create the y-coordinates for each branch. Complex.
   Object.keys(branchObj).forEach(branch => {
     if(!branchXCoordinates[branch] || branch === 'master') return;
 
