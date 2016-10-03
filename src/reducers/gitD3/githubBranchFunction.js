@@ -29,7 +29,7 @@ export default class GithubApiInterface {
   sortByDepth(a, b) {
     return a.depth - b.depth;
   }
-  
+
   validateCommits() {
     // check what we add on top of original JSONCommits from github API
     this.JSONCommits.forEach(function(commit) {
@@ -43,7 +43,7 @@ export default class GithubApiInterface {
         console.log("commit has no branch", commit.sha.slice(0, 5));
       }
       if (commit.depth === undefined) {
-        console.log("commit has no depth", commit.sha.slice(0, 5));
+        // console.log("commit has no depth", commit.sha.slice(0, 5));
       }
       if (commit.children === undefined) {
         console.log("commit has no children", commit.sha.slice(0, 5));
