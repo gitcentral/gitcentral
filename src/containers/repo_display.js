@@ -140,4 +140,12 @@ function mapStateToProps(state) {
   return { currentRepo: state.currentRepo };
 }
 
-export default connect(mapStateToProps)(RepoDisplay);
+//anything returned from this fn will end up as props
+//on RepoDisplay container
+function mapDispatchToProps(dispatch) {
+  //whenever updateNode is called, the result should be passed
+  //to all of our reducers
+  return bindActionCreators({ updateNode }, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RepoDisplay);
