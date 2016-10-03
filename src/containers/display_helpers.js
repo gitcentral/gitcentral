@@ -218,8 +218,8 @@ function addColors(branches) {
   ];
 
   let i = 0;
-  for(let branch in branchLookup) {
-    branchLookup[branch].color = colors[i++ % colors.length];
+  for(let branch in branches) {
+    branches[branch].color = colors[i++ % colors.length];
   }
 }
 
