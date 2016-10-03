@@ -203,14 +203,6 @@ function zoomed(svg) {
     .html('');
 }
 
-//add x and y values to each commit
-function addCoordinates(nodes) {
-  nodes.forEach(node => {
-    node.x = generateX(node);
-    node.y = generateY(node);
-  });
-}
-
 //give each branch a different color property
 function addColors(branches) {
   const colors = [
@@ -335,16 +327,11 @@ Message: ${commit.commit.message}`;
   tooltip.show();
 }
 
-
-
-
-
 export default {
   makeAnchor,
   generateCoordinates,
   zoomed,
   addColors,
-  addCoordinates,
   analyzeRepo,
   flipXY,
   startLoadAnimation,

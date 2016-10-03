@@ -49,6 +49,7 @@ class RepoDisplay extends Component {
       showToolTip,
       makeAnchor,
       zoomed,
+      startLoadAnimation,
 
     } = displayHelpers;
 
@@ -225,14 +226,6 @@ class RepoDisplay extends Component {
       d3commits.forEach(commit => commit.y = branchYCoordinates[commit.branch]);
     }
 
-    //add x and y values to each commit
-    function addCoordinates(nodes) {
-      nodes.forEach(node => {
-        node.x = generateX(node);
-        node.y = generateY(node);
-      });
-    }
-
     //give each branch a different color property
     function addColors(branches) {
       const colors = [
@@ -328,16 +321,6 @@ class RepoDisplay extends Component {
       });
     }
 
-    function startLoadAnimation() {
-      console.log('loading...')
-      d3.selectAll('circle')
-        .each(function(node) {
-          d3.select(this)
-            .transition()
-            .duration(5000)
-            .attr('cy', pageHeight * 2);
-        });
-    }
 
     addColors(d3commits);
     generateCoordinates();
