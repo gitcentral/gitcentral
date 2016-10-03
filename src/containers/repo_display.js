@@ -13,7 +13,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
-import d3 from '../reducers/gitD3/d3.js';
 import tooltip from '../reducers/gitD3/d3tip.js';
 import _  from 'lodash';
 import $ from 'jquery';
@@ -141,4 +140,12 @@ function mapStateToProps(state) {
   return { currentRepo: state.currentRepo };
 }
 
-export default connect(mapStateToProps)(RepoDisplay);
+//anything returned from this fn will end up as props
+//on RepoDisplay container
+function mapDispatchToProps(dispatch) {
+  //whenever updateNode is called, the result should be passed
+  //to all of our reducers
+  return bindActionCreators({ updateNode }, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RepoDisplay);

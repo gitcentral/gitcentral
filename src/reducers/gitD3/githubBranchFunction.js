@@ -22,7 +22,7 @@ export default class GithubApiInterface {
     // json obj transformation
     this.addOrphanBranch();
     this.analyzeRepo();
-    this.addParentObj();
+    // this.addParentObj();
     this.validateCommits();
   }
 
