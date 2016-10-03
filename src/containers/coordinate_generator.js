@@ -49,28 +49,70 @@ function generateY(branch, branchXCoordinates, takenXCoordinates, y, yOffset) {
   return overlap ? generateY(branch, branchXCoordinates, takenXCoordinates, y + yOffset, yOffset) : y;
 }
 
+// if there are 2 branches connected and on the same line, move one
+function shiftChildrenFromParents(commitsArr, commitsObj, branchYCoordinates, yOffset) {
+  let changed = false;
+  commitsArr.forEach(commit => {
+    commit.children.forEach(child => {
+      const childObj = commitsObj[child];
+      if(childObj && commit.branch !== childObj.branch) {
+        if(branchYCoordinates[commit.branch] === branchYCoordinates[childObj.branch]) {
+          branchYCoordinates[childObj.branch] += yOffset;
+          changed = true;
+        }
+      }
+    });
+  });
+
+  if(changed) {
+    shiftChildrenFromParents(commitsArr, commitsObj, branchYCoordinates, yOffset);
+  }
+}
+
+//If there are 2 branches overlapping, move one. Meant to fix problems
+//caused by shiftChildrenFromParents
+function shiftOverlappingBranches(branchXCoordinates, branchYCoordinates) {
+  const allBranches = Object.keys(branchXCoordinates);
+  let altered = false;
+  allBranches.forEach(thisBranch => {
+    const thisBranchSet = branchXCoordinates[thisBranch];
+    allBranches.forEach(branchToCheck => {
+      //make sure it's not the same branch
+      if(thisBranch !== branchToCheck){
+        //make sure they have the same y-coordinate
+        if(branchYCoordinates[thisBranch] === branchYCoordinates[branchToCheck]){
+          const branchToCheckSet = branchXCoordinates[branchToCheck];
+
+          //Make sure they overlap somewhere along their x-coordinates
+          if(thisBranch !== branchToCheck && checkOverlap(thisBranchSet, branchToCheckSet)) {
+            branchYCoordinates[branchToCheck] += yOffset;
+            altered = true;
+          }
+        }
+      }
+    });
+  });
+
+  if(altered){
+    shiftOverlappingBranches(branchXCoordinates, branchYCoordinates);
+  }
+}
+
 /**
  * Generate the x and y-coordinates for each commit. Place them as properties
  * on the commit.
  */
 export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
+  const firstCheckForY = 360;
+  const yOffset = 40;
+  let numCommits = 0;
 
-
-  /**
-   * branchXCoordinates will contain the start and end x-values for
-   * each commit.
-   * @type {Object}
-   */
+  // branchXCoordinates will contain the start and end x-values for
+  // each commit.
   const branchXCoordinates = {};
 
-  /**
-   * branchYCoordinates will the y-coordinate of each branch.
-   * @type {Object}
-   */
+  //branchYCoordinates will the y-coordinate of each branch.
   const branchYCoordinates = { master: 360 };
-  let firstCheckForY = 360;
-  let numCommits = 0;
-  const yOffset = 40;
 
   //Create the x-value for each commit.
   commitsArr.forEach(commit => {
@@ -89,7 +131,6 @@ export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
    * List the positions that are taken. Properties of each object are
    * a y-value and the range (start and end) of the x-values taken for that
    * y-value. Initialize with a hard-coded master.
-   * @type {Array}
    */
   const taken = [{
     y: 360,
@@ -122,47 +163,8 @@ export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
   });
 
   // if there are 2 branches connected and on the same line, move one
-  let changed = false;
-  do{
-    changed = false;
-    commitsArr.forEach(commit => {
-      commit.children.forEach(child => {
-        const childObj = commitsObj[child];
-        if(childObj && commit.branch !== childObj.branch) {
-          if(branchYCoordinates[commit.branch] === branchYCoordinates[childObj.branch]) {
-            branchYCoordinates[childObj.branch] += yOffset;
-            changed = true;
-          }
-        }
-      });
-    });
-  } while(changed);
-
-  //If there are 2 branches overlapping, move one
-  const allBranches = Object.keys(branchXCoordinates);
-  let altered = false;
-  do{
-    altered = false;
-    allBranches.forEach(thisBranch => {
-      const thisBranchSet = branchXCoordinates[thisBranch];
-      allBranches.forEach(branchToCheck => {
-        //make sure it's not the same branch
-        if(thisBranch !== branchToCheck){
-          //make sure they have the same y-coordinate
-          if(branchYCoordinates[thisBranch] === branchYCoordinates[branchToCheck]){
-            const branchToCheckSet = branchXCoordinates[branchToCheck];
-
-            //Make sure they overlap somewhere along their x-coordinates
-            if(thisBranch !== branchToCheck && checkOverlap(thisBranchSet, branchToCheckSet)) {
-              branchYCoordinates[branchToCheck] += yOffset;
-              altered = true;
-            }
-          }
-        }
-      });
-    });
-  } while(altered);
-
+  shiftChildrenFromParents(commitsArr, commitsObj, branchYCoordinates, yOffset);
+  shiftOverlappingBranches(branchObj, branchXCoordinates, branchYCoordinates)
 
   //map the branchYCoordinates values over to their commits
   commitsArr.forEach(commit => commit.y = branchYCoordinates[commit.branch]);
