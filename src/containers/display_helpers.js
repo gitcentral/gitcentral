@@ -19,7 +19,7 @@ function makeAnchor(linkedText, site) {
  * Generate the x and y-coordinates for each commit. Place them as properties
  * on the commit.
  */
-function generateCoordinates() {
+function generateCoordinates(commitsArr, commitsObj, branchObj) {
   /**
    * Given a range of start and end values, determine if there is any
    * overlap.
@@ -99,7 +99,7 @@ function generateCoordinates() {
   const yOffset = 40;
 
   //Create the x-value for each commit.
-  d3commits.forEach(commit => {
+  commitsArr.forEach(commit => {
     commit.x = generateX(commit);
 
     //if it's the first time we're processing a commit from this branch, create an object
@@ -131,7 +131,7 @@ function generateCoordinates() {
   let lastBranch;
 
   //get the y-coordinates for each branch
-  Object.keys(branchLookup).forEach(branch => {
+  Object.keys(branchObj).forEach(branch => {
     if(!branchXCoordinates[branch] || branch === 'master') return;
 
     const { start, end } = branchXCoordinates[branch];
@@ -145,9 +145,9 @@ function generateCoordinates() {
   let changed = false;
   do{
     changed = false;
-    d3commits.forEach(commit => {
+    commitsArr.forEach(commit => {
       commit.children.forEach(child => {
-        const childObj = SHALookup[child];
+        const childObj = commitsObj[child];
         if(childObj && commit.branch !== childObj.branch) {
           if(branchYCoordinates[commit.branch] === branchYCoordinates[childObj.branch]) {
             branchYCoordinates[childObj.branch] += yOffset;
@@ -185,7 +185,7 @@ function generateCoordinates() {
 
 
   //map the branchYCoordinates values over to their commits
-  d3commits.forEach(commit => commit.y = branchYCoordinates[commit.branch]);
+  commitsArr.forEach(commit => commit.y = branchYCoordinates[commit.branch]);
 }
 
 //https://bl.ocks.org/mbostock/6123708
@@ -246,7 +246,7 @@ function analyzeRepo(commits) {
 
   const { branches, contributors } = stats;
 
-  for(let branch in branchLookup) {
+  for(let branch in branchObj) {
     branches[branch] = branches[branch] || countCommitsPerBranch(branch);
   }
 
