@@ -189,7 +189,7 @@ function generateCoordinates() {
 }
 
 //https://bl.ocks.org/mbostock/6123708
-function zoomed() {
+function zoomed(svg) {
   const { translate, scale } = d3.event;
   svg.selectAll('g')
     .attr("transform", "translate(" + translate + ")scale(" + scale + ")");

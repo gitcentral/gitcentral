@@ -48,6 +48,8 @@ class RepoDisplay extends Component {
     const {
       showToolTip,
       makeAnchor,
+      zoomed,
+
     } = displayHelpers;
 
     /**
@@ -223,21 +225,6 @@ class RepoDisplay extends Component {
       d3commits.forEach(commit => commit.y = branchYCoordinates[commit.branch]);
     }
 
-    //https://bl.ocks.org/mbostock/6123708
-    function zoomed() {
-      const { translate, scale } = d3.event;
-      svg.selectAll('g')
-        .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
-      svg.selectAll('line')
-        .attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
-
-      //To make the tip essentially disappear from the page we remove its HTML.
-      //It is still present on the page, but now consists of a tiny invisible square.
-      d3.selectAll('.d3-tip')
-        .style('opacity', 0)
-        .html('');
-    }
-
     //add x and y values to each commit
     function addCoordinates(nodes) {
       nodes.forEach(node => {
@@ -364,7 +351,7 @@ class RepoDisplay extends Component {
     //https://bl.ocks.org/mbostock/6123708
     const zoom = d3.behavior.zoom()
       .scaleExtent([0.1, 10])
-      .on("zoom", zoomed);
+      .on("zoom", () => zoomed(svg));
 
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
