@@ -70,8 +70,8 @@ function showToolTip(commit, originalBranches, tooltip) {
   const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
 
   const tooltipContent =
-`${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:     ${makeAnchor(sha.slice(0, 9) + '...', url)}
-Author:  ${authorName}
+`${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:    ${makeAnchor(sha.slice(0, 9) + '...', url)}
+Author: ${authorName}
 
 Message: ${commit.commit.message}`;
 
