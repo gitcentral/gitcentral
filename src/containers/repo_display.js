@@ -25,9 +25,9 @@ class RepoDisplay extends Component {
   makeD3Display () {
     // remove all svg elements
     // d3.select("svg").remove();
-    $('#container').remove();
+    $('#container').empty();
     $('.d3-tip').remove();
-    $('body').append('<div id="container"></div>');
+    // $('body').append('<div id="container"></div>');
 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
