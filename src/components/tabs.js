@@ -26,17 +26,22 @@ export default class NavTabs extends Component {
   getGitGraph(){
     console.log('get graph');
     document.getElementById('stats').className="hidden";
+    document.getElementById('word-cloud').className="hidden";
     document.getElementById('container').classList.remove("hidden");
   }
 
   getStats(){
     console.log('get stats');
     document.getElementById('container').className="hidden";
+    document.getElementById('word-cloud').className="hidden";
     document.getElementById('stats').classList.remove("hidden");
   }
   getWordCloud(){
     console.log('get word cloud');
-    
+    document.getElementById('container').className="hidden";
+    document.getElementById('stats').className="hidden";
+    document.getElementById('word-cloud').classList.remove("hidden");
+
   }
 
   render (){

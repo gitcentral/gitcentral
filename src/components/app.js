@@ -16,7 +16,7 @@ export default class App extends Component {
         <SearchBar />
         <RepoDisplay />
         <Chart />
-        {/* <WordCloud /> */}
+        <WordCloud />
       </div>
     );
   }
