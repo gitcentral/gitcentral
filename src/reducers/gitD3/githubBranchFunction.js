@@ -29,30 +29,30 @@ export default class GithubApiInterface {
   sortByDepth(a, b) {
     return a.depth - b.depth;
   }
-  
+
   validateCommits() {
     // check what we add on top of original JSONCommits from github API
     this.JSONCommits.forEach(function(commit) {
       if (commit.sha === undefined) {
-        console.log("commit has no sha!!!!!!, really bad");
+        // console.log("commit has no sha!!!!!!, really bad");
       }
       if (commit.parents === undefined) {
-        console.log("commit has no parents", commit.sha.slice(0, 5));
+        // console.log("commit has no parents", commit.sha.slice(0, 5));
       }
       if (commit.branch === undefined) {
-        console.log("commit has no branch", commit.sha.slice(0, 5));
+        // console.log("commit has no branch", commit.sha.slice(0, 5));
       }
       if (commit.depth === undefined) {
-        console.log("commit has no depth", commit.sha.slice(0, 5));
+        // console.log("commit has no depth", commit.sha.slice(0, 5));
       }
       if (commit.children === undefined) {
-        console.log("commit has no children", commit.sha.slice(0, 5));
+        // console.log("commit has no children", commit.sha.slice(0, 5));
       }
       // if (commit.gitCommands === undefined) {
       //   console.log("commit has no git-command", commit.sha.slice(0, 5));
       // }
       if (commit.parentReferences === undefined) {
-        console.log("commit has no parent references", commit.sha.slice(0, 5));
+        // console.log("commit has no parent references", commit.sha.slice(0, 5));
       }
     });
   }
