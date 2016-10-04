@@ -6,10 +6,10 @@ import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
 // import d3 from '../reducers/gitD3/d3';
 
 class CrossfilterChart extends Component {
-  componentDidMount(){
-    console.log('crossfilter component will mount');
-    this.makeCrossfilterChart();
-  }
+  // componentDidMount(){
+  //   console.log('crossfilter component will mount');
+  //   this.makeCrossfilterChart();
+  // }
   makeCrossfilterChart(){
     // console.log("crossfitlerChart loaded")
 
