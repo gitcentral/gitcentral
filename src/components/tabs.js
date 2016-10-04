@@ -5,6 +5,7 @@ import RepoDisplay from '../containers/repo_display';
 import FontIcon from 'material-ui/FontIcon';
 import Timeline from 'material-ui/svg-icons/action/timeline';
 import Equalizer from 'material-ui/svg-icons/av/equalizer';
+import FormatQuote from 'material-ui/svg-icons/editor/format-quote';
 
 const styles = {
   headline: {
@@ -33,6 +34,10 @@ export default class NavTabs extends Component {
     document.getElementById('container').className="hidden";
     document.getElementById('stats').classList.remove("hidden");
   }
+  getWordCloud(){
+    console.log('get word cloud');
+    
+  }
 
   render (){
     return (
@@ -46,6 +51,11 @@ export default class NavTabs extends Component {
         icon={<Equalizer />}
         style={{padding: 5}}
         onActive={this.getStats} >
+      </Tab>
+      <Tab
+        icon={<FormatQuote />}
+        style={{padding: 5}}
+        onActive={this.getWordCloud} >
       </Tab>
     </Tabs>
   )}

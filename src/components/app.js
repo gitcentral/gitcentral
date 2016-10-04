@@ -7,6 +7,7 @@ import React, { Component } from 'react';
 import RepoDisplay from '../containers/repo_display';
 import SearchBar from '../containers/searchbar';
 import Chart from '../containers/chart';
+import WordCloud from '../containers/word_cloud';
 
 export default class App extends Component {
   render() {
@@ -15,6 +16,7 @@ export default class App extends Component {
         <SearchBar />
         <RepoDisplay />
         <Chart />
+        {/* <WordCloud /> */}
       </div>
     );
   }
