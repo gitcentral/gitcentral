@@ -24,10 +24,10 @@ d3.tip = tooltip;
 class RepoDisplay extends Component {
   makeD3Display () {
     // remove all svg elements
-    d3.select("svg").remove();
-    $('#container').remove();
+    // d3.select("svg").remove();
+    $('#container').empty();
     $('.d3-tip').remove();
-    $('body').append('<div id="container"></div>');
+    // $('body').append('<div id="container"></div>');
 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -83,6 +83,7 @@ class RepoDisplay extends Component {
     const straightLineLocations = [];
 
     // Make the lines
+    console.log('lines', d3commits);
     d3commits.forEach(commit => {
       console.log('make lines!');
       commit.children.forEach(child => {
@@ -100,7 +101,7 @@ class RepoDisplay extends Component {
           .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
           .projection(function(d) { return [d.y, d.x]; });
 
-        d3.select("g")
+        svg.select("g")
             .datum(curveData)
           .append("path")
             .attr("class", "line")
