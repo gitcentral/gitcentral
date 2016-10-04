@@ -52,6 +52,7 @@ class RepoDisplay extends Component {
       zoomed,
       // startLoadAnimation,
       addColors,
+      addDates,
     } = displayHelpers;
 
     addColors(branchLookup);

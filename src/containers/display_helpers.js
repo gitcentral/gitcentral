@@ -61,16 +61,20 @@ function startLoadAnimation() {
     });
 }
 
+const getCommitDate = commit => ('' + new Date(commit.commit.committer.date)).slice(0, 16);
+
 function showToolTip(commit, originalBranches, tooltip) {
   const { branch, sha, html_url: url, author: { login: authorName } } = commit;
   const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
+  const date = getCommitDate(commit);
 
   //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
   //then make it a hyperlink; otherwise, don't display branch name
   const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
 
   const tooltipContent =
-`${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:    ${makeAnchor(sha.slice(0, 9) + '...', url)}
+`Date:   ${date}
+${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:    ${makeAnchor(sha.slice(0, 9) + '...', url)}
 Author: ${authorName}
 
 Message: ${commit.commit.message}`;
@@ -79,10 +83,17 @@ Message: ${commit.commit.message}`;
   tooltip.show();
 }
 
+function addDates(commits) {
+  commits.forEach(commit => {
+    date = new Date(commit.commit.committer.date);
+  })
+}
+
 export default {
   makeAnchor,
   zoomed,
   addColors,
   startLoadAnimation,
   showToolTip,
+  addDates
 };
