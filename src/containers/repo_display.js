@@ -14,7 +14,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
-import d3 from '../reducers/gitD3/d3.js';
 import tooltip from '../reducers/gitD3/d3tip.js';
 import _  from 'lodash';
 import $ from 'jquery';
@@ -26,10 +25,10 @@ d3.tip = tooltip;
 class RepoDisplay extends Component {
   makeD3Display () {
     // remove all svg elements
-    d3.select("svg").remove();
-    $('#container').remove();
+    // d3.select("svg").remove();
+    $('#container').empty();
     $('.d3-tip').remove();
-    $('body').append('<div id="container"></div>');
+    // $('body').append('<div id="container"></div>');
 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -85,6 +84,7 @@ class RepoDisplay extends Component {
     const straightLineLocations = [];
 
     // Make the lines
+    console.log('lines', d3commits);
     d3commits.forEach(commit => {
       console.log('make lines!');
       commit.children.forEach(child => {
@@ -102,7 +102,7 @@ class RepoDisplay extends Component {
           .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
           .projection(function(d) { return [d.y, d.x]; });
 
-        d3.select("g")
+        svg.select("g")
             .datum(curveData)
           .append("path")
             .attr("class", "line")
@@ -142,4 +142,12 @@ function mapStateToProps(state) {
   return { currentRepo: state.currentRepo };
 }
 
-export default connect(mapStateToProps)(RepoDisplay);
+//anything returned from this fn will end up as props
+//on RepoDisplay container
+// function mapDispatchToProps(dispatch) {
+//   //whenever updateNode is called, the result should be passed
+//   //to all of our reducers
+//   return bindActionCreators({ updateNode }, dispatch);
+// }
+
+export default connect(mapStateToProps /*, mapDispatchToProps*/)(RepoDisplay);
