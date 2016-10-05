@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
+import $ from 'jquery';
 
 // import d3 from '../reducers/gitD3/d3';
 
@@ -11,7 +12,23 @@ class CrossfilterChart extends Component {
   //   this.makeCrossfilterChart();
   // }
   makeCrossfilterChart() {
-    // console.log("crossfitlerChart loaded")
+    
+    $('#stats').empty();
+    $('#stats').html(`
+      <div id="charts">
+        <div id="hour-chart" class="chart">
+          <div class="title">Time of Day</div>
+        </div>
+        <div id="date-chart" class="chart">
+          <div class="title">Date</div>
+        </div>
+      </div>
+
+      <aside id="totals"><span id="active">-</span> of <span id="total">-</span> flights selected.</aside>
+
+      <div id="lists">
+        <div id="flight-list" class="list"></div>
+      </div>`);
 
     let JSONCommits = this.props.currentRepo.JSONCommits;
     // let commits = crossfilter(this.props.currentRepo.JSONCommits);
@@ -68,24 +85,24 @@ class CrossfilterChart extends Component {
             .domain([0, 24])
             .rangeRound([0, 10 * 24])),
 
-        barChart()
-            .dimension(delay)
-            .group(delays)
-          .x(d3.scale.linear()
-            .domain([-60, 150])
-            .rangeRound([0, 10 * 21])),
-
-        barChart()
-            .dimension(distance)
-            .group(distances)
-          .x(d3.scale.linear()
-            .domain([0, 2000])
-            .rangeRound([0, 10 * 40])),
+        // barChart()
+        //     .dimension(delay)
+        //     .group(delays)
+        //   .x(d3.scale.linear()
+        //     .domain([-60, 150])
+        //     .rangeRound([0, 10 * 21])),
+        //
+        // barChart()
+        //     .dimension(distance)
+        //     .group(distances)
+        //   .x(d3.scale.linear()
+        //     .domain([0, 2000])
+        //     .rangeRound([0, 10 * 40])),
 
         barChart()
             .dimension(date)
             .group(dates)
-            .round(d3.time.day.round)
+            // .round(d3.time.day.round)
           .x(d3.time.scale()
             //domain is the range of the chart
             .domain([startDate, endDate])
