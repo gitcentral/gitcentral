@@ -12,7 +12,6 @@ class CrossfilterChart extends Component {
   //   this.makeCrossfilterChart();
   // }
   makeCrossfilterChart() {
-    
     $('#stats').empty();
     $('#stats').html(`
       <div id="charts">
@@ -29,17 +28,24 @@ class CrossfilterChart extends Component {
       <div id="lists">
         <div id="flight-list" class="list"></div>
       </div>`);
+    /*
+    NEED TO FIX, JSON commits are being placed in order in api.js. but sample data is not in order
 
-    let JSONCommits = this.props.currentRepo.JSONCommits;
-    // let commits = crossfilter(this.props.currentRepo.JSONCommits);
-    // var date = commits.dimension(function(d) { return d.commit.date; });
-    let startDate = new Date(JSONCommits[JSONCommits.length-1].commit.author.date);
-    let endDate = new Date(JSONCommits[0].commit.author.date);
+    So in this code, initial state of sample json works and next api calls dont works,
+    or initial state doesnt work and next api calls work.
+
+
+    also, check value vs reference issues?
+     */
+    let JSONCommits = this.props.currentRepo.JSONCommits.slice();
+    // JSONCommits.reverse();
+    console.log(JSONCommits,"HUHU");
+    let startDate = new Date(JSONCommits[0].commit.author.date);
+    let endDate = new Date(JSONCommits[JSONCommits.length-1].commit.author.date);
     console.log(startDate,endDate);
 
     let flights = JSONCommits;
-    // d3.csv("flights-3m.json", function(error, flights) {
-  // console.log(flights);
+
   // Various formatters.
       var formatNumber = d3.format(",d"),
           formatChange = d3.format("+,d"),
@@ -341,6 +347,7 @@ class CrossfilterChart extends Component {
               .style("display", null);
           g.select("#clip-" + id + " rect")
               .attr("x", x(extent[0]))
+              //x(extent [ 0] might have problems)
               .attr("width", x(extent[1]) - x(extent[0]));
           dimension.filterRange(extent);
         });
