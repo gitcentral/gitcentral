@@ -200,7 +200,7 @@ class CrossfilterChart extends Component {
 
           flightEnter.append("div")
               .attr("class", "origin")
-              .text(function(d) { return "poop"; });
+              .text(function(d) { return "test"; });
 
           flightEnter.append("div")
               .attr("class", "destination")
