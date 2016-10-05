@@ -2,9 +2,9 @@ body {
   overflow: hidden;
 }
 
- #git {
-   top: 50%;
- }
+#git {
+ top: 50%;
+}
 
 #chart div {
   font: 10px sans-serif;
