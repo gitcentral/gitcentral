@@ -10,44 +10,56 @@ class CrossfilterChart extends Component {
   //   console.log('crossfilter component will mount');
   //   this.makeCrossfilterChart();
   // }
-  makeCrossfilterChart(){
+  makeCrossfilterChart() {
     // console.log("crossfitlerChart loaded")
 
     let JSONCommits = this.props.currentRepo.JSONCommits;
     // let commits = crossfilter(this.props.currentRepo.JSONCommits);
     // var date = commits.dimension(function(d) { return d.commit.date; });
+    let startDate = new Date(JSONCommits[JSONCommits.length-1].commit.author.date);
+    let endDate = new Date(JSONCommits[0].commit.author.date);
+    console.log(startDate,endDate);
 
-    // Various formatters.
-      let formatNumber = d3.format(",d"),
+    let flights = JSONCommits;
+    // d3.csv("flights-3m.json", function(error, flights) {
+  // console.log(flights);
+  // Various formatters.
+      var formatNumber = d3.format(",d"),
           formatChange = d3.format("+,d"),
           formatDate = d3.time.format("%B %d, %Y"),
           formatTime = d3.time.format("%I:%M %p");
 
       // A nest operator, for grouping the flight list.
-      let nestByDate = d3.nest()
-          .key(function(d) { return d3.time.day(d.commit.author.date); });
+      var nestByDate = d3.nest()
+          .key(function(d) { return d3.time.day(d.date); });
 
-      // // A little coercion, since the CSV is untyped.
-      JSONCommits.forEach(function(d, i) {
-         d.index = i;
-         d.commit.author.date = new Date(d.commit.author.date);
-      //   d.delay = +d.delay;
-      //   d.distance = +d.distance;
+      // A little coercion, since the CSV is untyped.
+      // Add properties to each d.
+      flights.forEach(function(d, i) {
+        //add an index property
+        d.index = i;
+        //convert date
+        d.date = new Date(d.commit.author.date);
+
+        //convert delay into a number
+        d.delay = 100;
+        //convert distance to a number
+        d.distance = 200;
       });
 
       // Create the crossfilter for the relevant dimensions and groups.
-      let commits = crossfilter(JSONCommits);
-      let all = commits.groupAll();
-      let date = commits.dimension(function(d) { return d.commit.author.date; });
-      let dates = date.group(d3.time.day);
-      let hour = commits.dimension(function(d) { return d.commit.author.date.getHours() + d.commit.author.date.getMinutes() / 60; });
-      let hours = hour.group(Math.floor);
-          // delay = commits.dimension(function(d) { return Math.max(-60, Math.min(149, d.delay)); }),
-          // delays = delay.group(function(d) { return Math.floor(d / 10) * 10; }),
-          // distance = commits.dimension(function(d) { return Math.min(1999, d.distance); }),
-          // distances = distance.group(function(d) { return Math.floor(d / 50) * 50; });
+      var flight = crossfilter(flights),
+          all = flight.groupAll(),
+          date = flight.dimension(function(d) { return d.date; }),
+          dates = date.group(d3.time.day),
+          hour = flight.dimension(function(d) { return d.date.getHours() + d.date.getMinutes() / 60; }),
+          hours = hour.group(Math.floor),
+          delay = flight.dimension(function(d) { return Math.max(-60, Math.min(149, d.delay)); }),
+          delays = delay.group(function(d) { return Math.floor(d / 10) * 10; }),
+          distance = flight.dimension(function(d) { return Math.min(1999, d.distance); }),
+          distances = distance.group(function(d) { return Math.floor(d / 50) * 50; });
 
-      let charts = [
+      var charts = [
 
         barChart()
             .dimension(hour)
@@ -56,46 +68,48 @@ class CrossfilterChart extends Component {
             .domain([0, 24])
             .rangeRound([0, 10 * 24])),
 
-        // barChart()
-        //     .dimension(delay)
-        //     .group(delays)
-        //   .x(d3.scale.linear()
-        //     .domain([-60, 150])
-        //     .rangeRound([0, 10 * 21])),
-        //
-        // barChart()
-        //     .dimension(distance)
-        //     .group(distances)
-        //   .x(d3.scale.linear()
-        //     .domain([0, 2000])
-        //     .rangeRound([0, 10 * 40])),
+        barChart()
+            .dimension(delay)
+            .group(delays)
+          .x(d3.scale.linear()
+            .domain([-60, 150])
+            .rangeRound([0, 10 * 21])),
+
+        barChart()
+            .dimension(distance)
+            .group(distances)
+          .x(d3.scale.linear()
+            .domain([0, 2000])
+            .rangeRound([0, 10 * 40])),
 
         barChart()
             .dimension(date)
             .group(dates)
             .round(d3.time.day.round)
           .x(d3.time.scale()
-            .domain([new Date(2001, 0, 1), new Date(2001, 3, 1)])
+            //domain is the range of the chart
+            .domain([startDate, endDate])
+            //the range of the chart, how wide it is
             .rangeRound([0, 10 * 90]))
-            .filter([new Date(2001, 1, 1), new Date(2001, 2, 1)])
+            //filter is the part of barChart that is selected
+            // .filter([new Date(2001, 1, 1), new Date(2001, 2, 1)])
 
       ];
 
       // Given our array of charts, which we assume are in the same order as the
       // .chart elements in the DOM, bind the charts to the DOM and render them.
       // We also listen to the chart's brush events to update the display.
-      let chart = d3.selectAll(".chart")
+      var chart = d3.selectAll(".chart")
           .data(charts)
           .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
 
       // Render the initial lists.
-      let list = d3.selectAll(".list") //commits list not defined
-          .data([commitsList])
-          .data([commitsList]);
-          console.log('list', list);
+      var list = d3.selectAll(".list")
+          .data([flightList]);
+
       // Render the total.
       d3.selectAll("#total")
-          .text(formatNumber(commits.size()));
+          .text(formatNumber(flight.size()));
 
       renderAll();
 
@@ -130,54 +144,57 @@ class CrossfilterChart extends Component {
         renderAll();
       };
 
-      function commitsList(div) {
-        console.log('div', div);
-        var commitsByDate = nestByDate.entries(date.top(40));
+      function flightList(div) {
+        var flightsByDate = nestByDate.entries(date.top(40));
 
         div.each(function() {
-          console.log('*', d3.select(this)); // flight-list.list <-- need to set
           var date = d3.select(this).selectAll(".date")
-              .data(commitsByDate, function(d) {
-                return d.key;
-              });
+              .data(flightsByDate, function(d) { return d.key; });
 
           date.enter().append("div")
-              .attr("className", "date")
+              .attr("class", "date")
             .append("div")
-              .attr("className", "day")
-              .text(function(d) { return formatDate(d.values[0].date); });
+              .attr("class", "day")
+              .text(function(d) {
+                console.log(d,"d? what is d.values")
+                // appends first date to top of list "Feburary 28, 2001"
+                return formatDate(d.values[0].date); });
 
           date.exit().remove();
 
-          var commit = date.order().selectAll(".flight")
+          var flight = date.order().selectAll(".flight")
               .data(function(d) { return d.values; }, function(d) { return d.index; });
 
-          var commitEnter = commit.enter().append("div")
-              .attr("className", "flight");
+          var flightEnter = flight.enter().append("div")
+              .attr("class", "flight");
 
-          commitEnter.append("div")
-              .attr("className", "time")
-              .text(function(d) { return formatTime(d.commit.author.date); });
-          // commitEnter.append("div").attr("className", "here");
-          //     .attr("className", "origin")
-          //     .text(function(d) { return d.origin; });
-          //
-          // flightEnter.append("div")
-          //     .attr("className", "destination")
-          //     .text(function(d) { return d.destination; });
-          //
-          // flightEnter.append("div")
-          //     .attr("className", "distance")
-          //     .text(function(d) { return formatNumber(d.distance) + " mi."; });
-          //
-          // flightEnter.append("div")
-          //     .attr("className", "delay")
-          //     .classNameed("early", function(d) { return d.delay < 0; })
-          //     .text(function(d) { return formatChange(d.delay) + " min."; });
+          //this is where they append data to divs
+          flightEnter.append("div")
+              .attr("class", "time")
+              .text(function(d) {
+                //format time to be only time
+                return formatTime(d.date); });
 
-          commit.exit().remove();
+          flightEnter.append("div")
+              .attr("class", "origin")
+              .text(function(d) { return "poop"; });
 
-          commit.order();
+          flightEnter.append("div")
+              .attr("class", "destination")
+              .text(function(d) { return d.destination; });
+
+          flightEnter.append("div")
+              .attr("class", "distance")
+              .text(function(d) { return formatNumber(d.distance) + " mi."; });
+
+          flightEnter.append("div")
+              .attr("class", "delay")
+              .classed("early", function(d) { return d.delay < 0; })
+              .text(function(d) { return formatChange(d.delay) + " min."; });
+
+          flight.exit().remove();
+
+          flight.order();
         });
       }
 
@@ -198,10 +215,8 @@ class CrossfilterChart extends Component {
         function chart(div) {
           var width = x.range()[1],
               height = y.range()[0];
-          console.log(group.top,"hello cady");
-          // y.domain([0, group.top(1)[0].value]);
-          y.domain([0, 50]);
 
+          y.domain([0, group.top(1)[0].value]);
 
           div.each(function() {
             var div = d3.select(this),
@@ -211,7 +226,7 @@ class CrossfilterChart extends Component {
             if (g.empty()) {
               div.select(".title").append("a")
                   .attr("href", "javascript:reset(" + id + ")")
-                  .attr("className", "reset")
+                  .attr("class", "reset")
                   .text("reset")
                   .style("display", "none");
 
@@ -230,19 +245,19 @@ class CrossfilterChart extends Component {
               g.selectAll(".bar")
                   .data(["background", "foreground"])
                 .enter().append("path")
-                  .attr("className", function(d) { return d + " bar"; })
+                  .attr("class", function(d) { return d + " bar"; })
                   .datum(group.all());
 
               g.selectAll(".foreground.bar")
                   .attr("clip-path", "url(#clip-" + id + ")");
 
               g.append("g")
-                  .attr("className", "axis")
+                  .attr("class", "axis")
                   .attr("transform", "translate(0," + height + ")")
                   .call(axis);
 
               // Initialize the brush component with pretty resize handles.
-              var gBrush = g.append("g").attr("className", "brush").call(brush);
+              var gBrush = g.append("g").attr("class", "brush").call(brush);
               gBrush.selectAll("rect").attr("height", height);
               gBrush.selectAll(".resize").append("path").attr("d", resizePath);
             }
@@ -373,10 +388,9 @@ class CrossfilterChart extends Component {
         };
 
         return d3.rebind(chart, brush, "on");
-
-
+      }
+    // });
   }
-}
 
   render(){
     return(
