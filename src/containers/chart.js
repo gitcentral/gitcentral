@@ -40,7 +40,7 @@ class CrossfilterChart extends Component {
     const startDate = new Date(JSONCommits[0].commit.author.date);
     const endDate = new Date(JSONCommits[JSONCommits.length - 1].commit.author.date);
 
-    const flights = JSONCommits;
+    const commits = JSONCommits;
       // Various formatters.
     const formatNumber = d3.format(',d');
     const formatChange = d3.format('+,d');
@@ -51,7 +51,7 @@ class CrossfilterChart extends Component {
     const nestByDate = d3.nest().key(d => d3.time.day(d.date));
 
     // Add properties to each d.
-    flights.forEach((d, i) => {
+    commits.forEach((d, i) => {
       // Add an index property
       d.index = i;
       // Convert date
@@ -59,13 +59,13 @@ class CrossfilterChart extends Component {
     });
 
     // Create the crossfilter for the relevant dimensions and groups.
-    const flight = crossfilter(flights);
-    const all = flight.groupAll();
-    const date = flight.dimension(d => d.date);
+    const commit = crossfilter(commits);
+    const all = commit.groupAll();
+    const date = commit.dimension(d => d.date);
     const dates = date.group(d3.time.day);
-    const hour = flight.dimension(d => d.date.getHours() + (d.date.getMinutes() / 60));
+    const hour = commit.dimension(d => d.date.getHours() + (d.date.getMinutes() / 60));
     const hours = hour.group(Math.floor);
-    const day = flight.dimension(d => d.date.getDay());
+    const day = commit.dimension(d => d.date.getDay());
     const days = day.group(d => d);
 
     const charts = [
@@ -103,11 +103,11 @@ class CrossfilterChart extends Component {
 
     // Render the initial lists.
     const list = d3.selectAll('.list')
-        .data([flightList]);
+        .data([commitList]);
 
     // Render the total.
     d3.selectAll('#total')
-        .text(formatNumber(flight.size()));
+        .text(formatNumber(commit.size()));
 
     renderAll();
 
@@ -133,12 +133,12 @@ class CrossfilterChart extends Component {
       renderAll();
     };
 
-    function flightList(div) {
-      const flightsByDate = nestByDate.entries(date.top(40));
+    function commitList(div) {
+      const commitsByDate = nestByDate.entries(date.top(40));
 
       div.each(function() {
         var date = d3.select(this).selectAll(".date")
-            .data(flightsByDate, d => d.key);
+            .data(commitsByDate, d => d.key);
 
         date.enter().append("div")
             .attr("class", "date")
@@ -150,35 +150,35 @@ class CrossfilterChart extends Component {
 
         date.exit().remove();
 
-        var flight = date.order().selectAll(".flight")
+        var commit = date.order().selectAll(".flight")
             .data(function(d) { return d.values; }, function(d) { return d.index; });
 
-        var flightEnter = flight.enter().append("div")
+        var commitEnter = commit.enter().append("div")
             .attr("class", "flight");
 
         //this is where they append data to divs
-        flightEnter.append("div")
+        commitEnter.append("div")
             .attr("class", "time")
             .text(function(d) {
               //format time to be only time
               return formatTime(d.date); });
 
-        flightEnter.append("div")
+        commitEnter.append("div")
             .attr("class", "origin")
             .text(function(d) { return d.commit.author.name; });
 
-        flightEnter.append("div")
+        commitEnter.append("div")
             .attr("class", "destination")
             .html(function(d) {
               return `<pre>SHA: <a href="${d.html_url}" target="_blank">${d.sha.slice(0,9)}...</a></pre>`;
             });
 
-        flightEnter.append("div")
+        commitEnter.append("div")
             .attr("class", "delay")
             .text(function(d) { return d.commit.message; });
 
-        flight.exit().remove();
-        flight.order();
+        commit.exit().remove();
+        commit.order();
       });
     }
 
