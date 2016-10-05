@@ -33,13 +33,22 @@ injectTapEventPlugin();
  * Renders the navigation bar and the drawer
  */
 class SearchBar extends Component {
-  constructor() {
-    super();
-
+  constructor(props) {
+    super(props);
     this.state = {
-      urlEntered: 'https://github.com/',
+      urlEntered: this.props.urlEntered || 'https://github.com/',
       open: false,
     };
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.urlEntered != this.props.urlEntered) {
+
+      const newUrlEntered = this.props.urlEntered;
+      // this.props.onSubmit(newUrlEntered);
+      this.setState({ urlEntered: newUrlEntered });
+      this.props.fetchRepo(newUrlEntered);
+    }
   }
 
   /**
@@ -47,7 +56,6 @@ class SearchBar extends Component {
    * @param  {Object} event
    */
   onInputChange(event) {
-    console.log(event.target.value);
     this.setState({ urlEntered: event.target.value });
   }
 
@@ -59,8 +67,14 @@ class SearchBar extends Component {
   onFormSubmit(event) {
     if(event.keyCode === 13){
       event.preventDefault();
+      if (this.props.onSubmit) {
+        this.props.onSubmit(event.target.value);
+      }
       this.props.fetchRepo(this.state.urlEntered);
-      this.setState({ urlEntered: '' });
+      if (this.state.urlEntered) {
+        const hash = "/#" + this.state.urlEntered.slice().split('github.com')[1];
+        window.location.hash = hash;
+      }
     }
   }
 

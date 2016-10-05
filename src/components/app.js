@@ -10,10 +10,34 @@ import Chart from '../containers/chart';
 import WordCloud from '../containers/word_cloud';
 
 export default class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { user_repo : "" };
+    this.updateUrl = this.updateUrl.bind(this);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if ((prevProps.params.user != this.props.params.user) ||
+        (prevProps.params.repo != this.props.params.repo)) {
+
+      const newUrlEntered = `${this.props.params.user}/${this.props.params.repo}`;
+      this.updateUrl(newUrlEntered);
+    }
+  }
+
+  updateUrl(newUserRepo) {
+    this.setState({ user_repo : newUserRepo });
+  }
+
   render() {
+    let user_repo ='https://github.com/';
+    if (this.props.params.user && this.props.params.repo) {
+      user_repo += this.props.params.user + '/' + this.props.params.repo;
+    }
     return (
       <div>
-        <SearchBar />
+        <SearchBar urlEntered={user_repo} onSubmit={this.updateUrl.bind(this)}/>
         <RepoDisplay />
         <Chart />
         <WordCloud />
