@@ -44,7 +44,7 @@ class CrossfilterChart extends Component {
       // Various formatters.
     const formatNumber = d3.format(',d');
     const formatChange = d3.format('+,d');
-    const formatDate = d3.time.format('%B %d, %Y');
+    const formatDate = d3.time.format('%A, %B %d, %Y');
     const formatTime = d3.time.format('%I:%M %p');
 
     // A nest operator, for grouping the flight list.
@@ -136,8 +136,8 @@ class CrossfilterChart extends Component {
     function flightList(div) {
       const flightsByDate = nestByDate.entries(date.top(40));
 
-      div.each(() => {
-        let date = d3.select(this).selectAll('.date')
+      div.each(function() {
+        var date = d3.select(this).selectAll(".date")
             .data(flightsByDate, d => d.key);
 
         date.enter().append("div")
@@ -376,8 +376,8 @@ class CrossfilterChart extends Component {
     }
   }
 
-  render() {
-    return (
+  render(){
+    return(
       <div>
         {this.makeCrossfilterChart()}
       </div>
