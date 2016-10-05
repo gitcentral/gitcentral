@@ -18,12 +18,15 @@ class CrossfilterChart extends Component {
         <span id="hour-chart" class="chart">
           <div class="title">Time of Day</div>
         </span>
+        <span id="delay-chart" class="chart">
+          <div class="title">Week Day</div>
+        </span>
         <span id="date-chart" class="chart">
           <div class="title">Date</div>
         </span>
       </div>
 
-      <aside id="totals"><span id="active">-</span> of <span id="total">-</span> flights selected.</aside>
+      <aside id="totals"><span id="active">-</span> of <span id="total">-</span> commits selected.</aside>
 
       <div id="lists">
         <div id="flight-list" class="list"></div>
@@ -42,16 +45,14 @@ class CrossfilterChart extends Component {
     let endDate = new Date(JSONCommits[JSONCommits.length-1].commit.author.date);
 
     let flights = JSONCommits;
-
   // Various formatters.
-      var formatNumber = d3.format(",d"),
-          formatChange = d3.format("+,d"),
-          formatDate = d3.time.format("%B %d, %Y"),
-          formatTime = d3.time.format("%I:%M %p");
+      let formatNumber = d3.format(",d");
+      let formatChange = d3.format("+,d");
+      let formatDate = d3.time.format("%B %d, %Y");
+      let formatTime = d3.time.format("%I:%M %p");
 
       // A nest operator, for grouping the flight list.
-      var nestByDate = d3.nest()
-          .key(function(d) { return d3.time.day(d.date); });
+      let nestByDate = d3.nest().key(d => d3.time.day(d.date));
 
       // A little coercion, since the CSV is untyped.
       // Add properties to each d.
@@ -68,16 +69,19 @@ class CrossfilterChart extends Component {
       });
 
       // Create the crossfilter for the relevant dimensions and groups.
-      var flight = crossfilter(flights),
-          all = flight.groupAll(),
-          date = flight.dimension(function(d) { return d.date; }),
-          dates = date.group(d3.time.day),
-          hour = flight.dimension(function(d) { return d.date.getHours() + d.date.getMinutes() / 60; }),
-          hours = hour.group(Math.floor),
-          delay = flight.dimension(function(d) { return Math.max(-60, Math.min(149, d.delay)); }),
-          delays = delay.group(function(d) { return Math.floor(d / 10) * 10; }),
-          distance = flight.dimension(function(d) { return Math.min(1999, d.distance); }),
-          distances = distance.group(function(d) { return Math.floor(d / 50) * 50; });
+      let flight = crossfilter(flights);
+      let all = flight.groupAll();
+      let date = flight.dimension(function(d) { return d.date; });
+      let dates = date.group(d3.time.day);
+      let hour = flight.dimension(function(d) { return d.date.getHours() + d.date.getMinutes() / 60; });
+      let hours = hour.group(Math.floor);
+      let day = flight.dimension(function(d){return d.date.getDay();});
+      let days = day.group(function(d){return d;});
+
+      // delay = flight.dimension(function(d) { return Math.max(-60, Math.min(149, d.delay)); }),
+      // delays = delay.group(function(d) { return Math.floor(d / 10) * 10; }),
+      // distance = flight.dimension(function(d) { return Math.min(1999, d.distance); }),
+      // distances = distance.group(function(d) { return Math.floor(d / 50) * 50; });
 
       var charts = [
 
@@ -88,12 +92,12 @@ class CrossfilterChart extends Component {
             .domain([0, 24])
             .rangeRound([0, 10 * 24])),
 
-        // barChart()
-        //     .dimension(delay)
-        //     .group(delays)
-        //   .x(d3.scale.linear()
-        //     .domain([-60, 150])
-        //     .rangeRound([0, 10 * 21])),
+        barChart()
+            .dimension(day)
+            .group(days)
+          .x(d3.scale.linear()
+            .domain([0, 7])
+            .rangeRound([0, 20 * 7])),
         //
         // barChart()
         //     .dimension(distance)
@@ -110,7 +114,7 @@ class CrossfilterChart extends Component {
             //domain is the range of the chart
             .domain([startDate, endDate])
             //the range of the chart, how wide it is
-            .rangeRound([0, 10 * 90]))
+            .rangeRound([0, 10 * 80]))
             //filter is the part of barChart that is selected
             // .filter([new Date(2001, 1, 1), new Date(2001, 2, 1)])
 
@@ -190,17 +194,15 @@ class CrossfilterChart extends Component {
               .attr("class", "origin")
               .text(function(d) { return d.commit.author.name; });
 
+
           flightEnter.append("div")
               .attr("class", "destination")
-              .text(function(d) { return "SHA = "+d.sha; });
-
-          // flightEnter.append("div")
-          //     .attr("class", "distance")
-          //     .text(function(d) { return d.commit.author.name; });
+              .html(function(d) {
+                return `<pre>SHA: <a href="${d.html_url}" target="_blank">${d.sha.slice(0,9)}...</a></pre>`;
+              });
 
           flightEnter.append("div")
               .attr("class", "delay")
-              // .classed("early", function(d) { return d.delay < 0; })
               .text(function(d) { return d.commit.message; });
 
           flight.exit().remove();
