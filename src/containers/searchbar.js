@@ -109,7 +109,7 @@ class SearchBar extends Component {
       <div>
         <MuiThemeProvider>
           <AppBar
-            title={<span>Mangonada</span>}
+            title={<span>Git Central</span>}
             iconElementLeft={<IconButton onClick={this.handleToggle.bind(this)}><Menu /></IconButton>
            }
           >
