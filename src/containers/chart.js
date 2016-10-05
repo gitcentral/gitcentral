@@ -15,12 +15,12 @@ class CrossfilterChart extends Component {
     $('#stats').empty();
     $('#stats').html(`
       <div id="charts">
-        <div id="hour-chart" class="chart">
+        <span id="hour-chart" class="chart">
           <div class="title">Time of Day</div>
-        </div>
-        <div id="date-chart" class="chart">
+        </span>
+        <span id="date-chart" class="chart">
           <div class="title">Date</div>
-        </div>
+        </span>
       </div>
 
       <aside id="totals"><span id="active">-</span> of <span id="total">-</span> flights selected.</aside>
@@ -38,11 +38,8 @@ class CrossfilterChart extends Component {
     also, check value vs reference issues?
      */
     let JSONCommits = this.props.currentRepo.JSONCommits.slice();
-    // JSONCommits.reverse();
-    console.log(JSONCommits,"HUHU");
     let startDate = new Date(JSONCommits[0].commit.author.date);
     let endDate = new Date(JSONCommits[JSONCommits.length-1].commit.author.date);
-    console.log(startDate,endDate);
 
     let flights = JSONCommits;
 
@@ -148,15 +145,6 @@ class CrossfilterChart extends Component {
         d3.select("#active").text(formatNumber(all.value()));
       }
 
-      // Like d3.time.format, but faster.
-      // function parseDate(d) {
-      //   return new Date(2001,
-      //       d.substring(0, 2) - 1,
-      //       d.substring(2, 4),
-      //       d.substring(4, 6),
-      //       d.substring(6, 8));
-      // }
-
       window.filter = function(filters) {
         filters.forEach(function(d, i) { charts[i].filter(d); });
         renderAll();
@@ -200,20 +188,20 @@ class CrossfilterChart extends Component {
 
           flightEnter.append("div")
               .attr("class", "origin")
-              .text(function(d) { return "test"; });
+              .text(function(d) { return d.commit.author.name; });
 
           flightEnter.append("div")
               .attr("class", "destination")
-              .text(function(d) { return d.destination; });
+              .text(function(d) { return "SHA = "+d.sha; });
 
-          flightEnter.append("div")
-              .attr("class", "distance")
-              .text(function(d) { return formatNumber(d.distance) + " mi."; });
+          // flightEnter.append("div")
+          //     .attr("class", "distance")
+          //     .text(function(d) { return d.commit.author.name; });
 
           flightEnter.append("div")
               .attr("class", "delay")
-              .classed("early", function(d) { return d.delay < 0; })
-              .text(function(d) { return formatChange(d.delay) + " min."; });
+              // .classed("early", function(d) { return d.delay < 0; })
+              .text(function(d) { return d.commit.message; });
 
           flight.exit().remove();
 
