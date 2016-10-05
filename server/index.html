@@ -11,7 +11,7 @@
         event.preventDefault();
 
         //make all nodes the correct color (not red)
-        d3.selectAll('circle')
+        d3.select('#container').selectAll('circle')
           .each(function(node){
             d3.select(this)
               .classed('selected', false);
@@ -23,7 +23,7 @@
         //if empty string, return
         if(terms[0] === '') return;
 
-        d3.selectAll('circle')
+        d3.select('#container').selectAll('circle')
           .each(function(node){
             const nodeText = JSON.stringify(node).toLowerCase();
             const termCheck = terms.map(term => nodeText.includes(term));
@@ -70,7 +70,7 @@
     <div id ="word-cloud" class="hidden">
 
     </div>
-
+    <div id="bubble-chart" class="hidden"></div>
   </body>
   <script src="../build/bundle.js"></script>
 </html>

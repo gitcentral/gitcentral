@@ -8,6 +8,7 @@ import RepoDisplay from '../containers/repo_display';
 import SearchBar from '../containers/searchbar';
 import Chart from '../containers/chart';
 import WordCloud from '../containers/word_cloud';
+import BubbleChart from '../containers/bubble_chart';
 
 export default class App extends Component {
   constructor(props) {
@@ -41,6 +42,7 @@ export default class App extends Component {
         <RepoDisplay />
         <Chart />
         <WordCloud />
+        <BubbleChart />
       </div>
     );
   }
