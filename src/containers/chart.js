@@ -188,15 +188,15 @@ class CrossfilterChart extends Component {
 
           flightEnter.append("div")
               .attr("class", "origin")
-              .text(function(d) { return "test"; });
+              .text(function(d) { return d.commit.author.name; });
 
           flightEnter.append("div")
               .attr("class", "destination")
               .text(function(d) { return "SHA = "+d.sha; });
 
-          flightEnter.append("div")
-              .attr("class", "distance")
-              .text(function(d) { return d.commit.author.name; });
+          // flightEnter.append("div")
+          //     .attr("class", "distance")
+          //     .text(function(d) { return d.commit.author.name; });
 
           flightEnter.append("div")
               .attr("class", "delay")
