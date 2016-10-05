@@ -50,7 +50,7 @@ class RepoDisplay extends Component {
       showToolTip,
       makeAnchor,
       zoomed,
-      // startLoadAnimation,
+      renderRepoName,
       addColors,
       addDates,
     } = displayHelpers;
@@ -130,6 +130,7 @@ class RepoDisplay extends Component {
     nodes.on('mouseover', node => showToolTip(node, originalBranches, infoTip));
 
     addDates(svg, d3commits);
+    renderRepoName(d3commits[0], svg);
   }
 
 
