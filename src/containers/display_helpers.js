@@ -18,10 +18,10 @@ function makeAnchor(linkedText, site) {
 //https://bl.ocks.org/mbostock/6123708
 function zoomed(svg) {
   const { translate, scale } = d3.event;
-  svg.selectAll('g')
-    .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
-  svg.selectAll('line')
-    .attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
+  const translation = `translate(${translate})scale(${scale})`;
+  svg.selectAll('g').attr("transform", translation);
+  svg.selectAll('line').attr("transform", translation);
+  svg.selectAll('text').attr("transform", translation);
 
   //To make the tip essentially disappear from the page we remove its HTML.
   //It is still present on the page, but now consists of a tiny invisible square.
@@ -83,10 +83,53 @@ Message: ${commit.commit.message}`;
   tooltip.show();
 }
 
-function addDates(commits) {
+function addDates(svg, commits) {
+  const xOffset = 30;
+  const yOffset = 40;
+  const lowestY = 360;
+
+  let lastSunday;
+  const yMax = commits.reduce((maxY, nextCommit) => Math.max(maxY, nextCommit.y), lowestY) + 30;
+
   commits.forEach(commit => {
-    date = new Date(commit.commit.committer.date);
-  })
+    const dateObj = new Date(commit.commit.committer.date);
+    const dateStr = getCommitDate(commit);
+    if(lastSunday === dateStr) return;
+
+    //if sunday
+    if(dateObj.getDay() === 0) {
+      const x = commit.x - xOffset / 2;
+      const lowerPoint = {x, y: yMax + yOffset};
+      const higherPoint = {x,  y:lowestY - yOffset};
+      const curveData = [lowerPoint, higherPoint];
+
+      const dateLine = svg.append('g');
+      const diagonal = d3.svg.diagonal()
+        .source(function(d) {return {"x":d[0].y, "y":d[0].x}; })
+        .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
+        .projection(function(d) { return [d.y, d.x]; });
+
+      svg.select("g")
+          .datum(curveData)
+        .append("path")
+          .attr("class", "dateLine")
+          .attr("d", diagonal)
+          .attr("stroke-width", '2px')
+        .attr('stroke', '#000000')
+        .attr('fill', 'none')
+        // .style("stroke-linejoin", "round"); //doesn't work
+
+      // http://stackoverflow.com/questions/17410082/appending-multiple-svg-text-with-d3
+      svg.append("text")
+        .text(dateStr)
+        .attr('class', 'dateText')
+        .attr("x", lowerPoint.x + 7)
+        .attr("y", lowerPoint.y - 1)
+        .attr("font-size", 10);
+
+      lastSunday = dateStr;
+    }
+  });
 }
 
 export default {

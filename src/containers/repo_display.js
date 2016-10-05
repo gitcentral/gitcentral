@@ -126,9 +126,12 @@ class RepoDisplay extends Component {
       .attr('stroke', commit => branchLookup[commit.branch].color)
       .attr('fill', commit => branchLookup[commit.branch].color);
 
-      //show the tool on hover
-      nodes.on('mouseover', node => showToolTip(node, originalBranches, infoTip));
+    //show the tool on hover
+    nodes.on('mouseover', node => showToolTip(node, originalBranches, infoTip));
+
+    addDates(svg, d3commits);
   }
+
 
   render() {
     return (
