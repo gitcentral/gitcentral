@@ -199,3 +199,38 @@ pre {
   * End of Chart.js Styles
   *
   */
+
+  .contrib-content {
+    padding: 5px 5px 5px 5px;
+  }
+
+  .tooltip {
+  	position: absolute;
+  	top: 100px;
+  	left: 100px;
+    -moz-border-radius:5px;
+    border-radius: 5px;
+    border: solid gray 1px;
+    background: #fff;
+  	opacity: .9;
+    color: black;
+  	padding: 10px;
+  	width: 200px;
+  	font-size: 12px;
+    /*padding: 5px 5px 5px 5px;*/
+  	z-index: 10;
+  }
+
+  .tooltip .title {
+  	font-size: 13px;
+  }
+
+  .tooltip .name {
+    font-weight:bold;
+  }
+
+  .img-url {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+  }
