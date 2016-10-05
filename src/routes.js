@@ -15,7 +15,7 @@ class AppWrapper extends Component {
 }
 export default (
   <Route path="/" component={AppWrapper}>
-    <IndexRoute component={Hello}/>
+    <IndexRoute component={App}/>
     <Route path=":user/:repo" component={App}/>
   </Route>  
 );

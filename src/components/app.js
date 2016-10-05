@@ -22,19 +22,19 @@ export default class App extends Component {
         (prevProps.params.repo != this.props.params.repo)) {
 
       const newUrlEntered = `${this.props.params.user}/${this.props.params.repo}`;
-      console.log("component did update:", newUrlEntered);
       this.updateUrl(newUrlEntered);
     }
   }
 
   updateUrl(newUserRepo) {
-    console.log("new url entered:", newUserRepo);
     this.setState({ user_repo : newUserRepo });
   }
 
   render() {
-    const user_repo =`https://github.com/${this.props.params.user}/${this.props.params.repo}`;
-    console.log({ user: this.props.params.user, repo: this.props.params.repo, user_repo});
+    let user_repo ='https://github.com/';
+    if (this.props.params.user && this.props.params.repo) {
+      user_repo += this.props.params.user + '/' + this.props.params.repo;
+    }
     return (
       <div>
         <SearchBar urlEntered={user_repo} onSubmit={this.updateUrl.bind(this)}/>
