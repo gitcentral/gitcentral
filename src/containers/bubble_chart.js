@@ -106,10 +106,6 @@ class BubbleChart extends Component {
     }
 
     $.ajax({
-      // options: {
-      //   client_id: '',
-      //   client_secret: '',
-      // },
       url: commit.url,
       success: function (data) {
         console.log(accum[commit.author.login], data.stats.additions);
