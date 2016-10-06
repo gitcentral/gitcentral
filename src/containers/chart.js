@@ -1,12 +1,14 @@
+/**
+ * TO DO : Update CSS names to commits
+ * Initial filter
+ */
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import $ from 'jquery';
 
 class CrossfilterChart extends Component {
-  // componentDidMount(){
-  //   console.log('crossfilter component will mount');
-  //   this.makeCrossfilterChart();
-  // }
+
   makeCrossfilterChart() {
     $('#stats').empty();
     $('#stats').html(`
@@ -33,17 +35,30 @@ class CrossfilterChart extends Component {
     So in this code, initial state of sample json works and next api calls dont works,
     or initial state doesnt work and next api calls work.
 
-
     also, check value vs reference issues?
      */
     const JSONCommits = this.props.currentRepo.JSONCommits.slice();
-    const startDate = new Date(JSONCommits[0].commit.author.date);
-    const endDate = new Date(JSONCommits[JSONCommits.length - 1].commit.author.date);
+    let startDate = new Date(JSONCommits[0].commit.author.date);
+    let endDate = new Date(JSONCommits[JSONCommits.length - 1].commit.author.date);
+
+    // TEMP FIX because of initial state being in wrong order
+    // reverses order of array
+    if (startDate.getTime() > endDate.getTime()) {
+      const temp = startDate;
+      startDate = endDate;
+      endDate = temp;
+      JSONCommits.reverse()
+    }
+
+    const timeBetween = endDate.getTime() - startDate.getTime();
+    const quarterMark = Math.floor(timeBetween / 4);
+    const filterStart = new Date(startDate.getTime() + quarterMark);
+    const filterEnd = new Date(endDate.getTime() - quarterMark);
 
     const commits = JSONCommits;
       // Various formatters.
     const formatNumber = d3.format(',d');
-    const formatChange = d3.format('+,d');
+    // const formatChange = d3.format('+,d');
     const formatDate = d3.time.format('%A, %B %d, %Y');
     const formatTime = d3.time.format('%I:%M %p');
 
@@ -89,9 +104,9 @@ class CrossfilterChart extends Component {
           // Domain is the range of the chart
             .domain([startDate, endDate])
           // The range of the chart, how wide it is
-            .rangeRound([0, 10 * 80]))
+            .rangeRound([0, 10 * 90]))
           // Filter is the part of barChart that is selected
-          // .filter([new Date(2001, 1, 1), new Date(2001, 2, 1)])
+          .filter([filterStart, filterEnd]),
     ];
 
     // Given our array of charts, which we assume are in the same order as the
