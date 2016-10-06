@@ -1,9 +1,11 @@
 /**
- * TO DO : Update CSS names
+ * TO DO :
+ * Update CSS names
  * Add starting and ending date near the date chart.
  * Add overflow for commit list
- * Implement search
+ * Add weekday to search possibilities
  * Make CSS values % instead of px
+ * Find out why author name displays different
  */
 
 import React, { Component } from 'react';
