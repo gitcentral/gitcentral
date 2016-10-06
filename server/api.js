@@ -83,7 +83,7 @@ router.route('/repos/:userName/:repoName')
        branches = JSON.parse(branches);
        const requestBranchCommits = [];
        branches.forEach((branch) => {
-         requestBranchCommits.push(makeRequestBranchCommits(branch.commit.sha, []));
+         requestBranchCommits.push(makeRequestBranchCommits(branch.commit.sha, {}));
        });
        Promise.all(requestBranchCommits).then((allCommits) => {
          const requestAllCommits = { commits: [], lookup: {} };
@@ -136,19 +136,30 @@ router.route('/repos/:userName/:repoName')
        });
 
        /**
-         * [makeRequestBranchCommits gets a branches' commits from github's api in quantities of 100,
-                                                     * if there are more commits to be retrieved,
-                                                     * run getNextCommits again until there are no more commits to retrieve]
-                                                     * @param  {[String]} lastSha [Sha # of most recent commit on the branch]
-                                                     * @return {[Promise]} [Returns a promise that contains a recursive invocation to Github Api]
-          */
-       function makeRequestBranchCommits(branchLastSha) {
+        * [makeRequestBranchCommits gets a branches' commits from github's api in quantities of 100,
+        * if there are more commits to be retrieved,
+        * run getNextCommits again until there are no more commits to retrieve]
+        * @param  {[String]} lastSha [Sha # of most recent commit on the branch]
+        * @return {[Promise]} [Returns a promise that contains a recursive invocation to Github Api]
+        */
+       function makeRequestBranchCommits(branchLastSha, foundShaLookup) {
          return new Promise((resolve, reject) => {
            function getNextCommits(lastSha, commitArr = []) {
              const commitsOpt = { uri: `${commitsURL}?sha=${lastSha}&per_page=100&${secrets}`,
                                   headers: { 'User-Agent': userAgent } };
              request(commitsOpt).then((commits) => {
                const commitObjs = JSON.parse(commits);
+               commitObjs.map((aCommit) => { foundShaLookup[aCommit.sha] = true; });
+               const commitMissingObjs = commitObjs.reduce((missing, aCommit) => {
+                 aCommit.parents.map((parent) => {
+                   if (foundShaLookup[parent.sha] === undefined) {
+                     foundShaLookup[parent.sha] = true;
+                     missing.push(parent.sha);
+                   }
+                 });
+                 return missing;
+               }, []);
+               console.log("missing", commitMissingObjs);
                commitArr.push(...commitObjs);
                if (commitObjs.length < 100 || commitObjs[commitObjs.length - 1].parents.length === 0) {
                  resolve(commitArr);
