@@ -23,8 +23,10 @@ class WordCloud extends Component {
     let words = this.props.currentRepo.JSONCommits.reduce((currentString, word) => {
       return currentString.concat(' ', word.commit.message);
     }, '');
+
     // Replace punctuation with spaces
     words = words.replace(/\d|\W/g, ' ').split(' ')
+    console.log(words);
 
     // Count frequency of each word and create new array of non duplicates
     const frequencyCount = {};
@@ -51,7 +53,8 @@ class WordCloud extends Component {
     });
 
     // Scale of colors for words
-    const fill = d3.scale.category20();
+    // can choose from d3.scale.category20(),d3.scale.category20c(),d3.scale.category20b()
+    const fill = d3.scale.category20c();
 
     // Construct the word cloud's SVG element
     const svg = d3.select('#word-cloud')
