@@ -14,8 +14,8 @@ export default class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { user_repo : "" };
-    this.updateUrl = this.updateUrl.bind(this);
+    // this.state = { user_repo : "" };
+    // this.updateUrl = this.updateUrl.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -27,18 +27,20 @@ export default class App extends Component {
     }
   }
 
-  updateUrl(newUserRepo) {
-    this.setState({ user_repo : newUserRepo });
-  }
+  // updateUrl(newUserRepo) {
+  //   this.setState({ user_repo : newUserRepo });
+  // }
 
   render() {
     let user_repo ='https://github.com/';
     if (this.props.params.user && this.props.params.repo) {
       user_repo += this.props.params.user + '/' + this.props.params.repo;
     }
+    // former SearchBar:
+    // <SearchBar urlEntered={user_repo} onSubmit={this.updateUrl.bind(this)}/>
     return (
       <div>
-        <SearchBar urlEntered={user_repo} onSubmit={this.updateUrl.bind(this)}/>
+        <SearchBar />
         <RepoDisplay />
         <Chart />
         <WordCloud />
