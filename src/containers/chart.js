@@ -51,7 +51,7 @@ class CrossfilterChart extends Component {
       const temp = startDate;
       startDate = endDate;
       endDate = temp;
-      JSONCommits.reverse()
+      JSONCommits.reverse();
     }
 
     // Calculate 25% and 75% of date for initial filter area to load for chart
@@ -70,7 +70,7 @@ class CrossfilterChart extends Component {
     // A nest operator, for grouping the flight list.
     const nestByDate = d3.nest().key(d => d3.time.day(d.date));
 
-    // Create array of weekdays to store in d.words property
+    // Create array of weekdays to store in d.words property of commits
     const weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 
     // Add properties to each commit
