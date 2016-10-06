@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -105,16 +106,16 @@ class BubbleChart extends Component {
       accum[commit.author.login].commits += 1;
     }
 
-    $.ajax({
-      url: commit.url,
-      success: function (data) {
-        console.log(accum[commit.author.login], data.stats.additions);
-        accum[commit.author.login].lines += data.stats.additions - data.stats.deletions;
-      },
-      error: function (error) {
-        console.error(error);
-      }
-    });
+    // $.ajax({
+    //   url: commit.url,
+    //   success: function (data) {
+    //     console.log(accum[commit.author.login], data.stats.additions);
+    //     accum[commit.author.login].lines += data.stats.additions - data.stats.deletions;
+    //   },
+    //   error: function (error) {
+    //     console.error(error);
+    //   }
+    // });
 
     return accum;
   }, {});
