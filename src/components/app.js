@@ -10,27 +10,7 @@ import WordCloud from '../containers/word_cloud';
 import BubbleChart from '../containers/bubble_chart';
 
 export default class App extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      (prevProps.params.user != this.props.params.user) ||
-      (prevProps.params.repo != this.props.params.repo)
-      )
-    {
-      const newUrlEntered = `${this.props.params.user}/${this.props.params.repo}`;
-      this.updateUrl(newUrlEntered);
-    }
-  }
-
   render() {
-    let user_repo ='https://github.com/';
-    if (this.props.params.user && this.props.params.repo) {
-      user_repo += this.props.params.user + '/' + this.props.params.repo;
-    }
-
     return (
       <div>
         <RepoDisplay />
