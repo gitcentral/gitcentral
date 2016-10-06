@@ -92,7 +92,13 @@ router.route('/repos/:userName/:repoName')
          /**
           * Sorts array of commits by timestamp
           */
-         allFlattenCommits.sort((lhs, rhs) => Date.parse(lhs.commit.committer.date) - Date.parse(rhs.commit.committer.date));
+         allFlattenCommits.sort((lhs, rhs) => {
+           if (lhs.commit.committer.date !== rhs.commit.committer.date) {
+             return new Date(lhs.commit.committer.date) - new Date(rhs.commit.committer.date)
+           } else {
+             return new Date(lhs.commit.author.date) - new Date(rhs.commit.author.date)
+           }
+         });
 
          /**
           * Filters array of commits to remove duplicates
