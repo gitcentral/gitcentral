@@ -6,6 +6,26 @@ import SearchBar from './containers/searchbar';
 import RepoDisplay from './containers/repo_display';
 
 class AppWrapper extends Component {
+  constructor(props) {   
+    super(props);   
+    
+    this.state = { user_repo : "" };    
+    this.updateUrl = this.updateUrl.bind(this);   
+  }
+
+  componentDidUpdate(prevProps, prevState) {    
+    if ((prevProps.params.user != this.props.params.user) ||    
+        (prevProps.params.repo != this.props.params.repo)) {    
+    
+      const newUrlEntered = `${this.props.params.user}/${this.props.params.repo}`;    
+      this.updateUrl(newUrlEntered);    
+    }   
+  }   
+    
+  updateUrl(newUserRepo) {    
+    this.setState({ user_repo : newUserRepo });   
+  }
+
   filterRepo(event) {
     event.preventDefault();
 
@@ -36,9 +56,14 @@ class AppWrapper extends Component {
   }
 
   render() {
+    let user_repo ='https://github.com/';   
+    if (this.props.params.user && this.props.params.repo) {   
+      user_repo += this.props.params.user + '/' + this.props.params.repo;   
+    }
+    
     return (
       <div>
-        <SearchBar />
+        <SearchBar urlEntered={user_repo} onSubmit={this.updateUrl.bind(this)} />
         <form onInput={this.filterRepo}>
           <input type="text" className="form-control" placeholder="Keyword search" />
         </form>
@@ -50,6 +75,7 @@ class AppWrapper extends Component {
 
 export default (
   <Route path="/" component={AppWrapper}>
-    <IndexRoute component={App}/>
+    <IndexRoute component={App} />
+    <Route path=":user/:repo" component={App} />
   </Route>  
 );
