@@ -1,6 +1,6 @@
 /**
- * TO DO : Update CSS names to commits
- * Initial filter
+ * TO DO : Update CSS names
+ * Add starting and ending date near the chart.
  */
 
 import React, { Component } from 'react';
@@ -50,6 +50,7 @@ class CrossfilterChart extends Component {
       JSONCommits.reverse()
     }
 
+    // Calculate 25% and 75% of date for initial filter area to load for chart
     const timeBetween = endDate.getTime() - startDate.getTime();
     const quarterMark = Math.floor(timeBetween / 4);
     const filterStart = new Date(startDate.getTime() + quarterMark);

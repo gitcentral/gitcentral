@@ -23,8 +23,10 @@ class WordCloud extends Component {
     let words = this.props.currentRepo.JSONCommits.reduce((currentString, word) => {
       return currentString.concat(' ', word.commit.message);
     }, '');
+
     // Replace punctuation with spaces
     words = words.replace(/\d|\W/g, ' ').split(' ')
+    console.log(words);
 
     // Count frequency of each word and create new array of non duplicates
     const frequencyCount = {};
