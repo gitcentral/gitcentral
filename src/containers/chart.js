@@ -3,9 +3,7 @@
  * Update CSS names
  * Add starting and ending date near the date chart.
  * Add overflow for commit list
- * Add weekday to search possibilities
  * Make CSS values % instead of px
- * Find out why author name displays different
  */
 
 import React, { Component } from 'react';
@@ -72,14 +70,17 @@ class CrossfilterChart extends Component {
     // A nest operator, for grouping the flight list.
     const nestByDate = d3.nest().key(d => d3.time.day(d.date));
 
+    // Create array of weekdays to store in d.words property
+    const weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+
     // Add properties to each commit
     commits.forEach((d, i) => {
-      // Add property to hold all words in commit
-      d.words = JSON.stringify(d).toLowerCase();
-      // Add an index property
-      d.index = i;
       // Convert date
       d.date = new Date(d.commit.author.date);
+      // Add property to hold all words in commit and corresponding weekday
+      d.words = JSON.stringify(d).toLowerCase() + weekdays[d.date.getDay()];
+      // Add an index property
+      d.index = i;
     });
 
     // Create the crossfilter for the relevant dimensions and groups.
@@ -189,7 +190,7 @@ class CrossfilterChart extends Component {
 
         commitEnter.append("div")
             .attr("class", "origin")
-            .text(function(d) { return d.commit.author.name; });
+            .text(function(d) { return d.author.login; });
 
         commitEnter.append("div")
             .attr("class", "destination")
@@ -332,7 +333,6 @@ class CrossfilterChart extends Component {
             .style("display", null);
         g.select("#clip-" + id + " rect")
             .attr("x", x(extent[0]))
-            //x(extent [ 0] might have problems)
             .attr("width", x(extent[1]) - x(extent[0]));
         dimension.filterRange(extent);
       });
@@ -402,8 +402,7 @@ class CrossfilterChart extends Component {
     /**
      * On form input, check if word exist in each word dimension,
      * if it does, filter to only show those commit
-     * Utilized a flag variable to prevent re-rendering charts
-     * if filter function doesn't result in new data to be shown
+     * Utilized a flag variable to only render if neccessary
      */
     $('.form-control').on('input', function () {
       const term = this.value.toLowerCase().split(' ');
