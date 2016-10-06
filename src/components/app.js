@@ -12,23 +12,18 @@ import BubbleChart from '../containers/bubble_chart';
 export default class App extends Component {
   constructor(props) {
     super(props);
-
-    // this.state = { user_repo : "" };
-    // this.updateUrl = this.updateUrl.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if ((prevProps.params.user != this.props.params.user) ||
-        (prevProps.params.repo != this.props.params.repo)) {
-
+    if (
+      (prevProps.params.user != this.props.params.user) ||
+      (prevProps.params.repo != this.props.params.repo)
+      )
+    {
       const newUrlEntered = `${this.props.params.user}/${this.props.params.repo}`;
       this.updateUrl(newUrlEntered);
     }
   }
-
-  // updateUrl(newUserRepo) {
-  //   this.setState({ user_repo : newUserRepo });
-  // }
 
   render() {
     let user_repo ='https://github.com/';
