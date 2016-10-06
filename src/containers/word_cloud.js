@@ -24,9 +24,8 @@ class WordCloud extends Component {
       return currentString.concat(' ', word.commit.message);
     }, '');
 
-    // Replace punctuation with spaces
+    // Replace punctuation and digits with spaces
     words = words.replace(/\d|\W/g, ' ').split(' ')
-    console.log(words);
 
     // Count frequency of each word and create new array of non duplicates
     const frequencyCount = {};

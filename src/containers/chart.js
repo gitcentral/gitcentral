@@ -1,6 +1,11 @@
 /**
- * TO DO : Update CSS names
- * Add starting and ending date near the chart.
+ * TO DO :
+ * Update CSS names
+ * Add starting and ending date near the date chart.
+ * Add overflow for commit list
+ * Add weekday to search possibilities
+ * Make CSS values % instead of px
+ * Find out why author name displays different
  */
 
 import React, { Component } from 'react';
@@ -37,6 +42,7 @@ class CrossfilterChart extends Component {
 
     also, check value vs reference issues?
      */
+
     const JSONCommits = this.props.currentRepo.JSONCommits.slice();
     let startDate = new Date(JSONCommits[0].commit.author.date);
     let endDate = new Date(JSONCommits[JSONCommits.length - 1].commit.author.date);
@@ -66,8 +72,10 @@ class CrossfilterChart extends Component {
     // A nest operator, for grouping the flight list.
     const nestByDate = d3.nest().key(d => d3.time.day(d.date));
 
-    // Add properties to each d.
+    // Add properties to each commit
     commits.forEach((d, i) => {
+      // Add property to hold all words in commit
+      d.words = JSON.stringify(d).toLowerCase();
       // Add an index property
       d.index = i;
       // Convert date
@@ -83,6 +91,7 @@ class CrossfilterChart extends Component {
     const hours = hour.group(Math.floor);
     const day = commit.dimension(d => d.date.getDay());
     const days = day.group(d => d);
+    const word = commit.dimension(d => d.words);
 
     const charts = [
       barChart()
@@ -97,7 +106,6 @@ class CrossfilterChart extends Component {
           .x(d3.scale.linear()
             .domain([0, 7])
             .rangeRound([0, 20 * 7])),
-
       barChart()
           .dimension(date)
           .group(dates)
@@ -153,7 +161,7 @@ class CrossfilterChart extends Component {
       const commitsByDate = nestByDate.entries(date.top(40));
 
       div.each(function() {
-        var date = d3.select(this).selectAll(".date")
+        let date = d3.select(this).selectAll(".date")
             .data(commitsByDate, d => d.key);
 
         date.enter().append("div")
@@ -166,13 +174,13 @@ class CrossfilterChart extends Component {
 
         date.exit().remove();
 
-        var commit = date.order().selectAll(".flight")
+        let commit = date.order().selectAll(".flight")
             .data(function(d) { return d.values; }, function(d) { return d.index; });
 
-        var commitEnter = commit.enter().append("div")
+        const commitEnter = commit.enter().append("div")
             .attr("class", "flight");
 
-        //this is where they append data to divs
+        // This is where they append data to divs
         commitEnter.append("div")
             .attr("class", "time")
             .text(function(d) {
@@ -196,7 +204,7 @@ class CrossfilterChart extends Component {
         commit.exit().remove();
         commit.order();
       });
-    }
+    } // End of commitList function
 
     function barChart() {
       if (!barChart.id) barChart.id = 0;
@@ -308,7 +316,7 @@ class CrossfilterChart extends Component {
               + "M" + (4.5 * x) + "," + (y + 8)
               + "V" + (2 * y - 8);
         }
-      }
+      }// End of chart function
 
       brush.on("brushstart.chart", function() {
         var div = d3.select(this.parentNode.parentNode.parentNode);
@@ -389,11 +397,32 @@ class CrossfilterChart extends Component {
       };
 
       return d3.rebind(chart, brush, "on");
-    }
+    }// End of barChart function
+
+    /**
+     * On form input, check if word exist in each word dimension,
+     * if it does, filter to only show those commit
+     * Utilized a flag variable to prevent re-rendering charts
+     * if filter function doesn't result in new data to be shown
+     */
+    $('.form-control').on('input', function () {
+      const term = this.value.toLowerCase().split(' ');
+      let needToRender = false;
+      word.filterFunction((d) => {
+        const termCheck = term.map(input => d.includes(input));
+        if (!termCheck.includes(false)) {
+          needToRender = true;
+          return true;
+        }
+      });
+      if (needToRender) {
+        renderAll();
+      }
+    });
   }
 
-  render(){
-    return(
+  render() {
+    return (
       <div>
         {this.makeCrossfilterChart()}
       </div>

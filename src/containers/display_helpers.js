@@ -142,7 +142,7 @@ function renderRepoName(firstCommit, svg) {
   const { x, y: commitY } = firstCommit;
   const y = commitY - 40;
   const repoText = firstCommit.html_url.match(/.*github\.com\/(.*)\/commit.*/)[1];
-  console.log(repoText)
+  // console.log(repoText)
   svg.append("text")
     .text(repoText)
     .attr('class', 'repoNameText')
@@ -150,7 +150,7 @@ function renderRepoName(firstCommit, svg) {
     .attr("y", y)
     .attr("font-size", 24);
 
-    console.log(firstCommit)
+    // console.log(firstCommit)
 }
 
 export default {
