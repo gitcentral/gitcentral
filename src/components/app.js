@@ -5,7 +5,6 @@
 
 import React, { Component } from 'react';
 import RepoDisplay from '../containers/repo_display';
-import SearchBar from '../containers/searchbar';
 import Chart from '../containers/chart';
 import WordCloud from '../containers/word_cloud';
 import BubbleChart from '../containers/bubble_chart';
@@ -36,11 +35,9 @@ export default class App extends Component {
     if (this.props.params.user && this.props.params.repo) {
       user_repo += this.props.params.user + '/' + this.props.params.repo;
     }
-    // former SearchBar:
-    // <SearchBar urlEntered={user_repo} onSubmit={this.updateUrl.bind(this)}/>
+
     return (
       <div>
-        <SearchBar />
         <RepoDisplay />
         <Chart />
         <WordCloud />
