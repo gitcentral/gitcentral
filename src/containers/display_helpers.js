@@ -90,7 +90,7 @@ function addDates(svg, commits) {
   const oneWeek = 1000 * 60 * 60 * 24 * 7;
   let nodesSinceLastDate = 0;
 
-  let lastSunday;
+  let lastSunday = null;
   const yMax = commits.reduce((maxY, nextCommit) => Math.max(maxY, nextCommit.y), lowestY) + 30;
 
   commits.forEach(commit => {
@@ -99,7 +99,10 @@ function addDates(svg, commits) {
     if(lastSunday === dateStr) return;
 
     //if sunday or it's been over a week
-    if((dateObj.getDay() === 0 || dateObj - lastSunday > oneWeek) && ++nodesSinceLastDate > 7) {
+    if(
+      (dateObj.getDay() === 0 || dateObj - lastSunday > oneWeek) &&
+      ++nodesSinceLastDate > 7
+    ) {
       const x = commit.x - xOffset / 2;
       const lowerPoint = {x, y: yMax + yOffset};
       const higherPoint = {x,  y:lowestY - yOffset};
@@ -129,7 +132,7 @@ function addDates(svg, commits) {
         .attr("y", lowerPoint.y - 1)
         .attr("font-size", 10);
 
-      lastSunday = dateObj;
+      lastSunday = dateStr;
       nodesSinceLastDate = 0;
     }
   });
