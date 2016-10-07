@@ -309,7 +309,7 @@ class BubbleChart extends Component {
         <br>
         ${d.commits} commits
         <br>
-        <a href='https://www.github.com/${d.username}'>See profile</a>
+        <a href='https://www.github.com/${d.username}' target="_blank">See profile</a>
         <br>
       </div>`;
 
