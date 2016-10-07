@@ -24,11 +24,8 @@ d3.tip = tooltip;
 
 class RepoDisplay extends Component {
   makeD3Display () {
-    // remove all svg elements
-    // d3.select("svg").remove();
     $('#container').empty();
     $('.d3-tip').remove();
-    // $('body').append('<div id="container"></div>');
 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -101,7 +98,7 @@ class RepoDisplay extends Component {
           straightLineLocations.push({ y:commit.y, xStart: commit.x, xEnd: childObj.x });
         }
 
-      //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
+        //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
         const curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
         const edge = svg.append('g');
         const diagonal = d3.svg.diagonal()
@@ -139,8 +136,12 @@ class RepoDisplay extends Component {
     //show the tool on hover
     nodes.on('mouseover', node => showToolTip(node, originalBranches, infoTip));
 
-    addDates(svg, d3commits);
-    renderRepoName(d3commits[0], svg);
+    const highestNode = d3commits.reduce((highest, commit) => {
+      return commit.y < highest ? commit : highest;
+    });
+
+    addDates(svg, d3commits, highestNode.y);
+    renderRepoName(highestNode, svg);
   }
 
 

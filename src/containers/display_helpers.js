@@ -83,10 +83,9 @@ Message: ${commit.commit.message}`;
   tooltip.show();
 }
 
-function addDates(svg, commits) {
+function addDates(svg, commits, lowestY) {
   const xOffset = 30;
   const yOffset = 40;
-  const lowestY = 360;
   const oneWeek = 1000 * 60 * 60 * 24 * 7;
   let nodesSinceLastDate = 0;
 
@@ -96,16 +95,16 @@ function addDates(svg, commits) {
   commits.forEach(commit => {
     const dateObj = new Date(commit.commit.committer.date);
     const dateStr = getCommitDate(commit);
-    if(lastSunday === dateStr) return;
+    if(lastSunday === dateObj) return;
 
     //if sunday or it's been over a week
     if(
       (dateObj.getDay() === 0 || dateObj - lastSunday > oneWeek) &&
-      ++nodesSinceLastDate > 7
+      ++nodesSinceLastDate > 12
     ) {
       const x = commit.x - xOffset / 2;
       const lowerPoint = {x, y: yMax + yOffset};
-      const higherPoint = {x,  y:lowestY - yOffset};
+      const higherPoint = {x,  y:lowestY - 60};
       const curveData = [lowerPoint, higherPoint];
 
       const dateLine = svg.append('g');
@@ -121,8 +120,7 @@ function addDates(svg, commits) {
           .attr("d", diagonal)
           .attr("stroke-width", '2px')
         .attr('stroke', '#000000')
-        .attr('fill', 'none')
-        // .style("stroke-linejoin", "round"); //doesn't work
+        .attr('fill', 'none');
 
       // http://stackoverflow.com/questions/17410082/appending-multiple-svg-text-with-d3
       svg.append("text")
@@ -132,7 +130,7 @@ function addDates(svg, commits) {
         .attr("y", lowerPoint.y - 1)
         .attr("font-size", 10);
 
-      lastSunday = dateStr;
+      lastSunday = dateObj;
       nodesSinceLastDate = 0;
     }
   });
@@ -140,17 +138,14 @@ function addDates(svg, commits) {
 
 function renderRepoName(firstCommit, svg) {
   const { x, y: commitY } = firstCommit;
-  const y = commitY - 40;
+  const y = commitY - 70;
   const repoText = firstCommit.html_url.match(/.*github\.com\/(.*)\/commit.*/)[1];
-  // console.log(repoText)
   svg.append("text")
     .text(repoText)
     .attr('class', 'repoNameText')
     .attr("x", x)
     .attr("y", y)
     .attr("font-size", 24);
-
-    // console.log(firstCommit)
 }
 
 export default {
