@@ -105,8 +105,16 @@ class CrossfilterChart extends Component {
           .dimension(day)
           .group(days)
           .x(d3.scale.linear()
+            // .domain(['Sun','Mon','Tue','Wed','Thur','Fri','Sat'])
+            // .rangeRoundBands([0,900])),
+            // .rangePoints([0,300])),
+            // .rangeRoundBands([0,350],0.1)),
+
+            // .range([0, 50, 100, 150, 200, 250, 300, 350])),
+
             .domain([0, 7])
             .rangeRound([0, 20 * 7])),
+            // .tickFormat(function(d) { return weekdays[d]; })),
       barChart()
           .dimension(date)
           .group(dates)
@@ -114,7 +122,8 @@ class CrossfilterChart extends Component {
           // Domain is the range of the chart
             .domain([startDate, endDate])
           // The range of the chart, how wide it is
-            .rangeRound([0, 10 * 90]))
+            // .rangeRoundBands([0,200],1))
+            .rangeRound([0, 10 * 80]))
           // Filter is the part of barChart that is selected
           .filter([filterStart, filterEnd]),
     ];
@@ -208,6 +217,7 @@ class CrossfilterChart extends Component {
     } // End of commitList function
 
     function barChart() {
+      console.log(barChart.id,"barchart ?")
       if (!barChart.id) barChart.id = 0;
 
       var margin = {top: 10, right: 10, bottom: 20, left: 10},
@@ -221,9 +231,17 @@ class CrossfilterChart extends Component {
           group,
           round;
 
+      if (barChart.id === 2) {
+        axis = d3.svg.axis().orient("bottom").tickFormat(function(d) { return weekdays[d]; });
+      }
+
       function chart(div) {
         var width = x.range()[1],
             height = y.range()[0];
+        // if scale is ordinal, adjust width accordingly
+        if (x.range().length > 2){
+          width = x.range()[x.range().length - 1];
+        }
 
         y.domain([0, group.top(1)[0].value]);
 
@@ -298,6 +316,7 @@ class CrossfilterChart extends Component {
               d;
           while (++i < n) {
             d = groups[i];
+            console.log(d,"d");
             path.push("M", x(d.key), ",", height, "V", y(d.value), "h9V", height);
           }
           return path.join("");
