@@ -161,7 +161,6 @@ class CrossfilterChart extends Component {
 
     function commitList(div) {
       const commitsByDate = nestByDate.entries(date.top(40));
-
       div.each(function () {
         const date = d3.select(this).selectAll('.date')
             .data(commitsByDate, d => d.key);
@@ -176,7 +175,7 @@ class CrossfilterChart extends Component {
         date.exit().remove();
 
         const commit = date.order().selectAll('.flight')
-            .data((d) => { return d.values; }, (d) => { return d.index; });
+            .data(d => d.values, d => d.index);
 
         const commitEnter = commit.enter().append('div')
             .attr('class', 'flight');
@@ -203,42 +202,45 @@ class CrossfilterChart extends Component {
       });
     } // End of commitList function
 
+    /**
+     * [convertTime] Converts military time to standard AM/PM time
+     * @param  {[number]} hour [military time in hours]
+     * @return {[string]} standard time in hours % AM/PM
+     */
+    function convertTime(oldHour) {
+      if (oldHour === 0 || oldHour === 24) {
+        return '12AM';
+      }
+      const amPm = oldHour > 11 ? 'PM' : 'AM';
+      const newHour = oldHour > 12 ? oldHour - 12 : oldHour;
+      return newHour + amPm;
+    }
+
     function barChart() {
       if (!barChart.id) barChart.id = 0;
       let margin = { top: 10, right: 15, bottom: 20, left: 15 };
       let x;
       let y = d3.scale.linear().range([100, 0]);
-      let id = barChart.id++;
+      const id = barChart.id++;
       let axis = d3.svg.axis().orient('bottom');
-      let brush = d3.svg.brush();
+      const brush = d3.svg.brush();
       let brushDirty;
       let dimension;
       let group;
       let round;
 
-
-        if (barChart.id === 1) {
-          axis = d3.svg.axis().orient('bottom').tickFormat(d => {
-            if (d === 0){
-              return `12AM`;
-            }
-            else if(d < 12){
-              return `${d}AM`;
-            }else if(d === 12){
-              d = d +'PM'
-            }else if(d === 24){
-              d = 12 + 'AM';
-            }else{
-              d = d - 12 +'PM'
-            }
-            return d;
-          });
-        }
-
-
       /**
-       * If barchart.id is 2, that means it is the week day chart.
-       * Set x-axis for weekday chart to have the days of the week instead of numbers
+       * If barchart.id is 1, it is the hourly chart
+       * Change x-axis for hourly chart to have AM/PM time instead of military time
+       */
+      if (barChart.id === 1) {
+        axis = d3.svg.axis().orient('bottom').tickFormat(d => {
+          return convertTime(d);
+        });
+      }
+      /**
+       * If barchart.id is 2, it is the week day chart.
+       * Change x-axis for weekday chart to have the days of the week instead of numbers
        */
       if (barChart.id === 2) {
         axis = d3.svg.axis().orient('bottom').tickFormat((d) => {
