@@ -9,8 +9,6 @@ class BubbleChart extends Component {
   /*
  * Creates tooltip with provided id that
  * floats on top of visualization.
- * Most styling is expected to come from CSS
- * so check out bubble_chart.css for more details.
  */
 
   floatingTooltip(tooltipId, width) {
@@ -31,9 +29,7 @@ class BubbleChart extends Component {
 
     /*
      * Display tooltip with provided content.
-     *
      * content is expected to be HTML string.
-     *
      * event is d3.event for positioning.
      */
     function showTooltip(content, event) {
@@ -326,8 +322,6 @@ class BubbleChart extends Component {
         </span>
         <br>
         ${d.commits} commits
-        <br>
-        ${d.lines} contributed lines
         <br>
         <a href='https://www.github.com/${d.username}'>See profile</a>
         <br>
