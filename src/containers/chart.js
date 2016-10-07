@@ -1,6 +1,5 @@
 /**
  * TO DO :
- * Update CSS names
  * Add starting and ending date near the date chart.
  * Add overflow for commit list
  * Make CSS values % instead of px

@@ -84,9 +84,7 @@ pre {
 }
 
 /**
- *
  *  For Chart.js
- *
  */
 
  #charts {
@@ -157,7 +155,7 @@ pre {
  #commit-list .commit {
    line-height: 1.5em;
    background: #eee;
-   width: 1400px;
+   width: 1000px;
    margin-bottom: 1px;
  }
 
@@ -172,17 +170,19 @@ pre {
  #commit-list div.author {
    width: 200px;
  }
- #commit-list div.sha-link,
+ #commit-list div.sha-link{
+   width: 200px;
+ }
  #commit-list div.commit-message {
    width: 500px;
    padding-right: 10px;
-   text-align: right;
+   text-align: left;
  }
 
  #commit-list .early {
    color: green;
  }
- 
+
  aside {
    position: absolute;
    left: 740px;
@@ -191,9 +191,7 @@ pre {
  }
 
  /**
-  *
   * End of Chart.js Styles
-  *
   */
 
   .contrib-content {
