@@ -113,7 +113,7 @@ function shiftOverlappingBranches(branchXCoordinates, branchYCoordinates, yOffse
  * on the commit.
  */
 export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
-  const firstCheckForY = 360;
+  const firstCheckForY = window.innerHeight / 2 - 200;
   const yOffset = 40;
   let numCommits = 0;
 
@@ -129,7 +129,7 @@ export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
    * branchYCoordinates will the y-coordinate of each branch.
    * @type {Object}, format: { branchname1: n, branchname2: m, ...}
    */
-  const branchYCoordinates = { master: 360 };
+  const branchYCoordinates = { master: firstCheckForY };
 
   //Create the x-value for each commit. Simple and linear.
   commitsArr.forEach(commit => {
@@ -150,7 +150,7 @@ export default function generateCoordinates(commitsArr, commitsObj, branchObj) {
    * y-value. Initialize with a hard-coded master.
    */
   const taken = [{
-    y: 360,
+    y: firstCheckForY,
     start: branchXCoordinates['master'].start,
     end: branchXCoordinates['master'].end,
   }];
