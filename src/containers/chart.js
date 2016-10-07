@@ -112,8 +112,8 @@ class CrossfilterChart extends Component {
 
             // .range([0, 50, 100, 150, 200, 250, 300, 350])),
 
-            .domain([0, 7])
-            .rangeRound([0, 20 * 7])),
+            .domain([-1, 7])
+            .rangeRound([0, 30 * 7])),
             // .tickFormat(function(d) { return weekdays[d]; })),
       barChart()
           .dimension(date)
@@ -230,9 +230,17 @@ class CrossfilterChart extends Component {
           dimension,
           group,
           round;
-
+      /**
+       * If barchart.id is 2, that means it is the week day chart.
+       * Set x-axis for weekday chart to have the days of the week instead of numbers
+       */
       if (barChart.id === 2) {
-        axis = d3.svg.axis().orient("bottom").tickFormat(function(d) { return weekdays[d]; });
+        axis = d3.svg.axis().orient("bottom").tickFormat(function(d) {
+          if(!weekdays[d]){
+            return '';
+          }
+          return weekdays[d].slice(0,1).toUpperCase() + weekdays[d].slice(1,3);
+        });
       }
 
       function chart(div) {
@@ -316,7 +324,6 @@ class CrossfilterChart extends Component {
               d;
           while (++i < n) {
             d = groups[i];
-            console.log(d,"d");
             path.push("M", x(d.key), ",", height, "V", y(d.value), "h9V", height);
           }
           return path.join("");
