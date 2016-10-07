@@ -100,7 +100,7 @@ class CrossfilterChart extends Component {
           .group(hours)
           .x(d3.scale.linear()
             .domain([0, 24])
-            .rangeRound([0, 14 * 24])),
+            .rangeRound([0, 18 * 24])),
       barChart()
           .dimension(day)
           .group(days)
