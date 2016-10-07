@@ -7,6 +7,7 @@ import Timeline from 'material-ui/svg-icons/action/timeline';
 import Equalizer from 'material-ui/svg-icons/av/equalizer';
 import FormatQuote from 'material-ui/svg-icons/editor/format-quote';
 import Bubbles from 'material-ui/svg-icons/editor/bubble-chart';
+import $ from 'jquery';
 
 function enterTab(elementId) {
   console.log('get ' + elementId);
@@ -21,6 +22,7 @@ function enterTab(elementId) {
   document.getElementById('bubble-chart').className="hidden";
 
   document.getElementById(elementId).classList.remove("hidden");
+  $('body').css('overflow', 'hidden');
 }
 
 export default class NavTabs extends Component {
@@ -30,6 +32,7 @@ export default class NavTabs extends Component {
 
   getStats(){
     enterTab('stats');
+    $('body').css('overflow', 'visible');
   }
 
   getWordCloud(){
