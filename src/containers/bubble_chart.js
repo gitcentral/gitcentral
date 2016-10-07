@@ -193,7 +193,7 @@ class BubbleChart extends Component {
           };
         });
       // sort them to prevent occlusion of smaller nodes.
-        myNodes.sort(function (a, b) { return b.commits - a.commits; });
+        myNodes.sort((a, b) => b.commits - a.commits);
 
         return myNodes;
       }
@@ -209,7 +209,7 @@ class BubbleChart extends Component {
      */
       const chart = function chart(selector, data) {
       // Use the max total_amount in the data as the max in the scale's domain
-        const maxAmount = d3.max(data, function (d) { return +d.commits; });
+        const maxAmount = d3.max(data, d => +d.commits);
         radiusScale.domain([0, maxAmount]);
 
         nodes = createNodes(data);
@@ -224,14 +224,14 @@ class BubbleChart extends Component {
 
       // Bind nodes data to what will become DOM elements to represent them.
         bubbles = bubbleSvg.selectAll('.bubble')
-          .data(nodes, function (d) { return d.author; });
+          .data(nodes, d => d.author);
 
       // Create new circle elements each with class `bubble` per node.
         bubbles.enter().append('circle')
           .classed('bubble', true)
           .attr('r', 0)
-          .attr('fill', function (d) { return fillColor(d.author); })
-          .attr('stroke', function (d) { return d3.rgb(fillColor(d.group)).darker(); })
+          .attr('fill', d => fillColor(d.author))
+          .attr('stroke', d => d3.rgb(fillColor(d.group)).darker())
           .attr('stroke-width', 2)
           .attr('opacity', 0.5)
           .on('mouseover', showDetail)
@@ -241,7 +241,7 @@ class BubbleChart extends Component {
       // correct radius
         bubbles.transition()
           .duration(2000)
-          .attr('r', function (d) { return d.radius; });
+          .attr('r', d => d.radius);
 
       // Set initial layout to single group.
         groupBubbles();
@@ -251,17 +251,17 @@ class BubbleChart extends Component {
      * Force layout tick function is set to move all nodes to the
      * center of the visualization.
      */
-     function groupBubbles() {
-      hideYears();
+      function groupBubbles() {
+        hideYears();
 
-       force.on('tick', function (e) {
-         bubbles.each(moveToCenter(e.alpha))
-          .attr('cx', function (d) { return d.x; })
-          .attr('cy', function (d) { return d.y; });
-       });
+        force.on('tick', (e) => {
+          bubbles.each(moveToCenter(e.alpha))
+            .attr('cx', d => d.x)
+            .attr('cy', d => d.y);
+        });
 
-       force.start();
-     }
+        force.start();
+      }
 
     /*
      * Helper function for center grouping.
@@ -274,7 +274,7 @@ class BubbleChart extends Component {
      * node's charge force to also impact final location.
      */
       function moveToCenter(alpha) {
-        return function (d) {
+        return (d) => {
           d.x = d.x + (center.x - d.x) * damper * alpha;
           d.y = d.y + (center.y - d.y) * damper * alpha;
         };
