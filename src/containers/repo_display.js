@@ -1,5 +1,6 @@
 /* eslint-disable */
 /**
+
  * This is the container that displays the repo itself. It needs access to the
  * redux state to receive the commit data returned from the api call. Does not
  * need to dispatch to the redux state.
@@ -23,11 +24,8 @@ d3.tip = tooltip;
 
 class RepoDisplay extends Component {
   makeD3Display () {
-    // remove all svg elements
-    // d3.select("svg").remove();
     $('#container').empty();
     $('.d3-tip').remove();
-    // $('body').append('<div id="container"></div>');
 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -49,8 +47,9 @@ class RepoDisplay extends Component {
       showToolTip,
       makeAnchor,
       zoomed,
-      // startLoadAnimation,
+      renderRepoName,
       addColors,
+      addDates,
     } = displayHelpers;
 
     addColors(branchLookup);
@@ -62,9 +61,18 @@ class RepoDisplay extends Component {
       .direction('s')
       .offset([10, 0]);
 
+    const totalCommits = d3commits.length;
+    const largeLimit = 10;
+    let smallLimit;
+    if(totalCommits < 500) smallLimit = 0.1;
+    else if (totalCommits < 1000) smallLimit = 0.05;
+    else if (totalCommits < 2000) smallLimit = 0.25;
+    else smallLimit = 0.01;
+    const zoomLimit = [smallLimit, largeLimit];
+
     //https://bl.ocks.org/mbostock/6123708
     const zoom = d3.behavior.zoom()
-      .scaleExtent([0.1, 10])
+      .scaleExtent(zoomLimit)
       .on("zoom", () => zoomed(svg));
 
     let svg = d3.select('#container').append('svg')
@@ -82,10 +90,7 @@ class RepoDisplay extends Component {
     let container = svg.append('g');
     const straightLineLocations = [];
 
-    // Make the lines
-    console.log('lines', d3commits);
     d3commits.forEach(commit => {
-      console.log('make lines!');
       commit.children.forEach(child => {
         let childObj = githubTranslator.getCommit(child);
 
@@ -93,7 +98,7 @@ class RepoDisplay extends Component {
           straightLineLocations.push({ y:commit.y, xStart: commit.x, xEnd: childObj.x });
         }
 
-      //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
+        //curved lines: http://stackoverflow.com/questions/34558943/draw-curve-between-two-points-using-diagonal-function-in-d3-js
         const curveData = [ {x:commit.x, y:commit.y },{x:childObj.x,  y:childObj.y}];
         const edge = svg.append('g');
         const diagonal = d3.svg.diagonal()
@@ -101,14 +106,18 @@ class RepoDisplay extends Component {
           .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
           .projection(function(d) { return [d.y, d.x]; });
 
-        svg.select("g")
-            .datum(curveData)
-          .append("path")
-            .attr("class", "line")
-            .attr("d", diagonal)
-            .attr("stroke-width", 1)
-          .attr('stroke', branchLookup[commit.branch].color)
-          .attr('fill', 'none');
+        try {
+          svg.select("g")
+              .datum(curveData)
+            .append("path")
+              .attr("class", "line")
+              .attr("d", diagonal)
+              .attr("stroke-width", 1)
+            .attr('stroke', branchLookup[commit.branch].color)
+            .attr('fill', 'none');
+        } catch(err) {
+          console.log(err);
+        }
       });
     });
 
@@ -124,11 +133,22 @@ class RepoDisplay extends Component {
       .attr('stroke', commit => branchLookup[commit.branch].color)
       .attr('fill', commit => branchLookup[commit.branch].color);
 
-      //show the tool on hover
-      nodes.on('mouseover', node => showToolTip(node, originalBranches, infoTip));
+    //show the tool on hover
+    nodes.on('mouseover', node => showToolTip(node, originalBranches, infoTip));
+
+    const highestNode = d3commits.reduce((highest, commit) => {
+      return commit.y < highest ? commit : highest;
+    });
+
+    addDates(svg, d3commits, highestNode.y);
+    renderRepoName(highestNode, svg);
   }
 
+
   render() {
+    
+    $('#loading').addClass('hidden');
+
     return (
       <div>
         {this.makeD3Display()}
