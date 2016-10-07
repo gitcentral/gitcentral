@@ -84,11 +84,6 @@ class RepoDisplay extends Component {
     let container = svg.append('g');
     const straightLineLocations = [];
 
-<<<<<<< 9e6cfc670a1ee616299a50a748daa8f4af04d0bb
-    // Make the lines
-    // console.log('lines', d3commits);
-=======
->>>>>>> (feat) add basic loading icon
     d3commits.forEach(commit => {
       commit.children.forEach(child => {
         let childObj = githubTranslator.getCommit(child);
