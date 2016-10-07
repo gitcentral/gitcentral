@@ -9,8 +9,6 @@ class BubbleChart extends Component {
   /*
  * Creates tooltip with provided id that
  * floats on top of visualization.
- * Most styling is expected to come from CSS
- * so check out bubble_chart.css for more details.
  */
 
   floatingTooltip(tooltipId, width) {
@@ -31,9 +29,7 @@ class BubbleChart extends Component {
 
     /*
      * Display tooltip with provided content.
-     *
      * content is expected to be HTML string.
-     *
      * event is d3.event for positioning.
      */
     function showTooltip(content, event) {
@@ -100,23 +96,10 @@ class BubbleChart extends Component {
         imgUrl: commit.author.avatar_url,
         url: commit.author.url,
         username: commit.author.login,
-        lines: 0,
       }
     } else {
       accum[commit.author.login].commits += 1;
     }
-
-    // $.ajax({
-    //   url: commit.url,
-    //   success: function (data) {
-    //     console.log(accum[commit.author.login], data.stats.additions);
-    //     accum[commit.author.login].lines += data.stats.additions - data.stats.deletions;
-    //   },
-    //   error: function (error) {
-    //     console.error(error);
-    //   }
-    // });
-
     return accum;
   }, {});
 
@@ -208,7 +191,6 @@ class BubbleChart extends Component {
           commits: d.commits,
           imgUrl: d.imgUrl,
           username: d.username,
-          lines: d.lines,
           x: Math.random() * 900,
           y: Math.random() * 800
         };
@@ -327,9 +309,7 @@ class BubbleChart extends Component {
         <br>
         ${d.commits} commits
         <br>
-        ${d.lines} contributed lines
-        <br>
-        <a href='https://www.github.com/${d.username}'>See profile</a>
+        <a href='https://www.github.com/${d.username}' target="_blank">See profile</a>
         <br>
       </div>`;
 
