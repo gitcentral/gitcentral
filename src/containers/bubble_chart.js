@@ -96,23 +96,10 @@ class BubbleChart extends Component {
         imgUrl: commit.author.avatar_url,
         url: commit.author.url,
         username: commit.author.login,
-        lines: 0,
       }
     } else {
       accum[commit.author.login].commits += 1;
     }
-
-    // $.ajax({
-    //   url: commit.url,
-    //   success: function (data) {
-    //     console.log(accum[commit.author.login], data.stats.additions);
-    //     accum[commit.author.login].lines += data.stats.additions - data.stats.deletions;
-    //   },
-    //   error: function (error) {
-    //     console.error(error);
-    //   }
-    // });
-
     return accum;
   }, {});
 
@@ -204,7 +191,6 @@ class BubbleChart extends Component {
           commits: d.commits,
           imgUrl: d.imgUrl,
           username: d.username,
-          lines: d.lines,
           x: Math.random() * 900,
           y: Math.random() * 800
         };
