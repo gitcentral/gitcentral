@@ -7,24 +7,24 @@ import SearchBar from './containers/searchbar';
 import RepoDisplay from './containers/repo_display';
 
 class AppWrapper extends Component {
-  constructor(props) {   
-    super(props);   
-    
-    this.state = { user_repo : "" };    
-    this.updateUrl = this.updateUrl.bind(this);   
+  constructor(props) {
+    super(props);
+
+    this.state = { user_repo : "" };
+    this.updateUrl = this.updateUrl.bind(this);
   }
 
-  componentDidUpdate(prevProps, prevState) {    
-    if ((prevProps.params.user != this.props.params.user) ||    
-        (prevProps.params.repo != this.props.params.repo)) {    
-    
-      const newUrlEntered = `${this.props.params.user}/${this.props.params.repo}`;    
-      this.updateUrl(newUrlEntered);    
-    }   
-  }   
-    
-  updateUrl(newUserRepo) {    
-    this.setState({ user_repo : newUserRepo });   
+  componentDidUpdate(prevProps, prevState) {
+    if ((prevProps.params.user != this.props.params.user) ||
+        (prevProps.params.repo != this.props.params.repo)) {
+
+      const newUrlEntered = `${this.props.params.user}/${this.props.params.repo}`;
+      this.updateUrl(newUrlEntered);
+    }
+  }
+
+  updateUrl(newUserRepo) {
+    this.setState({ user_repo : newUserRepo });
   }
 
   filterRepo(event) {
@@ -39,7 +39,7 @@ class AppWrapper extends Component {
 
     //consistently use toLowerCase() to remove case-sensitivity
     const terms = event.target.value.toLowerCase().split(' ');
-    
+
     //if empty string, return
     if(terms[0] === '') return;
 
@@ -57,15 +57,10 @@ class AppWrapper extends Component {
   }
 
   render() {
-<<<<<<< 9e6cfc670a1ee616299a50a748daa8f4af04d0bb
-    let user_repo ='https://github.com/';   
-    if (this.props.params.user && this.props.params.repo) {   
-      user_repo += this.props.params.user + '/' + this.props.params.repo;   
+    let user_repo ='https://github.com/';
+    if (this.props.params.user && this.props.params.repo) {
+      user_repo += this.props.params.user + '/' + this.props.params.repo;
     }
-    
-=======
-    console.log(this.props.children);
->>>>>>> (feat) add basic loading icon
     return (
       <div>
         <SearchBar urlEntered={user_repo} onSubmit={this.updateUrl.bind(this)} />
@@ -80,13 +75,7 @@ class AppWrapper extends Component {
 
 export default (
   <Route path="/" component={AppWrapper}>
-<<<<<<< 9e6cfc670a1ee616299a50a748daa8f4af04d0bb
     <IndexRoute component={App} />
     <Route path=":user/:repo" component={App} />
-  </Route>  
-=======
-    <IndexRoute component={App}/>
-    <Route path=":user/:repo" component={App}/>
   </Route>
->>>>>>> (feat) add basic loading icon
 );
