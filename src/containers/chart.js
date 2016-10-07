@@ -100,7 +100,7 @@ class CrossfilterChart extends Component {
           .group(hours)
           .x(d3.scale.linear()
             .domain([0, 24])
-            .rangeRound([0, 10 * 24])),
+            .rangeRound([0, 14 * 24])),
       barChart()
           .dimension(day)
           .group(days)
@@ -205,16 +205,37 @@ class CrossfilterChart extends Component {
 
     function barChart() {
       if (!barChart.id) barChart.id = 0;
-      let margin = { top: 10, right: 10, bottom: 20, left: 10 },
-        x,
-        y = d3.scale.linear().range([100, 0]),
-        id = barChart.id++,
-        axis = d3.svg.axis().orient('bottom'),
-        brush = d3.svg.brush(),
-        brushDirty,
-        dimension,
-        group,
-        round;
+      let margin = { top: 10, right: 15, bottom: 20, left: 15 };
+      let x;
+      let y = d3.scale.linear().range([100, 0]);
+      let id = barChart.id++;
+      let axis = d3.svg.axis().orient('bottom');
+      let brush = d3.svg.brush();
+      let brushDirty;
+      let dimension;
+      let group;
+      let round;
+
+
+        if (barChart.id === 1) {
+          axis = d3.svg.axis().orient('bottom').tickFormat(d => {
+            if (d === 0){
+              return `12AM`;
+            }
+            else if(d < 12){
+              return `${d}AM`;
+            }else if(d === 12){
+              d = d +'PM'
+            }else if(d === 24){
+              d = 12 + 'AM';
+            }else{
+              d = d - 12 +'PM'
+            }
+            return d;
+          });
+        }
+
+
       /**
        * If barchart.id is 2, that means it is the week day chart.
        * Set x-axis for weekday chart to have the days of the week instead of numbers
