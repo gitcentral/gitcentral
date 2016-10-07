@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * display_helpers.js
  *
@@ -25,6 +26,8 @@ function zoomed(svg) {
 
   //To make the tip essentially disappear from the page we remove its HTML.
   //It is still present on the page, but now consists of a tiny invisible square.
+  
+  // DELETE:
   d3.selectAll('.d3-tip')
     .style('opacity', 0)
     .html('');
