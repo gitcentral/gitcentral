@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * display_helpers.js
  *
@@ -25,9 +26,11 @@ function zoomed(svg) {
 
   //To make the tip essentially disappear from the page we remove its HTML.
   //It is still present on the page, but now consists of a tiny invisible square.
-  d3.selectAll('.d3-tip')
-    .style('opacity', 0)
-    .html('');
+
+  // DELETE:
+  // d3.selectAll('.d3-tip')
+  //   .style('opacity', 0)
+  //   .html('');
 }
 
 //give each branch a different color property
@@ -61,27 +64,112 @@ function startLoadAnimation() {
     });
 }
 
-const getCommitDate = commit => ('' + new Date(commit.commit.committer.date)).slice(0, 16);
-
-function showToolTip(commit, originalBranches, tooltip) {
-  const { branch, sha, html_url: url, author: { login: authorName } } = commit;
-  const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
-  const date = getCommitDate(commit);
-
-  //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
-  //then make it a hyperlink; otherwise, don't display branch name
-  const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
-
-  const tooltipContent =
-`Date:   ${date}
-${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:    ${makeAnchor(sha.slice(0, 9) + '...', url)}
-Author: ${authorName}
-
-Message: ${commit.commit.message}`;
-
-  tooltip.html(`<pre>${tooltipContent}</pre>`);
-  tooltip.show();
+function getCommitDate (commit) {
+  return ('' + new Date(commit.date)).slice(0, 16);
 }
+
+const getCommitDateLine = commit => ('' + new Date(commit.commit.committer.date)).slice(0, 16);
+
+// function showToolTip(commit, originalBranches, tooltip) {
+//   const { branch, sha, html_url: url, author: { login: authorName } } = commit;
+//   const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
+//   const date = getCommitDate(commit);
+//
+//   //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
+//   //then make it a hyperlink; otherwise, don't display branch name
+//   const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
+//
+//   const tooltipContent =
+// `Date:   ${date}
+// ${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:    ${makeAnchor(sha.slice(0, 9) + '...', url)}
+// Author: ${authorName}
+//
+// Message: ${commit.commit.message}`;
+//
+//   tooltip.html(`<pre>${tooltipContent}</pre>`);
+//   tooltip.show();
+// }
+
+
+/*
+ * Creates tooltip with provided id that
+ * floats on top of visualization.
+ */
+
+  function floatingTooltip(tooltipId, width, context) {
+    // Local variable to hold tooltip div for
+    // manipulation in other functions.
+    const tt = d3.select(context)
+      .append('div')
+      .attr('class', 'tooltip');
+      // .attr('id', tooltipId);
+
+    // Set a width if it is provided.
+    if (width) {
+      tt.style('width', width);
+    }
+
+    // Initially it is hidden.
+    hideTooltip();
+
+    /*
+     * Display tooltip with provided content.
+     * content is expected to be HTML string.
+     * event is d3.event for positioning.
+     */
+    function showTooltip(content, event) {
+      tt.style('opacity', 1.0)
+        .html(content);
+      updatePosition(event);
+    }
+
+    /*
+     * Hide the tooltip div.
+     */
+    function hideTooltip() {
+      tt.style('opacity', 0.0);
+    }
+
+    /*
+     * Figure out where to place the tooltip
+     * based on d3 mouse event.
+     */
+    function updatePosition(event) {
+      const xOffset = 0;
+      const yOffset = 0;
+
+      const ttw = tt.style('width');
+      const tth = tt.style('height');
+
+      const wscrY = window.scrollY;
+      const wscrX = window.scrollX;
+
+      const curX = (document.all) ? event.clientX + wscrX : event.pageX;
+      const curY = (document.all) ? event.clientY + wscrY : event.pageY;
+      let ttleft = ((curX - wscrX + xOffset * 1 + ttw) > window.innerWidth) ?
+                   curX - ttw - xOffset * 1 : curX + xOffset;
+
+      if (ttleft < wscrX + xOffset) {
+        ttleft = wscrX + xOffset;
+      }
+
+      let tttop = ((curY - wscrY + yOffset * 1 + tth) > window.innerHeight) ?
+                  curY - tth - yOffset * 1 : curY + yOffset;
+
+      if (tttop < wscrY + yOffset) {
+        tttop = curY + yOffset;
+      }
+
+      tt.style({ top: `${tttop}px`, left: `${ttleft}px`});
+    }
+
+    return {
+      showTooltip: showTooltip,
+      hideTooltip: hideTooltip,
+      updatePosition: updatePosition
+    };
+  }
+
 
 function addDates(svg, commits, lowestY) {
   const xOffset = 30;
@@ -94,7 +182,7 @@ function addDates(svg, commits, lowestY) {
 
   commits.forEach(commit => {
     const dateObj = new Date(commit.commit.committer.date);
-    const dateStr = getCommitDate(commit);
+    const dateStr = getCommitDateLine(commit);
     if(lastSunday === dateObj) return;
 
     //if sunday or it's been over a week
@@ -154,6 +242,8 @@ export default {
   zoomed,
   addColors,
   startLoadAnimation,
-  showToolTip,
-  addDates
+  // showToolTip,
+  addDates,
+  getCommitDate,
+  floatingTooltip
 };
