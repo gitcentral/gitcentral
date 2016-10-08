@@ -4,7 +4,7 @@ body {
 
 .github-corner-svg {
     z-index: 1112;
-    position: absolute;
+    position: fixed;
     bottom: -40px;
     right: 0px;
     border: 0px;
