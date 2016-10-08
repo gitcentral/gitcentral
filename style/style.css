@@ -66,9 +66,9 @@ body {
   z-index: 1;
 }
 
-#container {
-  cursor: pointer;
-}
+/*#container { //makes me feel weird...
+  cursor: move;
+}*/
 
 #chart div {
   font: 10px sans-serif;
