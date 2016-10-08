@@ -88,6 +88,29 @@ body {
   fill: red;
   stroke: red;
   stroke-width: 4;
+
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-name: selectCircleTransition;
+}
+
+@keyframes selectCircleTransition {
+    0% {
+        fill : "#ff999";
+        -webkit-svg-shadow: 10px 10px 5px #888888;
+        z-index: 1222;
+    }
+    50% {
+        r: 1%;
+        -webkit-svg-shadow: 10px 10px 5px #888888;
+        stroke: "#ff9999";
+        z-index: 1222;
+    }
+    100% {
+        fill : "#ff999";
+        -webkit-svg-shadow: 10px 10px 5px #888888;
+        z-index: 1222;
+    }
 }
 
 .line {

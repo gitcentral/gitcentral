@@ -44,26 +44,27 @@ export default class NavTabs extends Component {
   }
 
   render (){
+    const style = { padding: '10px' };
     return (
       <Tabs inkBarStyle={{background: 'none'}}>
       <Tab
         icon={<Timeline />}
-        style={{padding: 5}}
+        style={style}
         onActive={this.getGitGraph} >
       </Tab>
       <Tab
         icon={<Equalizer />}
-        style={{padding: 5}}
+        style={style}
         onActive={this.getStats} >
       </Tab>
       <Tab
         icon={<FormatQuote />}
-        style={{padding: 5}}
+        style={style}
         onActive={this.getWordCloud} >
       </Tab>
       <Tab
         icon={<Bubbles />}
-        style={{padding: 5}}
+        style={style}
         onActive={this.getBubbleChart} >
       </Tab>
     </Tabs>
