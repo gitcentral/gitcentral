@@ -30,7 +30,8 @@ body {
 
 .selected {
   fill: red;
-  stroke: brown;
+  stroke: red;
+  stroke-width: 4;
 }
 
 .line {
