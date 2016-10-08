@@ -123,6 +123,11 @@ class RepoDisplay extends Component {
       });
     });
 
+    function nodeColor(commit) {
+      return branchLookup[commit.branch] ?
+        branchLookup[commit.branch].color : '#000000';
+    }
+
     //Make the nodes
     const nodes = svg.append('g')
       .attr('class', 'commit')
@@ -132,14 +137,8 @@ class RepoDisplay extends Component {
       .attr('r', 5)
       .attr('cx', commit => commit.x)
       .attr('cy', commit => commit.y)
-      .attr('stroke', commit => {
-        if(branchLookup[commit.branch]) {
-          return branchLookup[commit.branch].color;
-        }
-        
-        return '#000000';
-      })
-      .attr('fill', commit => branchLookup[commit.branch].color);
+      .attr('stroke', nodeColor)
+      .attr('fill', nodeColor);
 
 
   /*

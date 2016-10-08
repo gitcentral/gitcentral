@@ -66,6 +66,10 @@ body {
   z-index: 1;
 }
 
+#container {
+  cursor: pointer;
+}
+
 #chart div {
   font: 10px sans-serif;
   background-color: rgb(0, 188, 212);
@@ -341,8 +345,3 @@ pre {
     margin-top: 6em;
     display: block;
   }
-
-
-/*.container {
-  text-align:center;
-}*/

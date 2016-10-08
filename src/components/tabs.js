@@ -43,7 +43,7 @@ export default class NavTabs extends Component {
     enterTab('bubble-chart');
   }
 
-  render (){
+  render() {
     const style = { padding: '10px' };
     return (
       <Tabs inkBarStyle={{background: 'none'}}>
