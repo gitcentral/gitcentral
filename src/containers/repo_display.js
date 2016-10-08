@@ -14,20 +14,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
-// import tooltip from '../reducers/gitD3/d3tip.js';
 import _  from 'lodash';
 import $ from 'jquery';
 import displayHelpers from './display_helpers';
 import generateCoordinates from './coordinate_generator';
-// import floatingTooltip from './tool_tip.js';
-// d3.tip = tooltip;
+import { floatingTooltip, showDetail } from './tooltip_helpers'
 
 class RepoDisplay extends Component {
 
   makeD3Display () {
     $('#container').empty();
-    //$('.d3-tip').remove();
-    // $('body').append('<div id="container"></div>');
 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -46,15 +42,10 @@ class RepoDisplay extends Component {
     } = githubTranslator;
 
     const {
-      showToolTip,
-      makeAnchor,
       zoomed,
       renderRepoName,
       addColors,
       addDates,
-      getCommitDate,
-      floatingTooltip,
-      showDetail,
     } = displayHelpers;
 
     const tooltip = floatingTooltip('container_tooltip', 100, '#container');

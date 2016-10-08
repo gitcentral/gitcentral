@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import displayHelpers from './display_helpers';
+import { floatingTooltip } from './tooltip_helpers';
 import $ from 'jquery';
 
 class BubbleChart extends Component {
@@ -9,12 +9,8 @@ class BubbleChart extends Component {
  * Process commit author data and displays contributors info
  */
   makeContributors() {
-    const {
-      floatingTooltip
-    } = displayHelpers;
-
     const context = this;
-  // Prep data
+    // Prep data
     const dataObj = this.props.currentRepo.JSONCommits.reduce((accum, commit) => {
       if (accum[commit.author.login] === undefined) {
         accum[commit.author.login] = {
