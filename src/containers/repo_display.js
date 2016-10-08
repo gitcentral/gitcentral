@@ -162,9 +162,14 @@ class RepoDisplay extends Component {
     }
 
     //show the tool on hover
-    nodes.on('mouseover', showDetail);
-    nodes.on('mouseout', hideDetail);
-
+    nodes.on('mouseover', function(d){
+      tooltipOnNode = true;
+      showDetail(d);
+    })
+    nodes.on('mouseout', function(){
+      tooltipOnNode = false;
+      hideDetail();
+    });
 
     const highestNode = d3commits.reduce((highest, commit) => {
       return commit.y < highest ? commit : highest;
