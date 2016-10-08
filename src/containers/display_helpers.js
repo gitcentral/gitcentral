@@ -68,7 +68,7 @@ function getCommitDate (commit) {
   return ('' + new Date(commit.date)).slice(0, 16);
 }
 
-// const getCommitDate = commit => ('' + new Date(commit.commit.committer.date)).slice(0, 16);
+const getCommitDateLine = commit => ('' + new Date(commit.commit.committer.date)).slice(0, 16);
 
 // function showToolTip(commit, originalBranches, tooltip) {
 //   const { branch, sha, html_url: url, author: { login: authorName } } = commit;
@@ -182,7 +182,8 @@ function addDates(svg, commits, lowestY) {
 
   commits.forEach(commit => {
     const dateObj = new Date(commit.commit.committer.date);
-    const dateStr = getCommitDate(commit);
+    console.log(dateObj);
+    const dateStr = getCommitDateLine(commit);
     if(lastSunday === dateObj) return;
 
     //if sunday or it's been over a week
