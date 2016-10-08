@@ -2,6 +2,62 @@ body {
   overflow: hidden;
 }
 
+.github-corner-svg {
+    z-index: 1112;
+    position: absolute;
+    bottom: -40px;
+    right: 0px;
+    border: 0px;
+    border-radius: 50%;
+    transform-origin: center;
+    transform: rotate(-45deg);
+    opacity: 0.4;
+}
+
+.github-corner:hover .octo-arm {
+  animation: octocat-wave 560ms ease-in-out;
+}
+
+@keyframes octocat-wave {
+  0% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-25deg);
+  }
+  40% {
+    transform: rotate(10deg);
+  }
+  60% {
+   transform: rotate(-25deg);
+  }
+  80% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (max-width: 500px) {
+    .github-corner:hover .octo-arm {
+        animation: none;
+    }
+
+    .github-corner .octo-arm {
+        animation: octocat-wave 560ms ease-in-out;
+    }
+}
+
+.fab-fork-github {
+    margin: 0px;
+    top: auto;
+    right: 1em;
+    bottom: 1em;
+    left: auto;
+    position: fixed;
+}
+
 #git {
  top: 50%;
 }
