@@ -132,8 +132,15 @@ class RepoDisplay extends Component {
       .attr('r', 5)
       .attr('cx', commit => commit.x)
       .attr('cy', commit => commit.y)
-      .attr('stroke', commit => branchLookup[commit.branch].color)
+      .attr('stroke', commit => {
+        if(branchLookup[commit.branch]) {
+          return branchLookup[commit.branch].color;
+        }
+        
+        return '#000000';
+      })
       .attr('fill', commit => branchLookup[commit.branch].color);
+
 
   /*
    * Function called on mouseover to display the
