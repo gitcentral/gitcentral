@@ -26,11 +26,11 @@ function zoomed(svg) {
 
   //To make the tip essentially disappear from the page we remove its HTML.
   //It is still present on the page, but now consists of a tiny invisible square.
-  
+
   // DELETE:
-  d3.selectAll('.d3-tip')
-    .style('opacity', 0)
-    .html('');
+  // d3.selectAll('.d3-tip')
+  //   .style('opacity', 0)
+  //   .html('');
 }
 
 //give each branch a different color property
@@ -66,25 +66,25 @@ function startLoadAnimation() {
 
 const getCommitDate = commit => ('' + new Date(commit.commit.committer.date)).slice(0, 16);
 
-function showToolTip(commit, originalBranches, tooltip) {
-  const { branch, sha, html_url: url, author: { login: authorName } } = commit;
-  const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
-  const date = getCommitDate(commit);
-
-  //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
-  //then make it a hyperlink; otherwise, don't display branch name
-  const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
-
-  const tooltipContent =
-`Date:   ${date}
-${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:    ${makeAnchor(sha.slice(0, 9) + '...', url)}
-Author: ${authorName}
-
-Message: ${commit.commit.message}`;
-
-  tooltip.html(`<pre>${tooltipContent}</pre>`);
-  tooltip.show();
-}
+// function showToolTip(commit, originalBranches, tooltip) {
+//   const { branch, sha, html_url: url, author: { login: authorName } } = commit;
+//   const repoName = url.match(/\/\/[\w\.]*\/[\w\.]*\/(\w*)\//);
+//   const date = getCommitDate(commit);
+//
+//   //the ternary operator below: if the branch name is not fake (e.g. master, dev, etc.)
+//   //then make it a hyperlink; otherwise, don't display branch name
+//   const branchLink = `https://github.com/${authorName}/${repoName[1]}/commits/${branch}`;
+//
+//   const tooltipContent =
+// `Date:   ${date}
+// ${originalBranches.includes(branch) ? 'Branch: ' + makeAnchor(branch, branchLink) + '\n' : '' }SHA:    ${makeAnchor(sha.slice(0, 9) + '...', url)}
+// Author: ${authorName}
+//
+// Message: ${commit.commit.message}`;
+//
+//   tooltip.html(`<pre>${tooltipContent}</pre>`);
+//   tooltip.show();
+// }
 
 function addDates(svg, commits, lowestY) {
   const xOffset = 30;
@@ -157,6 +157,6 @@ export default {
   zoomed,
   addColors,
   startLoadAnimation,
-  showToolTip,
+  // showToolTip,
   addDates
 };

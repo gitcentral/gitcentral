@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import $ from 'jquery';
 
 class BubbleChart extends Component {
-  /*
+/*
  * Creates tooltip with provided id that
  * floats on top of visualization.
  */
@@ -14,8 +14,8 @@ class BubbleChart extends Component {
     // manipulation in other functions.
     const tt = d3.select('#bubble-chart')
       .append('div')
-      .attr('class', 'tooltip')
-      .attr('id', tooltipId);
+      .attr('class', 'tooltip');
+      // .attr('id', tooltipId);
 
     // Set a width if it is provided.
     if (width) {
@@ -82,7 +82,10 @@ class BubbleChart extends Component {
       updatePosition: updatePosition
     };
   }
-
+// -------------------------------------------------
+/**
+ * Process commit author data and displays contributors info
+ */
   makeContributors() {
     const context = this;
   // Prep data
@@ -120,7 +123,7 @@ class BubbleChart extends Component {
       const height = 400;
 
       // tooltip for mouseover functionality
-      const tooltip = context.floatingTooltip('gates_tooltip', 100);
+      const tooltip = context.floatingTooltip('bubble_tooltip', 100);
 
       // Locations to move bubbles towards, depending
       // on which view mode is selected.
@@ -236,7 +239,7 @@ class BubbleChart extends Component {
           .attr('stroke-width', 2)
           .attr('opacity', 0.5)
           .on('mouseover', showDetail)
-          // .on('mouseout', hideDetail);
+          .on('click', hideDetail);
 
       // Fancy transition to make bubbles appear, ending with the
       // correct radius
@@ -319,7 +322,7 @@ class BubbleChart extends Component {
         // reset outline
         d3.select(this)
           .attr('stroke', d3.rgb(fillColor(d.group)).darker());
-        // tooltip.hideTooltip();
+        tooltip.hideTooltip();
       }
       return chart;
     }

@@ -14,18 +14,99 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
-import tooltip from '../reducers/gitD3/d3tip.js';
+// import tooltip from '../reducers/gitD3/d3tip.js';
 import _  from 'lodash';
 import $ from 'jquery';
 import displayHelpers from './display_helpers';
 import generateCoordinates from './coordinate_generator';
-
-d3.tip = tooltip;
+// import floatingTooltip from './tool_tip.js';
+// d3.tip = tooltip;
 
 class RepoDisplay extends Component {
+  /*
+   * Creates tooltip with provided id that
+   * floats on top of visualization.
+   */
+
+    floatingTooltip(tooltipId, width) {
+      // Local variable to hold tooltip div for
+      // manipulation in other functions.
+      const tt = d3.select('#container')
+        .append('div')
+        .attr('class', 'tooltip');
+        // .attr('id', tooltipId);
+
+      // Set a width if it is provided.
+      if (width) {
+        tt.style('width', width);
+      }
+
+      // Initially it is hidden.
+      hideTooltip();
+
+      /*
+       * Display tooltip with provided content.
+       * content is expected to be HTML string.
+       * event is d3.event for positioning.
+       */
+      function showTooltip(content, event) {
+        tt.style('opacity', 1.0)
+          .html(content);
+        updatePosition(event);
+      }
+
+      /*
+       * Hide the tooltip div.
+       */
+      function hideTooltip() {
+        tt.style('opacity', 0.0);
+      }
+
+      /*
+       * Figure out where to place the tooltip
+       * based on d3 mouse event.
+       */
+      function updatePosition(event) {
+        const xOffset = 2;
+        const yOffset = 2;
+
+        const ttw = tt.style('width');
+        const tth = tt.style('height');
+
+        const wscrY = window.scrollY;
+        const wscrX = window.scrollX;
+
+        const curX = (document.all) ? event.clientX + wscrX : event.pageX;
+        const curY = (document.all) ? event.clientY + wscrY : event.pageY;
+        let ttleft = ((curX - wscrX + xOffset * 1 + ttw) > window.innerWidth) ?
+                     curX - ttw - xOffset * 1 : curX + xOffset;
+
+        if (ttleft < wscrX + xOffset) {
+          ttleft = wscrX + xOffset;
+        }
+
+        let tttop = ((curY - wscrY + yOffset * 1 + tth) > window.innerHeight) ?
+                    curY - tth - yOffset * 1 : curY + yOffset;
+
+        if (tttop < wscrY + yOffset) {
+          tttop = curY + yOffset;
+        }
+
+        tt.style({ top: `${tttop}px`, left: `${ttleft}px`});
+      }
+
+      return {
+        showTooltip: showTooltip,
+        hideTooltip: hideTooltip,
+        updatePosition: updatePosition
+      };
+    }
+
   makeD3Display () {
     $('#container').empty();
-    $('.d3-tip').remove();
+    //$('.d3-tip').remove();
+    // $('body').append('<div id="container"></div>');
+    const tooltip = this.floatingTooltip('container_tooltip', 100);
 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -56,23 +137,14 @@ class RepoDisplay extends Component {
     generateCoordinates(d3commits, SHALookup, branchLookup);
 
     //http://bl.ocks.org/Caged/6476579
-    const infoTip = d3.tip()
-      .attr('class', 'd3-tip')
-      .direction('s')
-      .offset([10, 0]);
-
-    const totalCommits = d3commits.length;
-    const largeLimit = 10;
-    let smallLimit;
-    if(totalCommits < 500) smallLimit = 0.1;
-    else if (totalCommits < 1000) smallLimit = 0.05;
-    else if (totalCommits < 2000) smallLimit = 0.25;
-    else smallLimit = 0.01;
-    const zoomLimit = [smallLimit, largeLimit];
+    // const infoTip = d3.tip()
+    //   .attr('class', 'd3-tip')
+    //   .direction('s')
+    //   .offset([10, 0]);
 
     //https://bl.ocks.org/mbostock/6123708
     const zoom = d3.behavior.zoom()
-      .scaleExtent(zoomLimit)
+      .scaleExtent([0.1, 10])
       .on("zoom", () => zoomed(svg));
 
     let svg = d3.select('#container').append('svg')
@@ -85,7 +157,7 @@ class RepoDisplay extends Component {
       })
       .call(zoom);
 
-    svg.call(infoTip);
+    // svg.call(infoTip);
 
     let container = svg.append('g');
     const straightLineLocations = [];
@@ -106,18 +178,14 @@ class RepoDisplay extends Component {
           .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
           .projection(function(d) { return [d.y, d.x]; });
 
-        try {
-          svg.select("g")
-              .datum(curveData)
-            .append("path")
-              .attr("class", "line")
-              .attr("d", diagonal)
-              .attr("stroke-width", 1)
-            .attr('stroke', branchLookup[commit.branch].color)
-            .attr('fill', 'none');
-        } catch(err) {
-          console.log(err);
-        }
+        svg.select("g")
+            .datum(curveData)
+          .append("path")
+            .attr("class", "line")
+            .attr("d", diagonal)
+            .attr("stroke-width", 1)
+          .attr('stroke', branchLookup[commit.branch].color)
+          .attr('fill', 'none');
       });
     });
 
@@ -133,8 +201,41 @@ class RepoDisplay extends Component {
       .attr('stroke', commit => branchLookup[commit.branch].color)
       .attr('fill', commit => branchLookup[commit.branch].color);
 
+  /*
+   * Function called on mouseover to display the
+   * details of a bubble in the tooltip.
+   */
+    function showDetail(d) {
+      // change outline to indicate hover state.
+      // d3.select(this).attr('stroke', 'black');
+      const content = `Date: ${d.date}
+      ${originalBranches.includes(d.branch) ? 'Branch: ' + makeAnchor(d.branch, d.branchLink) + '\n' : '' }
+      <br>
+      <span>
+        SHA: ${makeAnchor(d.sha.slice(0, 9) + '...', d.url)}
+      </span>
+      <br>
+      <div>
+        Author: ${d.author.login}
+      <div>
+      <br>
+      Message: ${d.commit.message}`
+
+      tooltip.showTooltip(content, d3.event);
+    }
+
+    // hides tooltip
+    function hideDetail(d) {
+      // reset outline
+      d3.select(this)
+        .attr('stroke', d3.rgb(fillColor(d.group)).darker());
+      tooltip.hideTooltip();
+    }
+
     //show the tool on hover
-    nodes.on('mouseover', node => showToolTip(node, originalBranches, infoTip));
+    nodes.on('mouseover', showDetail)
+      .on('click', hideDetail);
+
 
     const highestNode = d3commits.reduce((highest, commit) => {
       return commit.y < highest ? commit : highest;
@@ -146,7 +247,7 @@ class RepoDisplay extends Component {
 
 
   render() {
-    
+
     $('#loading').addClass('hidden');
 
     return (
