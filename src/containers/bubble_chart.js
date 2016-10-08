@@ -66,7 +66,6 @@ class BubbleChart extends Component {
        */
         function showDetail(d) {
           // change outline to indicate hover state.
-
           d3.select(this).attr('stroke', 'black');
 
           const content = `<div class='contrib-content'>
@@ -86,16 +85,14 @@ class BubbleChart extends Component {
           tooltip.showTooltip(content, d3.event);
         }
 
-      // Hides tooltip
-        function hideDetail(d) {
-          setTimeout(function(){
-            if (!tooltipOnMouseover){
-              tooltip.hideTooltip();
-            }
-          }, 3000);
-        }
-
-
+    // Hides tooltip
+      function hideDetail(d) {
+        setTimeout(function(){
+          if (!tooltipOnMouseover && !tooltipOnNode){
+            tooltip.hideTooltip();
+          }
+        }, 3000);
+      }
 
       // Locations to move bubbles towards, depending
       // on which view mode is selected.
@@ -210,8 +207,14 @@ class BubbleChart extends Component {
           .attr('stroke', d => d3.rgb(fillColor(d.group)).darker())
           .attr('stroke-width', 2)
           .attr('opacity', 0.5)
-          .on('mouseover', showDetail)
-          .on('mouseout', hideDetail);
+          .on('mouseover', function(d){
+            tooltipOnNode = true;
+            showDetail(d);
+          })
+          .on('mouseout', function(){
+            tooltipOnNode = false;
+            hideDetail();
+          });
 
       // Fancy transition to make bubbles appear, ending with the
       // correct radius
