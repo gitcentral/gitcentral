@@ -196,7 +196,11 @@ class CrossfilterChart extends Component {
         // This is where they append data to divs
         commitEnter.append('div')
             .attr('class', 'time col-md-2')
-            .text(d => formatTime(d.date));
+            .text(d => {
+              let result = formatTime(d.date);
+              // Remove beginning 0 if there is a 0 in front of the hours
+              return result = result[0] === "0" ? result.slice(1) : result;
+            });
 
         commitEnter.append('div')
             .attr('class', 'author col-md-2')
