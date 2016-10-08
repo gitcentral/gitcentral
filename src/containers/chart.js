@@ -1,6 +1,5 @@
 /**
  * TO DO :
- * Update CSS names
  * Add starting and ending date near the date chart.
  * Add overflow for commit list
  * Make CSS values % instead of px
@@ -19,7 +18,7 @@ class CrossfilterChart extends Component {
         <span id="hour-chart" class="chart">
           <div class="title">Time of Day</div>
         </span>
-        <span id="delay-chart" class="chart">
+        <span id="weekday-chart" class="chart">
           <div class="title">Week Day</div>
         </span>
         <span id="date-chart" class="chart">
@@ -30,7 +29,7 @@ class CrossfilterChart extends Component {
         <span id="active">-</span> of <span id="total">-</span> commits selected.
       </aside>
       <div id="lists">
-        <div id="flight-list" class="list"></div>
+        <div id="commit-list" class="list"></div>
       </div>`);
     /*
     NEED TO FIX, JSON commits are being placed in order in api.js. but sample data is not in order
@@ -67,7 +66,7 @@ class CrossfilterChart extends Component {
     const formatDate = d3.time.format('%A, %B %d, %Y');
     const formatTime = d3.time.format('%I:%M %p');
 
-    // A nest operator, for grouping the flight list.
+    // A nest operator, for grouping the commit list.
     const nestByDate = d3.nest().key(d => d3.time.day(d.date));
 
     // Create array of weekdays to store in d.words property of commits
@@ -174,11 +173,11 @@ class CrossfilterChart extends Component {
 
         date.exit().remove();
 
-        const commit = date.order().selectAll('.flight')
+        const commit = date.order().selectAll('.commit')
             .data(d => d.values, d => d.index);
 
         const commitEnter = commit.enter().append('div')
-            .attr('class', 'flight');
+            .attr('class', 'commit');
 
         // This is where they append data to divs
         commitEnter.append('div')
@@ -186,15 +185,15 @@ class CrossfilterChart extends Component {
             .text(d => formatTime(d.date));
 
         commitEnter.append('div')
-            .attr('class', 'origin')
+            .attr('class', 'author')
             .text(d => d.author.login);
 
         commitEnter.append('div')
-            .attr('class', 'destination')
+            .attr('class', 'sha-link')
             .html(d => `<pre>SHA: <a href="${d.html_url}" target="_blank">${d.sha.slice(0, 9)}...</a></pre>`);
 
         commitEnter.append('div')
-            .attr('class', 'delay')
+            .attr('class', 'commit-message')
             .text(d => d.commit.message);
 
         commit.exit().remove();

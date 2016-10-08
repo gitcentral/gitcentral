@@ -83,13 +83,9 @@ pre {
   font-size: 8; /* doesn't work */
 }
 
-
 /**
- *
  *  For Chart.js
- *
  */
-
 
  #charts {
    padding: 10px 0;
@@ -112,7 +108,7 @@ pre {
  }
 
  .foreground.bar {
-   fill: steelblue;
+   fill: rgb(0, 188, 212);
  }
 
  .axis path, .axis line {
@@ -139,57 +135,53 @@ pre {
    width: 450px;
  }
 
- #delay-chart {
+ #weekday-chart {
    width: 370px;
- }
-
- #distance-chart {
-   width: 420px;
  }
 
  #date-chart {
    width: 920px;
  }
 
- #flight-list {
+ #commit-list {
    min-height: 1024px;
  }
 
- #flight-list .date,
- #flight-list .day {
+ #commit-list .date,
+ #commit-list .day {
    margin-bottom: .4em;
  }
 
- #flight-list .flight {
+ #commit-list .commit {
    line-height: 1.5em;
    background: #eee;
-   width: 1400px;
+   width: 1000px;
    margin-bottom: 1px;
  }
 
- #flight-list .time {
+ #commit-list .time {
    color: #999;
  }
 
- #flight-list .flight div {
+ #commit-list .commit div {
    display: inline-block;
    width: 100px;
  }
- #flight-list div.origin {
+ #commit-list div.author {
    width: 200px;
  }
- #flight-list div.destination,
- #flight-list div.distance,
- #flight-list div.delay {
+ #commit-list div.sha-link{
+   width: 200px;
+ }
+ #commit-list div.commit-message {
    width: 500px;
    padding-right: 10px;
-   text-align: right;
+   text-align: left;
  }
 
- #flight-list .early {
+ #commit-list .early {
    color: green;
  }
-
 
  aside {
    position: absolute;
@@ -199,9 +191,7 @@ pre {
  }
 
  /**
-  *
   * End of Chart.js Styles
-  *
   */
 
   .contrib-content {
