@@ -235,6 +235,8 @@ pre {
    margin-bottom: .4em;
  }
 
+
+
  #commit-list .commit {
    line-height: 1.5em;
    background: #eee;
@@ -265,12 +267,16 @@ pre {
  #commit-list .early {
    color: green;
  }
-
+/**
+ * NEED TO CLEAR FIX
+ */
  aside {
    /*position: absolute;*/
    /*left: 740px;*/
    font-size: smaller;
    /*width: 220px;*/
+   display:inline-block;
+   float:right;
  }
 
 
