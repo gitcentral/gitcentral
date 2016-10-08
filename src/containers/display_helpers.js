@@ -182,7 +182,6 @@ function addDates(svg, commits, lowestY) {
 
   commits.forEach(commit => {
     const dateObj = new Date(commit.commit.committer.date);
-    console.log(dateObj);
     const dateStr = getCommitDateLine(commit);
     if(lastSunday === dateObj) return;
 
