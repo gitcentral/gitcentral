@@ -3,6 +3,8 @@
  * Add starting and ending date near the date chart.
  * Add overflow for commit list
  * Fix chart overflow while mobile
+ * Change times to not have 0 in front of hours
+ * Display more bars in Date chart
  * IN PROGRESS:
  * Mobile friendly
  */
@@ -20,11 +22,11 @@ class CrossfilterChart extends Component {
           <div class ="row">
             <div class="col-lg-2">
             </div>
+            <div id="weekday-chart" class="chart col-lg-3">
+            <div class="title">Weekday</div>
+            </div>
             <div id="hour-chart" class= "chart col-lg-5">
               <div class="title">Time of Day</div>
-            </div>
-            <div id="weekday-chart" class="chart col-lg-3">
-              <div class="title">Week Day</div>
             </div>
           </div>
           <div class="row">
@@ -107,18 +109,18 @@ class CrossfilterChart extends Component {
 
     const charts = [
       barChart()
+      .dimension(day)
+      .group(days)
+      .x(d3.scale.linear()
+      // Domain starts at -1 and ends at 7 to add extra tick as padding on the sides
+      .domain([-1, 7])
+      .rangeRound([0, 30 * 7])),
+      barChart()
           .dimension(hour)
           .group(hours)
           .x(d3.scale.linear()
             .domain([0, 24])
             .rangeRound([0, 18 * 24])),
-      barChart()
-          .dimension(day)
-          .group(days)
-          .x(d3.scale.linear()
-            // Domain starts at -1 and ends at 7 to add extra tick as padding on the sides
-            .domain([-1, 7])
-            .rangeRound([0, 30 * 7])),
       barChart()
           .dimension(date)
           .group(dates)
@@ -241,19 +243,19 @@ class CrossfilterChart extends Component {
       let round;
 
       /**
-       * If barchart.id is 1, it is the hourly chart
+       * If barchart.id is 2, it is the hourly chart
        * Change x-axis for hourly chart to have AM/PM time instead of military time
        */
-      if (barChart.id === 1) {
+      if (barChart.id === 2) {
         axis = d3.svg.axis().orient('bottom').tickFormat(d => {
           return convertTime(d);
         });
       }
       /**
-       * If barchart.id is 2, it is the week day chart.
+       * If barchart.id is 1, it is the week day chart.
        * Change x-axis for weekday chart to have the days of the week instead of numbers
        */
-      if (barChart.id === 2) {
+      if (barChart.id === 1) {
         axis = d3.svg.axis().orient('bottom').tickFormat((d) => {
           if (!weekdays[d]) {
             return '';

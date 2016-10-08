@@ -68,7 +68,7 @@ body {
 
 #chart div {
   font: 10px sans-serif;
-  background-color: steelblue;
+  background-color: rgb(0, 188, 212);
   text-align: right;
   padding: 3px;
   margin: 1px;
@@ -203,7 +203,7 @@ pre {
  }
 
  .brush rect.extent {
-   fill: steelblue;
+   fill: rgb(0, 188, 212);
    fill-opacity: .125;
  }
 
@@ -241,7 +241,7 @@ pre {
    line-height: 1.5em;
    background: #eee;
    /*width: 1000px;*/
-   margin-bottom: 1px;
+   margin-bottom: 10px;
    border: 2px solid white;
    border-radius: 10px;
    padding: 10px;
@@ -270,6 +270,7 @@ pre {
  #commit-list .early {
    color: green;
  }
+
 /**
  * NEED TO CLEAR FIX
  */
