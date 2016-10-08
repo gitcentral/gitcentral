@@ -118,11 +118,14 @@ class WordCloud extends Component {
       layout.stop().words(words).start();
     }
 
-    // If window resizes and wordcloud is not hidden, update the svg
+    // If window width resizes and wordcloud is not hidden, update the svg
+    // Need to resize on window width only because mobile scrolling resizes window height
     // May need to refactor to resize on switching tabs
     window.onresize = event => {
-      if (!$('#word-cloud').hasClass('hidden')) {
-        update();
+      if ($(window).width() !== w) {
+        if (!$('#word-cloud').hasClass('hidden')) {
+          update();
+        }
       }
     };
     update();
