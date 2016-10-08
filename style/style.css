@@ -242,6 +242,9 @@ pre {
    background: #eee;
    /*width: 1000px;*/
    margin-bottom: 1px;
+   border: 2px solid white;
+   border-radius: 10px;
+   padding: 10px;
  }
 
  #commit-list .time {
