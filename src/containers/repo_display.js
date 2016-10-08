@@ -67,8 +67,8 @@ class RepoDisplay extends Component {
        * based on d3 mouse event.
        */
       function updatePosition(event) {
-        const xOffset = 2;
-        const yOffset = 2;
+        const xOffset = 0;
+        const yOffset = 0;
 
         const ttw = tt.style('width');
         const tth = tt.style('height');
@@ -243,9 +243,7 @@ class RepoDisplay extends Component {
 
     //show the tool on hover
     nodes.on('mouseover', showDetail);
-    nodes.on('mouseout', function(){
-      hideDetail();
-    });
+    nodes.on('mouseout', hideDetail);
 
 
     const highestNode = d3commits.reduce((highest, commit) => {
