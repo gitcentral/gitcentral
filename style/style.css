@@ -172,8 +172,9 @@ pre {
  }
 
  .chart {
-   display: inline-block;
-   height: 151px;
+   /*display: inline-block;*/
+   /*height: 151px;*/
+   text-align: center;
    margin-bottom: 20px;
  }
 
@@ -212,30 +213,34 @@ pre {
  }
 
  #hour-chart {
-   width: 450px;
+   /*width: 450px;*/
  }
 
  #weekday-chart {
-   width: 370px;
+   /*width: 370px;*/
  }
 
  #date-chart {
-   width: 920px;
+   /*width: 920px;*/
  }
 
  #commit-list {
    min-height: 1024px;
  }
 
- #commit-list .date,
+ #commit-list .date{
+   margin-bottom: .4em;
+ }
  #commit-list .day {
    margin-bottom: .4em;
  }
 
+
+
  #commit-list .commit {
    line-height: 1.5em;
    background: #eee;
-   width: 1000px;
+   /*width: 1000px;*/
    margin-bottom: 1px;
  }
 
@@ -244,31 +249,34 @@ pre {
  }
 
  #commit-list .commit div {
-   display: inline-block;
-   width: 100px;
+   /*display: inline-block;*/
+   /*width: 100px;*/
  }
  #commit-list div.author {
-   width: 200px;
+   /*width: 200px;*/
  }
  #commit-list div.sha-link{
-   width: 200px;
+   /*width: 200px;*/
  }
  #commit-list div.commit-message {
-   width: 500px;
+   /*width: 500px;
    padding-right: 10px;
-   text-align: left;
+   text-align: left;*/
  }
 
  #commit-list .early {
    color: green;
  }
-
+/**
+ * NEED TO CLEAR FIX
+ */
  aside {
-   position: absolute;
-   left: 740px;
    font-size: smaller;
-   width: 220px;
+   display:inline-block;
+   text-align: center;
+   margin-bottom: 1em;
  }
+
 
  /**
   * End of Chart.js Styles
@@ -327,3 +335,8 @@ pre {
     margin-top: 6em;
     display: block;
   }
+
+
+/*.container {
+  text-align:center;
+}*/

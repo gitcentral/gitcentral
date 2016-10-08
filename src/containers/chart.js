@@ -2,7 +2,9 @@
  * TO DO :
  * Add starting and ending date near the date chart.
  * Add overflow for commit list
- * Make CSS values % instead of px
+ * Fix chart overflow while mobile
+ * IN PROGRESS:
+ * Mobile friendly
  */
 /* eslint-disable */
 import React, { Component } from 'react';
@@ -14,24 +16,34 @@ class CrossfilterChart extends Component {
   makeCrossfilterChart() {
     $('#stats').empty();
     $('#stats').html(`
-      <div id="charts">
-        <span id="hour-chart" class="chart">
-          <div class="title">Time of Day</div>
-        </span>
-        <span id="weekday-chart" class="chart">
-          <div class="title">Week Day</div>
-        </span>
-        <span id="date-chart" class="chart">
-          <div class="title">Date</div>
-        </span>
-      </div>
-      <aside id="totals">
-        <span id="active">-</span> of <span id="total">-</span> commits selected.
-      </aside>
-      <div id="lists">
-        <div id="commit-list" class="list"></div>
-      </div>`);
+        <div id="charts" class="container">
+          <div class ="row">
+            <div class="col-lg-2">
+            </div>
+            <div id="hour-chart" class= "chart col-lg-5">
+              <div class="title">Time of Day</div>
+            </div>
+            <div id="weekday-chart" class="chart col-lg-3">
+              <div class="title">Week Day</div>
+            </div>
+          </div>
+          <div class="row">
+            <div id="date-chart" class="chart col-md-12">
+              <div class="title">Date</div>
+            </div>
+          </div>
+        </div>
+        <div class ="row">
+          <aside id="totals" class="col-xs-12">
+          <span id="active">-</span> of <span id="total">-</span> commits selected.
+          </aside>
+        </div>
+        <div id="lists">
+          <div id="commit-list" class="list"></div>
+        </div>`);
     /*
+
+
     NEED TO FIX, JSON commits are being placed in order in api.js. but sample data is not in order
 
     So in this code, initial state of sample json works and next api calls dont works,
@@ -165,39 +177,39 @@ class CrossfilterChart extends Component {
             .data(commitsByDate, d => d.key);
 
         date.enter().append('div')
-            .attr('class', 'date')
-          .append('div')
+            .attr('class', 'date container')
+          .append('span')
             .attr('class', 'day')
             // appends first date to top of list "Feburary 28, 2001"
             .text(d => formatDate(d.values[0].date));
 
         date.exit().remove();
 
-        const commit = date.order().selectAll('.commit')
+        const commitItem = date.order().selectAll('.commit')
             .data(d => d.values, d => d.index);
 
-        const commitEnter = commit.enter().append('div')
-            .attr('class', 'commit');
+        const commitEnter = commitItem.enter().append('div')
+            .attr('class', 'commit row');
 
         // This is where they append data to divs
         commitEnter.append('div')
-            .attr('class', 'time')
+            .attr('class', 'time col-md-2')
             .text(d => formatTime(d.date));
 
         commitEnter.append('div')
-            .attr('class', 'author')
+            .attr('class', 'author col-md-2')
             .text(d => d.author.login);
 
         commitEnter.append('div')
-            .attr('class', 'sha-link')
+            .attr('class', 'sha-link col-md-2')
             .html(d => `<pre>SHA: <a href="${d.html_url}" target="_blank">${d.sha.slice(0, 9)}...</a></pre>`);
 
         commitEnter.append('div')
-            .attr('class', 'commit-message')
+            .attr('class', 'commit-message col-md-6')
             .text(d => d.commit.message);
 
-        commit.exit().remove();
-        commit.order();
+        commitItem.exit().remove();
+        commitItem.order();
       });
     } // End of commitList function
 
