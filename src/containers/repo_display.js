@@ -14,20 +14,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GithubApiInterface from '../reducers/gitD3/githubBranchFunction';
-// import tooltip from '../reducers/gitD3/d3tip.js';
 import _  from 'lodash';
 import $ from 'jquery';
 import displayHelpers from './display_helpers';
 import generateCoordinates from './coordinate_generator';
-// import floatingTooltip from './tool_tip.js';
-// d3.tip = tooltip;
+import { floatingTooltip, showDetail } from './tooltip_helpers'
 
 class RepoDisplay extends Component {
 
   makeD3Display () {
     $('#container').empty();
-    //$('.d3-tip').remove();
-    // $('body').append('<div id="container"></div>');
 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -46,27 +42,13 @@ class RepoDisplay extends Component {
     } = githubTranslator;
 
     const {
-      showToolTip,
-      makeAnchor,
       zoomed,
       renderRepoName,
       addColors,
       addDates,
-      getCommitDate,
-      floatingTooltip
     } = displayHelpers;
 
     const tooltip = floatingTooltip('container_tooltip', 100, '#container');
-    let tooltipOnMouseover = false;
-    let tooltipOnNode = false;
-
-    $('.tooltip').on('mouseover', function(){
-      tooltipOnMouseover = true;
-    });
-    $('.tooltip').on('mouseout', function(){
-      tooltipOnMouseover = false;
-      hideDetail();
-    })
 
     addColors(branchLookup);
     generateCoordinates(d3commits, SHALookup, branchLookup);
@@ -74,19 +56,12 @@ class RepoDisplay extends Component {
     //https://bl.ocks.org/mbostock/6123708
     const zoom = d3.behavior.zoom()
       .scaleExtent([0.1, 10])
-      .on("zoom", () => zoomed(svg));
+      .on("zoom", () => zoomed(svg, tooltip));
 
     let svg = d3.select('#container').append('svg')
       .attr('width', pageWidth)
       .attr('height', pageHeight)
-      .on('click', function() {
-        d3.selectAll('.d3-tip')
-          .style('opacity', 0)
-          .html('');
-      })
       .call(zoom);
-
-    // svg.call(infoTip);
 
     let container = svg.append('g');
     const straightLineLocations = [];
@@ -123,6 +98,11 @@ class RepoDisplay extends Component {
       });
     });
 
+    function nodeColor(commit) {
+      return branchLookup[commit.branch] ?
+        branchLookup[commit.branch].color : '#000000';
+    }
+
     //Make the nodes
     const nodes = svg.append('g')
       .attr('class', 'commit')
@@ -132,55 +112,13 @@ class RepoDisplay extends Component {
       .attr('r', 5)
       .attr('cx', commit => commit.x)
       .attr('cy', commit => commit.y)
-      .attr('stroke', commit => {
-        if(branchLookup[commit.branch]) {
-          return branchLookup[commit.branch].color;
-        }
-        
-        return '#000000';
-      })
-      .attr('fill', commit => branchLookup[commit.branch].color);
-
-
-  /*
-   * Function called on mouseover to display the
-   * details of a bubble in the tooltip.
-   */
-    function showDetail(d) {
-      // change outline to indicate hover state.
-
-      const content = `Date: ${('' + d.date).slice(0, 16)}
-      ${originalBranches.includes(d.branch) ? 'Branch: ' + makeAnchor(d.branch, d.branchLink) + '\n' : '' }
-      <br>
-      <span>
-        SHA: ${makeAnchor(d.sha.slice(0, 9) + '...', d.url)}
-      </span>
-      <br>
-      <div>
-        Author: ${d.author.login}
-      <div>
-      <br>
-      Message: ${d.commit.message}`
-      tooltip.showTooltip(content, d3.event);
-    }
-
-    // hides tooltip
-    function hideDetail() {
-      setTimeout(function(){
-        if (!tooltipOnMouseover){
-          tooltip.hideTooltip();
-        }
-      }, 3000);
-    }
+      .attr('stroke', nodeColor)
+      .attr('fill', nodeColor);
 
     //show the tool on hover
     nodes.on('mouseover', function(d){
-      tooltipOnNode = true;
-      showDetail(d);
-    })
-    nodes.on('mouseout', function(){
-      tooltipOnNode = false;
-      hideDetail();
+      // tooltipOnNode = true;
+      showDetail(d, originalBranches, tooltip);
     });
 
     const highestNode = d3commits.reduce((highest, commit) => {
@@ -193,7 +131,6 @@ class RepoDisplay extends Component {
 
 
   render() {
-
     $('#loading').addClass('hidden');
 
     return (
