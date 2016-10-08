@@ -14,27 +14,27 @@ class CrossfilterChart extends Component {
   makeCrossfilterChart() {
     $('#stats').empty();
     $('#stats').html(`
-      <div class="container">
-        <div id="charts">
+        <div id="charts" class="container">
           <div class ="row">
-            <span id="hour-chart" class="chart col-md-8">
+            <div id="hour-chart" class="chart col-md-7">
               <div class="title">Time of Day</div>
-            </span>
-          <span id="weekday-chart" class="chart col-md-4">
-            <div class="title">Week Day</div>
-          </span>
+            </div>
+            <div id="weekday-chart" class="chart col-md-5">
+              <div class="title">Week Day</div>
+            </div>
           </div>
-          <span id="date-chart" class="chart">
-            <div class="title">Date</div>
-          </span>
+          <div class="row">
+            <div id="date-chart" class="chart col-md-12">
+              <div class="title">Date</div>
+            </div>
+          </div>
         </div>
-        <aside id="totals">
-          <span id="active">-</span> of <span id="total">-</span> commits selected.
-        </aside>
         <div id="lists">
+        <aside id="totals">
+        <span id="active">-</span> of <span id="total">-</span> commits selected.
+        </aside>
           <div id="commit-list" class="list"></div>
-        </div>
-      </div>`);
+        </div>`);
     /*
     NEED TO FIX, JSON commits are being placed in order in api.js. but sample data is not in order
 

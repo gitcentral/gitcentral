@@ -172,8 +172,9 @@ pre {
  }
 
  .chart {
-   display: inline-block;
-   height: 151px;
+   /*display: inline-block;*/
+   /*height: 151px;*/
+   text-align: center;
    margin-bottom: 20px;
  }
 
@@ -212,15 +213,15 @@ pre {
  }
 
  #hour-chart {
-   width: 450px;
+   /*width: 450px;*/
  }
 
  #weekday-chart {
-   width: 370px;
+   /*width: 370px;*/
  }
 
  #date-chart {
-   width: 920px;
+   /*width: 920px;*/
  }
 
  #commit-list {
@@ -266,10 +267,10 @@ pre {
  }
 
  aside {
-   position: absolute;
-   left: 740px;
+   /*position: absolute;*/
+   /*left: 740px;*/
    font-size: smaller;
-   width: 220px;
+   /*width: 220px;*/
  }
 
 
