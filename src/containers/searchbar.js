@@ -13,8 +13,6 @@ import { bindActionCreators } from 'redux';
 import fetchRepo from '../actions/index';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import TextField from 'material-ui/TextField';
-import Drawer from 'material-ui/Drawer';
-import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Menu from 'material-ui/svg-icons/navigation/menu';
 import AppBar from 'material-ui/AppBar';
@@ -124,39 +122,6 @@ class SearchBar extends Component {
               hintText="Enter repo URL"
             />
           </AppBar>
-        </MuiThemeProvider>
-        <MuiThemeProvider>
-          <Drawer
-            docked={false}
-            width={300}
-            open={this.state.open}
-            onRequestChange={this.handleClose.bind(this)}
-            >
-            <MenuItem onClick={log && this.handleClose.bind(this)}>
-              Search by:
-            </MenuItem>
-            <MenuItem onClick={() => console.log('Author name')}>
-              <TextField
-                floatingLabelText="Author name"
-              />
-            </MenuItem>
-            <MenuItem onClick={() => console.log('Branch')}>
-              <TextField
-                floatingLabelText="Branch"
-              />
-            </MenuItem>
-            <MenuItem onClick={() => console.log('Commit message')}>
-              <TextField
-                floatingLabelText="Commit message"
-              />
-            </MenuItem>
-            <MenuItem onClick={() => console.log('# authors')}>
-              Number of authors: 4
-            </MenuItem>
-            <MenuItem onClick={() => console.log('Total commits')}>
-              Total commits: 492
-            </MenuItem>
-          </Drawer>
         </MuiThemeProvider>
       </div>
     );
