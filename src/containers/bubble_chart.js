@@ -239,7 +239,7 @@ class BubbleChart extends Component {
           .attr('stroke-width', 2)
           .attr('opacity', 0.5)
           .on('mouseover', showDetail)
-          .on('click', hideDetail);
+          .on('mouseout', hideDetail);
 
       // Fancy transition to make bubbles appear, ending with the
       // correct radius
@@ -319,7 +319,6 @@ class BubbleChart extends Component {
 
     // Hides tooltip
       function hideDetail(d) {
-        // reset outline
         d3.select(this)
           .attr('stroke', d3.rgb(fillColor(d.group)).darker());
         tooltip.hideTooltip();

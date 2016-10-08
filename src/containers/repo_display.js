@@ -107,6 +107,15 @@ class RepoDisplay extends Component {
     //$('.d3-tip').remove();
     // $('body').append('<div id="container"></div>');
     const tooltip = this.floatingTooltip('container_tooltip', 100);
+    let tooltipOnMouseover = false;
+
+    $('.tooltip').on('mouseover', function(){
+      tooltipOnMouseover = true;
+    });
+    $('.tooltip').on('mouseout', function(){
+      tooltipOnMouseover = false;
+      hideDetail();
+    })
 
     const pageWidth = window.innerWidth;
     const pageHeight = window.innerHeight;
@@ -207,7 +216,6 @@ class RepoDisplay extends Component {
    */
     function showDetail(d) {
       // change outline to indicate hover state.
-      // d3.select(this).attr('stroke', 'black');
       const content = `Date: ${d.date}
       ${originalBranches.includes(d.branch) ? 'Branch: ' + makeAnchor(d.branch, d.branchLink) + '\n' : '' }
       <br>
@@ -225,16 +233,19 @@ class RepoDisplay extends Component {
     }
 
     // hides tooltip
-    function hideDetail(d) {
-      // reset outline
-      d3.select(this)
-        .attr('stroke', d3.rgb(fillColor(d.group)).darker());
-      tooltip.hideTooltip();
+    function hideDetail() {
+      setTimeout(function(){
+        if (!tooltipOnMouseover){
+          tooltip.hideTooltip();
+        }
+      }, 3000);
     }
 
     //show the tool on hover
-    nodes.on('mouseover', showDetail)
-      .on('click', hideDetail);
+    nodes.on('mouseover', showDetail);
+    nodes.on('mouseout', function(){
+      hideDetail();
+    });
 
 
     const highestNode = d3commits.reduce((highest, commit) => {
