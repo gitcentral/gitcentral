@@ -107,14 +107,19 @@ class RepoDisplay extends Component {
           .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
           .projection(function(d) { return [d.y, d.x]; });
 
-        svg.select("g")
-            .datum(curveData)
-          .append("path")
-            .attr("class", "line")
-            .attr("d", diagonal)
-            .attr("stroke-width", 1)
-          .attr('stroke', branchLookup[commit.branch].color)
-          .attr('fill', 'none');
+        try {
+          svg.select("g")
+              .datum(curveData)
+            .append("path")
+              .attr("class", "line")
+              .attr("d", diagonal)
+              .attr("stroke-width", 1)
+            .attr('stroke', branchLookup[commit.branch].color)
+            .attr('fill', 'none');
+        }
+        catch(err) {
+          console.log(err);
+        }
       });
     });
 
@@ -127,8 +132,15 @@ class RepoDisplay extends Component {
       .attr('r', 5)
       .attr('cx', commit => commit.x)
       .attr('cy', commit => commit.y)
-      .attr('stroke', commit => branchLookup[commit.branch].color)
+      .attr('stroke', commit => {
+        if(branchLookup[commit.branch]) {
+          return branchLookup[commit.branch].color;
+        }
+        
+        return '#000000';
+      })
       .attr('fill', commit => branchLookup[commit.branch].color);
+
 
   /*
    * Function called on mouseover to display the
