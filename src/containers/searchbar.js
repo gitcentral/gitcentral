@@ -18,10 +18,9 @@ import Menu from 'material-ui/svg-icons/navigation/menu';
 import AppBar from 'material-ui/AppBar';
 import {orange500, blue500} from 'material-ui/styles/colors';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import SvgIcon from 'material-ui/SvgIcon';
 import NavTabs from '../components/tabs';
 import $ from 'jquery';
-
-import RaisedButton from 'material-ui/RaisedButton'
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
@@ -97,21 +96,18 @@ class SearchBar extends Component {
   }
 
   render() {
-    const log = () => console.log('aasdfasd');
-    // let myTabs = (
-    //    <Tabs style={{padding: 5}}>
-    //        <Tab icon={<Timeline />} style={{'padding-left': 5, 'padding-right': 5}}/>
-    //        <Tab icon={<Equalizer />} tyle={{'padding-left': 5, 'padding-right': 5}}/>
-    //    </Tabs>
-    // );
-
     return (
       <div>
         <MuiThemeProvider>
           <AppBar
-            title={<span>Git Central</span>}
-            iconElementLeft={<IconButton onClick={this.handleToggle.bind(this)}><Menu /></IconButton>
-           }
+            title={
+              <a
+                href='http://git-central.herokuapp.com/'
+                style={{ 'text-decoration': 'none', color: 'white'}} >
+                  Git Central
+              </a>
+            }
+            showMenuIconButton={false}
           >
           <NavTabs />
             <TextField
