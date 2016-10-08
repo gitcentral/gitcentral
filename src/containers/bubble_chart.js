@@ -5,85 +5,6 @@ import displayHelpers from './display_helpers';
 import $ from 'jquery';
 
 class BubbleChart extends Component {
-// /*
-//  * Creates tooltip with provided id that
-//  * floats on top of visualization.
-//  */
-//
-//   floatingTooltip(tooltipId, width) {
-//     // Local variable to hold tooltip div for
-//     // manipulation in other functions.
-//     const tt = d3.select('#bubble-chart')
-//       .append('div')
-//       .attr('class', 'tooltip');
-//       // .attr('id', tooltipId);
-//
-//     // Set a width if it is provided.
-//     if (width) {
-//       tt.style('width', width);
-//     }
-//
-//     // Initially it is hidden.
-//     hideTooltip();
-//
-//     /*
-//      * Display tooltip with provided content.
-//      * content is expected to be HTML string.
-//      * event is d3.event for positioning.
-//      */
-//     function showTooltip(content, event) {
-//       tt.style('opacity', 1.0)
-//         .html(content);
-//       updatePosition(event);
-//     }
-//
-//     /*
-//      * Hide the tooltip div.
-//      */
-//     function hideTooltip() {
-//       tt.style('opacity', 0.0);
-//     }
-//
-//     /*
-//      * Figure out where to place the tooltip
-//      * based on d3 mouse event.
-//      */
-//     function updatePosition(event) {
-//       const xOffset = 0;
-//       const yOffset = 0;
-//
-//       const ttw = tt.style('width');
-//       const tth = tt.style('height');
-//
-//       const wscrY = window.scrollY;
-//       const wscrX = window.scrollX;
-//
-//       const curX = (document.all) ? event.clientX + wscrX : event.pageX;
-//       const curY = (document.all) ? event.clientY + wscrY : event.pageY;
-//       let ttleft = ((curX - wscrX + xOffset * 1 + ttw) > window.innerWidth) ?
-//                    curX - ttw - xOffset * 1 : curX + xOffset;
-//
-//       if (ttleft < wscrX + xOffset) {
-//         ttleft = wscrX + xOffset;
-//       }
-//
-//       let tttop = ((curY - wscrY + yOffset * 1 + tth) > window.innerHeight) ?
-//                   curY - tth - yOffset * 1 : curY + yOffset;
-//
-//       if (tttop < wscrY + yOffset) {
-//         tttop = curY + yOffset;
-//       }
-//
-//       tt.style({ top: `${tttop}px`, left: `${ttleft}px`});
-//     }
-//
-//     return {
-//       showTooltip: showTooltip,
-//       hideTooltip: hideTooltip,
-//       updatePosition: updatePosition
-//     };
-//   }
-// -------------------------------------------------
 /**
  * Process commit author data and displays contributors info
  */
@@ -126,18 +47,6 @@ class BubbleChart extends Component {
       // Constants for sizing
       const width = window.innerWidth;
       const height = 400;
-
-      // tooltip for mouseover functionality
-      // const tooltip = context.floatingTooltip('bubble_tooltip', 100);
-      // let tooltipOnMouseover = false;
-      //
-      // $('.tooltip').on('mouseover', function(){
-      //   tooltipOnMouseover = true;
-      // });
-      // $('.tooltip').on('mouseout', function(){
-      //   tooltipOnMouseover = false;
-      //   hideDetail();
-      // })
 
       const tooltip = floatingTooltip('bubble_tooltip', 100, '#bubble-chart');
       let tooltipOnMouseover = false;
