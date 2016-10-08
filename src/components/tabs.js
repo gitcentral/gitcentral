@@ -9,38 +9,47 @@ import FormatQuote from 'material-ui/svg-icons/editor/format-quote';
 import Bubbles from 'material-ui/svg-icons/editor/bubble-chart';
 import $ from 'jquery';
 
-function enterTab(elementId) {
-  console.log('get ' + elementId);
+export default class NavTabs extends Component {
 
-  d3.selectAll('.d3-tip')
+  constructor(props) {
+    super(props);
+    this.enterTab = this.enterTab.bind(this);
+    this.getGitGraph = this.getGitGraph.bind(this);
+    this.getStats = this.getStats.bind(this);
+    this.getWordCloud = this.getWordCloud.bind(this);
+    this.getBubbleChart = this.getBubbleChart.bind(this);
+  }
+
+  enterTab(elementId) {
+    console.log('get ' + elementId);
+
+    d3.selectAll('.d3-tip')
     .style('opacity', 0)
     .html('');
 
-  document.getElementById('stats').className="hidden";
-  document.getElementById('word-cloud').className="hidden";
-  document.getElementById('container').className="hidden";
-  document.getElementById('bubble-chart').className="hidden";
+    const elements = ['stats', 'word-cloud', 'container', 'bubble-chart'];
 
-  document.getElementById(elementId).classList.remove("hidden");
-  $('body').css('overflow', 'hidden');
-}
+    elements.map((element) => { console.log(element); document.getElementById(element).className = "hidden"; } );
 
-export default class NavTabs extends Component {
+    document.getElementById(elementId).classList.remove("hidden");
+    $('body').css('overflow', 'hidden');
+  }
+
   getGitGraph(){
-    enterTab('container');
+    this.enterTab('container');
   }
 
   getStats(){
-    enterTab('stats');
+    this.enterTab('stats');
     $('body').css('overflow', 'visible');
   }
 
   getWordCloud(){
-    enterTab('word-cloud');
+    this.enterTab('word-cloud');
   }
 
   getBubbleChart(){
-    enterTab('bubble-chart');
+    this.enterTab('bubble-chart');
   }
 
   render() {
