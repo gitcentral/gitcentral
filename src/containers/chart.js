@@ -16,10 +16,12 @@ class CrossfilterChart extends Component {
     $('#stats').html(`
         <div id="charts" class="container">
           <div class ="row">
-            <div id="hour-chart" class="chart col-md-7">
+            <div class="col-md-2">
+            </div>
+            <div id="hour-chart" class= "chart col-md-5">
               <div class="title">Time of Day</div>
             </div>
-            <div id="weekday-chart" class="chart col-md-5">
+            <div id="weekday-chart" class="chart col-md-3">
               <div class="title">Week Day</div>
             </div>
           </div>
@@ -29,15 +31,16 @@ class CrossfilterChart extends Component {
             </div>
           </div>
         </div>
+        <div class ="row">
+          <aside id="totals" class="col-xs-12">
+          <span id="active">-</span> of <span id="total">-</span> commits selected.
+          </aside>
+        </div>
         <div id="lists">
-
           <div id="commit-list" class="list"></div>
         </div>`);
     /*
 
-    <aside id="totals">
-    <span id="active">-</span> of <span id="total">-</span> commits selected.
-    </aside>
 
     NEED TO FIX, JSON commits are being placed in order in api.js. but sample data is not in order
 
@@ -137,9 +140,9 @@ class CrossfilterChart extends Component {
     const list = d3.selectAll('.list')
         .data([commitList]);
 
-    // // Render the total.
-    // d3.selectAll('#total')
-    //     .text(formatNumber(commit.size()));
+    // Render the total.
+    d3.selectAll('#total')
+        .text(formatNumber(commit.size()));
 
     renderAll();
 
@@ -152,7 +155,7 @@ class CrossfilterChart extends Component {
     function renderAll() {
       chart.each(render);
       list.each(render);
-      // d3.select('#active').text(formatNumber(all.value()));
+      d3.select('#active').text(formatNumber(all.value()));
     }
 
     window.filter = (filters) => {
@@ -177,15 +180,12 @@ class CrossfilterChart extends Component {
             .attr('class', 'day')
             // appends first date to top of list "Feburary 28, 2001"
             .text(d => formatDate(d.values[0].date));
-        d3.select('.date')
-          .append('aside')
-            .html('<span id="active">-</span> of <span id="total">-</span> commits selected.');
 
-        d3.select('#active').text(formatNumber(all.value()));
+        // d3.select('#active').text(formatNumber(all.value()));
 
-        // Render the total.
-        d3.selectAll('#total')
-            .text(formatNumber(commit.size()));
+        // // Render the total.
+        // d3.selectAll('#total')
+        //     .text(formatNumber(commit.size()));
 
         date.exit().remove();
 
