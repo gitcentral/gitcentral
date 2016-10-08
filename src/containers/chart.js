@@ -14,22 +14,26 @@ class CrossfilterChart extends Component {
   makeCrossfilterChart() {
     $('#stats').empty();
     $('#stats').html(`
-      <div id="charts">
-        <span id="hour-chart" class="chart">
-          <div class="title">Time of Day</div>
-        </span>
-        <span id="weekday-chart" class="chart">
-          <div class="title">Week Day</div>
-        </span>
-        <span id="date-chart" class="chart">
-          <div class="title">Date</div>
-        </span>
-      </div>
-      <aside id="totals">
-        <span id="active">-</span> of <span id="total">-</span> commits selected.
-      </aside>
-      <div id="lists">
-        <div id="commit-list" class="list"></div>
+      <div class="container">
+        <div id="charts">
+          <div class ="row">
+            <span id="hour-chart" class="chart col-md-8">
+              <div class="title">Time of Day</div>
+            </span>
+          <span id="weekday-chart" class="chart col-md-4">
+            <div class="title">Week Day</div>
+          </span>
+          </div>
+          <span id="date-chart" class="chart">
+            <div class="title">Date</div>
+          </span>
+        </div>
+        <aside id="totals">
+          <span id="active">-</span> of <span id="total">-</span> commits selected.
+        </aside>
+        <div id="lists">
+          <div id="commit-list" class="list"></div>
+        </div>
       </div>`);
     /*
     NEED TO FIX, JSON commits are being placed in order in api.js. but sample data is not in order
@@ -165,7 +169,7 @@ class CrossfilterChart extends Component {
             .data(commitsByDate, d => d.key);
 
         date.enter().append('div')
-            .attr('class', 'date')
+            .attr('class', 'date container')
           .append('div')
             .attr('class', 'day')
             // appends first date to top of list "Feburary 28, 2001"
@@ -177,23 +181,23 @@ class CrossfilterChart extends Component {
             .data(d => d.values, d => d.index);
 
         const commitEnter = commit.enter().append('div')
-            .attr('class', 'commit');
+            .attr('class', 'commit row');
 
         // This is where they append data to divs
         commitEnter.append('div')
-            .attr('class', 'time')
+            .attr('class', 'time col-md-2')
             .text(d => formatTime(d.date));
 
         commitEnter.append('div')
-            .attr('class', 'author')
+            .attr('class', 'author col-md-2')
             .text(d => d.author.login);
 
         commitEnter.append('div')
-            .attr('class', 'sha-link')
+            .attr('class', 'sha-link col-md-2')
             .html(d => `<pre>SHA: <a href="${d.html_url}" target="_blank">${d.sha.slice(0, 9)}...</a></pre>`);
 
         commitEnter.append('div')
-            .attr('class', 'commit-message')
+            .attr('class', 'commit-message col-md-6')
             .text(d => d.commit.message);
 
         commit.exit().remove();
