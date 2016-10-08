@@ -2,7 +2,9 @@
  * TO DO :
  * Add starting and ending date near the date chart.
  * Add overflow for commit list
- * Make CSS values % instead of px
+ * Fix chart overflow while mobile
+ * IN PROGRESS:
+ * Mobile friendly
  */
 /* eslint-disable */
 import React, { Component } from 'react';
@@ -16,12 +18,12 @@ class CrossfilterChart extends Component {
     $('#stats').html(`
         <div id="charts" class="container">
           <div class ="row">
-            <div class="col-md-2">
+            <div class="col-lg-2">
             </div>
-            <div id="hour-chart" class= "chart col-md-5">
+            <div id="hour-chart" class= "chart col-lg-5">
               <div class="title">Time of Day</div>
             </div>
-            <div id="weekday-chart" class="chart col-md-3">
+            <div id="weekday-chart" class="chart col-lg-3">
               <div class="title">Week Day</div>
             </div>
           </div>
@@ -180,12 +182,6 @@ class CrossfilterChart extends Component {
             .attr('class', 'day')
             // appends first date to top of list "Feburary 28, 2001"
             .text(d => formatDate(d.values[0].date));
-
-        // d3.select('#active').text(formatNumber(all.value()));
-
-        // // Render the total.
-        // d3.selectAll('#total')
-        //     .text(formatNumber(commit.size()));
 
         date.exit().remove();
 
