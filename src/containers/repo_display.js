@@ -107,14 +107,19 @@ class RepoDisplay extends Component {
           .target(function(d) {return {"x":d[1].y, "y":d[1].x}; })
           .projection(function(d) { return [d.y, d.x]; });
 
-        svg.select("g")
-            .datum(curveData)
-          .append("path")
-            .attr("class", "line")
-            .attr("d", diagonal)
-            .attr("stroke-width", 1)
-          .attr('stroke', branchLookup[commit.branch].color)
-          .attr('fill', 'none');
+        try {
+          svg.select("g")
+              .datum(curveData)
+            .append("path")
+              .attr("class", "line")
+              .attr("d", diagonal)
+              .attr("stroke-width", 1)
+            .attr('stroke', branchLookup[commit.branch].color)
+            .attr('fill', 'none');
+        }
+        catch(err) {
+          console.log(err);
+        }
       });
     });
 
