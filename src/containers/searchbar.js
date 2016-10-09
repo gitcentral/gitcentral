@@ -38,6 +38,14 @@ class SearchBar extends Component {
     };
   }
 
+  componentWillMount() {
+    if (this.props.urlEntered.length > 'https://github.com/'.length) {
+      const newUrlEntered = this.props.urlEntered;
+      this.setState({ urlEntered: newUrlEntered });
+      this.props.fetchRepo(newUrlEntered);
+    }
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.urlEntered != this.props.urlEntered) {
 

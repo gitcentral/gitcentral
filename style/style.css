@@ -2,6 +2,21 @@ body {
   overflow: hidden;
 }
 
+.disable-anchor {
+ pointer-events: none;
+ cursor: default;
+}
+
+.disable-anchor img {
+    filter: alpha(opacity=40);
+    opacity : 0.4;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
 .github-corner-svg {
     z-index: 1112;
     position: fixed;
@@ -345,3 +360,4 @@ pre {
     margin-top: 6em;
     display: block;
   }
+
