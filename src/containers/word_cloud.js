@@ -31,6 +31,9 @@ class WordCloud extends Component {
     const frequencyCount = {};
     const uniqueWords = [];
     words.forEach((word) => {
+      if (word.length < 3) {
+        return;
+      }
       if (frequencyCount[word] === undefined) {
         frequencyCount[word] = 0;
         uniqueWords.push(word);
