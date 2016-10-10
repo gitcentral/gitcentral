@@ -7,6 +7,7 @@ import Timeline from 'material-ui/svg-icons/action/timeline';
 import Equalizer from 'material-ui/svg-icons/av/equalizer';
 import FormatQuote from 'material-ui/svg-icons/editor/format-quote';
 import Bubbles from 'material-ui/svg-icons/editor/bubble-chart';
+import Team from 'material-ui/svg-icons/social/people';
 import $ from 'jquery';
 
 export default class NavTabs extends Component {
@@ -52,6 +53,10 @@ export default class NavTabs extends Component {
     this.enterTab('bubble-chart');
   }
 
+  getAboutUs(){
+    window.location.href = 'http://localhost:3000/about';
+  }
+
   render() {
     const style = { padding: '10px' };
     return (
@@ -75,6 +80,11 @@ export default class NavTabs extends Component {
         icon={<Bubbles />}
         style={style}
         onActive={this.getBubbleChart} >
+      </Tab>
+      <Tab
+        icon={<Team />}
+        style={style}
+        onActive={this.getAboutUs} >
       </Tab>
     </Tabs>
   )}

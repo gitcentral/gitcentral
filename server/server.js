@@ -7,7 +7,7 @@ const githubAPI = require('./api');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
 const compiler = webpack(webpackConfig);
 
@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, '/..')));
 
 app.use('/api', githubAPI);
 
-app.get('/about.html', function (req, res) {
+app.get('/about', function (req, res) {
   console.log("hello there");
   const file = path.join(__dirname, 'about.html');
   console.log('Serving /', file);
@@ -40,7 +40,12 @@ app.get('/', function (req, res) {
   res.sendFile(file);
 });
 
+app.get('/home', function (req, res) {
+  const file = path.join(__dirname, '/landing_page.html');
+  console.log('Serving /landing_page', file);
+  res.sendFile(file);
+});
+
 app.listen(port, function() {
   console.log('Listening on port ', port);
 });
-
