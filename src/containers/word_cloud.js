@@ -75,7 +75,7 @@ class WordCloud extends Component {
                   .attr('width', w)
                   .attr('height', h);
     const vis = svg.append('g')
-                  // .attr('transform', `translate(${[w >> 1, h >> 1]})`);
+                  .attr('transform', `translate(${[w >> 1, h >> 1]})`);
 
 
     // Draw the word cloud
