@@ -257,17 +257,16 @@ pre {
 
 
  #commit-list .commit {
-   line-height: 1.5em;
    background: #eee;
-   /*width: 1000px;*/
    margin-bottom: 10px;
    border: 2px solid white;
    border-radius: 10px;
-   padding: 10px;
+   padding: 5px;
  }
 
  #commit-list .time {
    color: #999;
+   font-size: .92em;
  }
 
  #commit-list .commit div {
@@ -284,15 +283,12 @@ pre {
    /*width: 500px;
    padding-right: 10px;
    text-align: left;*/
- }
+}
 
  #commit-list .early {
    color: green;
  }
 
-/**
- * NEED TO CLEAR FIX
- */
  aside {
    font-size: smaller;
    display:inline-block;
@@ -360,4 +356,3 @@ pre {
     margin-top: 6em;
     display: block;
   }
-

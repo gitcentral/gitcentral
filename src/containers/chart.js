@@ -195,7 +195,7 @@ class CrossfilterChart extends Component {
 
         // This is where they append data to divs
         commitEnter.append('div')
-            .attr('class', 'time col-md-2')
+            .attr('class', 'time col-md-1 col-xs-3')
             .text(d => {
               let result = formatTime(d.date);
               // Remove beginning 0 if there is a 0 in front of the hours
@@ -203,15 +203,15 @@ class CrossfilterChart extends Component {
             });
 
         commitEnter.append('div')
-            .attr('class', 'author col-md-2')
+            .attr('class', 'author col-md-2 col-xs-3')
             .text(d => d.author.login);
 
         commitEnter.append('div')
-            .attr('class', 'sha-link col-md-2')
-            .html(d => `<pre>SHA: <a href="${d.html_url}" target="_blank">${d.sha.slice(0, 9)}...</a></pre>`);
+            .attr('class', 'sha-link col-md-2 col-xs-6')
+            .html(d => `<span>SHA: <a href="${d.html_url}" target="_blank">${d.sha.slice(0, 9)}...</a></span>`);
 
         commitEnter.append('div')
-            .attr('class', 'commit-message col-md-6')
+            .attr('class', 'commit-message col-md-7 col-xs-12')
             .text(d => d.commit.message);
 
         commitItem.exit().remove();
