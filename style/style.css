@@ -188,6 +188,7 @@ pre {
  */
 
  #charts {
+   margin-top: 20px;
  }
 
  .chart {
@@ -229,18 +230,6 @@ pre {
    stroke: #666;
  }
 
- #hour-chart {
-   /*width: 450px;*/
- }
-
- #weekday-chart {
-   /*width: 370px;*/
- }
-
- #date-chart {
-   /*width: 920px;*/
- }
-
  #commit-list {
    min-height: 1024px;
  }
@@ -252,10 +241,8 @@ pre {
    margin-bottom: .4em;
  }
 
-
-
  #commit-list .commit {
-   background: #eee;
+   background: #E0F7FA;
    margin-bottom: 10px;
    border: 2px solid white;
    border-radius: 10px;
@@ -263,25 +250,9 @@ pre {
  }
 
  #commit-list .time {
-   color: #999;
-   font-size: .92em;
+   color: #0097A7;
+   font-size: .88em;
  }
-
- #commit-list .commit div {
-   /*display: inline-block;*/
-   /*width: 100px;*/
- }
- #commit-list div.author {
-   /*width: 200px;*/
- }
- #commit-list div.sha-link{
-   /*width: 200px;*/
- }
- #commit-list div.commit-message {
-   /*width: 500px;
-   padding-right: 10px;
-   text-align: left;*/
-}
 
  #commit-list .early {
    color: green;

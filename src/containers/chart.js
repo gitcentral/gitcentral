@@ -72,7 +72,6 @@ class CrossfilterChart extends Component {
     const quarterMark = Math.floor(timeBetween / 4);
     const filterStart = new Date(startDate.getTime() + quarterMark);
     const filterEnd = new Date(endDate.getTime() - quarterMark);
-
     const commits = JSONCommits;
       // Various formatters.
     const formatNumber = d3.format(',d');
@@ -106,8 +105,9 @@ class CrossfilterChart extends Component {
     const days = day.group(d => d);
     const word = commit.dimension(d => d.words);
     let charts;
+    let mobileView = ($(window).width() < 960);
     // If viewed on mobile, make chart width smaller
-    if ($(window).width() < 960) {
+    if (mobileView) {
       charts = [
         barChart()
         .dimension(day)
@@ -299,10 +299,16 @@ class CrossfilterChart extends Component {
       /**
       * If barchart.id is 3, it is the date chart
       * Change x-axis for date chart to display date in Mon date
+      * If viewing on mobile, make every other tick on x-axis to be blank for spacing
       */
       if (barChart.id === 3) {
+        let count = 0;
         axis = d3.svg.axis().orient('bottom').tickFormat(d => {
-          return `${d.toString().slice(4,7)} ${d.getDate()}`;
+          count++;
+          if (!mobileView || count % 2 === 1){
+            return `${d.toString().slice(4,7)} ${d.getDate()}`;
+          }
+          return '';
         });
       }
 
