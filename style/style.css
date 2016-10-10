@@ -108,10 +108,10 @@ body {
   fill: red;
   stroke: red;
   stroke-width: 4;
-
+/*
   animation-duration: 2s;
   animation-iteration-count: infinite;
-  animation-name: selectCircleTransition;
+  animation-name: selectCircleTransition;*/
 }
 
 @keyframes selectCircleTransition {
