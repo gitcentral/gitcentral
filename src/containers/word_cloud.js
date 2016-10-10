@@ -27,7 +27,8 @@ class WordCloud extends Component {
     // Replace punctuation with spaces
     words = words.replace(/\d|\W/g, ' ').split(' ')
 
-    // Count frequency of each word and create new array of non duplicates
+    // Count frequency of each word.
+    // Create new array of non duplicates and words with length of 3 or more
     const frequencyCount = {};
     const uniqueWords = [];
     words.forEach((word) => {
@@ -59,7 +60,7 @@ class WordCloud extends Component {
     const fill = d3.scale.category20c();
 
     // Start word cloud placement
-    const layout = d3.layout.cloud().size([w * 0.90, h * 0.80])
+    const layout = d3.layout.cloud().size([w * 0.90, h * 0.72])
                      .words(words)
                     //  .rotate(() => ~~((Math.random() * 6) - 2.5) * 30)
                      .rotate(() => 0)
@@ -74,7 +75,7 @@ class WordCloud extends Component {
                   .attr('width', w)
                   .attr('height', h);
     const vis = svg.append('g')
-                  .attr('transform', `translate(${[w >> 1, h >> 1]})`);
+                  // .attr('transform', `translate(${[w >> 1, h >> 1]})`);
 
 
     // Draw the word cloud
@@ -114,7 +115,7 @@ class WordCloud extends Component {
 
     function update() {
       layout.font('Avenir Next').spiral('archimedean');
-      let fontSize = d3.scale['sqrt']().range([10, 100]);
+      const fontSize = d3.scale['sqrt']().range([10, 100]);
       if (words.length) {
         fontSize.domain([+words[words.length - 1].size || 1, +words[0].size]);
       }
