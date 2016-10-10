@@ -1,5 +1,6 @@
 body {
   overflow: hidden;
+  font-family: "Avenir Next"
 }
 
 .disable-anchor {
@@ -187,12 +188,10 @@ pre {
  */
 
  #charts {
-   padding: 10px 0;
+   margin-top: 20px;
  }
 
  .chart {
-   /*display: inline-block;*/
-   /*height: 151px;*/
    text-align: center;
    margin-bottom: 20px;
  }
@@ -231,18 +230,6 @@ pre {
    stroke: #666;
  }
 
- #hour-chart {
-   /*width: 450px;*/
- }
-
- #weekday-chart {
-   /*width: 370px;*/
- }
-
- #date-chart {
-   /*width: 920px;*/
- }
-
  #commit-list {
    min-height: 1024px;
  }
@@ -254,45 +241,23 @@ pre {
    margin-bottom: .4em;
  }
 
-
-
  #commit-list .commit {
-   line-height: 1.5em;
-   background: #eee;
-   /*width: 1000px;*/
+   background: #E0F7FA;
    margin-bottom: 10px;
    border: 2px solid white;
    border-radius: 10px;
-   padding: 10px;
+   padding: 5px;
  }
 
  #commit-list .time {
-   color: #999;
- }
-
- #commit-list .commit div {
-   /*display: inline-block;*/
-   /*width: 100px;*/
- }
- #commit-list div.author {
-   /*width: 200px;*/
- }
- #commit-list div.sha-link{
-   /*width: 200px;*/
- }
- #commit-list div.commit-message {
-   /*width: 500px;
-   padding-right: 10px;
-   text-align: left;*/
+   color: #0097A7;
+   font-size: .88em;
  }
 
  #commit-list .early {
    color: green;
  }
 
-/**
- * NEED TO CLEAR FIX
- */
  aside {
    font-size: smaller;
    display:inline-block;
@@ -360,4 +325,3 @@ pre {
     margin-top: 6em;
     display: block;
   }
-
