@@ -1,13 +1,14 @@
 /**
- * TO DO :
- * Add starting and ending date near the date chart.
- * Add overflow for commit list
- * Fix chart overflow while mobile
- * Change times to not have 0 in front of hours
- * Display more bars in Date chart
- * IN PROGRESS:
- * Mobile friendly
+
+ * This is the container that displays the hour chart, weekday chart, date chart and commit list.
+ * It needs access to the redux state to receive the commit data returned from the api call.
+ * Does not need to dispatch to the redux state.
+ *
+ * While this is a container, React is not actually being used to manipulate the
+ * DOM here. We simply call a function that will directly go to our canvas and
+ * draw on it, bypassing React.
  */
+
 /* eslint-disable */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -22,15 +23,15 @@ class CrossfilterChart extends Component {
           <div class ="row">
             <div class="col-lg-2">
             </div>
-            <div id="weekday-chart" class="chart col-lg-3">
+            <div id="weekday-chart" class="chart col-lg-3 col-sm-10">
             <div class="title">Weekday</div>
             </div>
-            <div id="hour-chart" class= "chart col-lg-5">
+            <div id="hour-chart" class= "chart col-lg-5 col-sm-10">
               <div class="title">Time of Day</div>
             </div>
           </div>
           <div class="row">
-            <div id="date-chart" class="chart col-md-12">
+            <div id="date-chart" class="chart col-md-12 col-sm-10">
               <div class="title">Date</div>
             </div>
           </div>
@@ -51,7 +52,6 @@ class CrossfilterChart extends Component {
     So in this code, initial state of sample json works and next api calls dont works,
     or initial state doesnt work and next api calls work.
 
-    also, check value vs reference issues?
      */
 
     const JSONCommits = this.props.currentRepo.JSONCommits.slice();
@@ -76,7 +76,6 @@ class CrossfilterChart extends Component {
     const commits = JSONCommits;
       // Various formatters.
     const formatNumber = d3.format(',d');
-    // const formatChange = d3.format('+,d');
     const formatDate = d3.time.format('%A, %B %d, %Y');
     const formatTime = d3.time.format('%I:%M %p');
 
@@ -106,32 +105,62 @@ class CrossfilterChart extends Component {
     const day = commit.dimension(d => d.date.getDay());
     const days = day.group(d => d);
     const word = commit.dimension(d => d.words);
+    let charts;
+    // If viewed on mobile, make chart width smaller
+    if ($(window).width() < 960) {
+      charts = [
+        barChart()
+        .dimension(day)
+        .group(days)
+        .x(d3.scale.linear()
+        // Domain starts at -1 and ends at 7 to add extra tick as padding on the sides
+        .domain([-1, 7])
+        .rangeRound([0, 30 * 7])),
+        barChart()
+            .dimension(hour)
+            .group(hours)
+            .x(d3.scale.linear()
+              .domain([0, 24])
+              .rangeRound([0, 15 * 24])),
+        barChart()
+            .dimension(date)
+            .group(dates)
+            .x(d3.time.scale()
+            // x-axis label of the chart
+              .domain([startDate, endDate])
+            // The range of the chart, how wide it is
+              .rangeRound([0, 10 * 36]))
+            // Filter is the part of barChart that is selected
+            .filter([filterStart, filterEnd]),
+      ];
+    }else {
+      charts = [
+        barChart()
+        .dimension(day)
+        .group(days)
+        .x(d3.scale.linear()
+        // Domain starts at -1 and ends at 7 to add extra tick as padding on the sides
+        .domain([-1, 7])
+        .rangeRound([0, 30 * 7])),
+        barChart()
+            .dimension(hour)
+            .group(hours)
+            .x(d3.scale.linear()
+              .domain([0, 24])
+              .rangeRound([0, 18 * 24])),
 
-    const charts = [
-      barChart()
-      .dimension(day)
-      .group(days)
-      .x(d3.scale.linear()
-      // Domain starts at -1 and ends at 7 to add extra tick as padding on the sides
-      .domain([-1, 7])
-      .rangeRound([0, 30 * 7])),
-      barChart()
-          .dimension(hour)
-          .group(hours)
-          .x(d3.scale.linear()
-            .domain([0, 24])
-            .rangeRound([0, 18 * 24])),
-      barChart()
-          .dimension(date)
-          .group(dates)
-          .x(d3.time.scale()
-          // x-axis label of the chart
-            .domain([startDate, endDate])
-          // The range of the chart, how wide it is
-            .rangeRound([0, 10 * 80]))
-          // Filter is the part of barChart that is selected
-          .filter([filterStart, filterEnd]),
-    ];
+        barChart()
+            .dimension(date)
+            .group(dates)
+            .x(d3.time.scale()
+            // x-axis label of the chart
+              .domain([startDate, endDate])
+            // The range of the chart, how wide it is
+              .rangeRound([0, 18 * 36]))
+            // Filter is the part of barChart that is selected
+            .filter([filterStart, filterEnd]),
+      ];
+    }
 
     // Given our array of charts, which we assume are in the same order as the
     // .chart elements in the DOM, bind the charts to the DOM and render them.
@@ -247,6 +276,18 @@ class CrossfilterChart extends Component {
       let round;
 
       /**
+      * If barchart.id is 1, it is the week day chart.
+      * Change x-axis for weekday chart to have the days of the week instead of numbers
+      */
+      if (barChart.id === 1) {
+        axis = d3.svg.axis().orient('bottom').tickFormat((d) => {
+          if (!weekdays[d]) {
+            return '';
+          }
+          return weekdays[d].slice(0, 1).toUpperCase() + weekdays[d].slice(1, 3);
+        });
+      }
+      /**
        * If barchart.id is 2, it is the hourly chart
        * Change x-axis for hourly chart to have AM/PM time instead of military time
        */
@@ -256,15 +297,12 @@ class CrossfilterChart extends Component {
         });
       }
       /**
-       * If barchart.id is 1, it is the week day chart.
-       * Change x-axis for weekday chart to have the days of the week instead of numbers
-       */
-      if (barChart.id === 1) {
-        axis = d3.svg.axis().orient('bottom').tickFormat((d) => {
-          if (!weekdays[d]) {
-            return '';
-          }
-          return weekdays[d].slice(0, 1).toUpperCase() + weekdays[d].slice(1, 3);
+      * If barchart.id is 3, it is the date chart
+      * Change x-axis for date chart to display date in Mon date
+      */
+      if (barChart.id === 3) {
+        axis = d3.svg.axis().orient('bottom').tickFormat(d => {
+          return `${d.toString().slice(4,7)} ${d.getDate()}`;
         });
       }
 

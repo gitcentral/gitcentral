@@ -61,7 +61,7 @@ class WordCloud extends Component {
                     //  .rotate(() => ~~((Math.random() * 6) - 2.5) * 30)
                      .rotate(() => 0)
                      .text(d => d.text)
-                     .font('Impact')
+                     .font('Avenir Next')
                      .fontSize(d => d.size)
                      .on('end', draw);
 
@@ -91,7 +91,7 @@ class WordCloud extends Component {
       // Entering words
       cloud.enter()
            .append('text')
-           .style('font-family', 'Impact')
+           .style('font-family', 'Avenir Next')
            .style('fill', (d, i) => fill(i))
            .attr('transform', d => `translate(${[d.x, d.y]})rotate(${d.rotate})`)
            .attr('text-anchor', 'middle')
@@ -110,7 +110,7 @@ class WordCloud extends Component {
 
 
     function update() {
-      layout.font('impact').spiral('archimedean');
+      layout.font('Avenir Next').spiral('archimedean');
       let fontSize = d3.scale['sqrt']().range([10, 100]);
       if (words.length) {
         fontSize.domain([+words[words.length - 1].size || 1, +words[0].size]);

@@ -111,7 +111,7 @@ class SearchBar extends Component {
             title={
               <a
                 href='http://git-central.herokuapp.com/'
-                style={{ 'text-decoration': 'none', color: 'white'}} >
+                style={{ 'text-decoration': 'none', color: 'white','font-family': 'Avenir Next'}} >
                   Git Central
               </a>
             }
@@ -119,7 +119,7 @@ class SearchBar extends Component {
           >
           <NavTabs />
             <TextField
-              style = {{width: 400}}
+              style = {{width: 400,'font-family': 'Avenir Next'}}
               onChange={this.onInputChange.bind(this)}
               value={this.state.urlEntered}
               onKeyDown={this.onFormSubmit.bind(this)}

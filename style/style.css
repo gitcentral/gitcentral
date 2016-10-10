@@ -1,5 +1,6 @@
 body {
   overflow: hidden;
+  font-family: "Avenir Next"
 }
 
 .disable-anchor {
@@ -187,12 +188,9 @@ pre {
  */
 
  #charts {
-   padding: 10px 0;
  }
 
  .chart {
-   /*display: inline-block;*/
-   /*height: 151px;*/
    text-align: center;
    margin-bottom: 20px;
  }
