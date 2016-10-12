@@ -110,7 +110,7 @@ class SearchBar extends Component {
           <AppBar
             title={
               <a
-                href='http://git-central.herokuapp.com/'
+                href='http://gitcentral.com/'
                 style={{ 'text-decoration': 'none', color: 'white','font-family': 'Avenir Next'}} >
                   Git Central
               </a>
