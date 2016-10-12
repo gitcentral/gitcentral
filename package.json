@@ -1,16 +1,16 @@
 {
-  "name": "Mangonada",
+  "name": "gitcentral",
   "version": "1.0.0",
   "description": "Git visualizer",
   "main": "index.js",
-  "repository": "https://github.com/mangonada/mangonada",
+  "repository": "https://github.com/gitcentral/gitcentral",
   "scripts": {
     "start": "node server/server.js",
     "test": "mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive ./test",
     "test:watch": "npm run test -- --watch",
     "postinstall": "webpack -p",
     "json-server": "json-server -f server/mock-database.json -p 5000",
-    "lint": "eslint src/containers/chart.js --fix"
+    "lint": "eslint *.js --fix"
   },
   "engines": {
     "node": "6.4.0"

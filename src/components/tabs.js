@@ -54,7 +54,7 @@ export default class NavTabs extends Component {
   }
 
   getAboutUs(){
-    window.location.href = 'http://git-central.herokuapp.com/about';
+    window.location.href = 'http://gitcentral.com/about';
   }
 
   render() {

@@ -1,4 +1,4 @@
-# ${1:Mangonada}
+# Git Central
 A git visualizer app that lets users review their Github repositories as clean, intuitive, metro-style diagrams. We hope to give our users a greater understanding of their Git workflow and ultimately empower them to be confident in future decision-making.
 
 ## Table of Contents
@@ -104,7 +104,7 @@ License
 ![System Architecture](/img/architecture.png)
 
 ## Contributing
-	Please see [_CONTRIBUTING.md](https://github.com/mangonada/mangonada/blob/master/_CONTRIBUTING.md).
+	Please see [_CONTRIBUTING.md](https://github.com/gitcentral/gitcentral/blob/master/_CONTRIBUTING.md).
 
 ## Credits
 Special thanks to Allen Price, Zak Golding, and Nathaniel Schwab.
