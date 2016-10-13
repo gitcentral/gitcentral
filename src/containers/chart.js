@@ -62,11 +62,10 @@ class CrossfilterChart extends Component {
       JSONCommits.reverse();
     }
 
-    // Check if range is longer than one year
+    // Check if date range is longer than one year
     const oneYear = 360*24*60*60*1000; // years*hours*minutes*seconds*milliseconds
     const diffYears = Math.round(Math.abs((startDate.getTime() - endDate.getTime())/(oneYear)));
 
-    console.log(diffYears,"diff years")
     // Calculate 25% and 75% of date for initial filter area to load for chart
     const timeBetween = endDate.getTime() - startDate.getTime();
     const quarterMark = Math.floor(timeBetween / 4);
