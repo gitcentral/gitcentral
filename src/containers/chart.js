@@ -36,6 +36,7 @@ class CrossfilterChart extends Component {
             </div>
           </div>
         </div>
+        <div class ="container">
         <div class ="row">
           <aside id="totals" class="col-xs-12">
           <span id="active">-</span> of <span id="total">-</span> commits selected.
@@ -43,15 +44,9 @@ class CrossfilterChart extends Component {
         </div>
         <div id="lists">
           <div id="commit-list" class="list"></div>
-        </div>`);
+        </div></div>`);
     /*
-
-
     NEED TO FIX, JSON commits are being placed in order in api.js. but sample data is not in order
-
-    So in this code, initial state of sample json works and next api calls dont works,
-    or initial state doesnt work and next api calls work.
-
      */
 
     const JSONCommits = this.props.currentRepo.JSONCommits.slice();
@@ -121,7 +116,7 @@ class CrossfilterChart extends Component {
             .group(hours)
             .x(d3.scale.linear()
               .domain([0, 24])
-              .rangeRound([0, 15 * 24])),
+              .rangeRound([0, 13.5 * 24])),
         barChart()
             .dimension(date)
             .group(dates)
@@ -129,7 +124,7 @@ class CrossfilterChart extends Component {
             // x-axis label of the chart
               .domain([startDate, endDate])
             // The range of the chart, how wide it is
-              .rangeRound([0, 10 * 36]))
+              .rangeRound([0, 10 * 32]))
             // Filter is the part of barChart that is selected
             .filter([filterStart, filterEnd]),
       ];
