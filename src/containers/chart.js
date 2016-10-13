@@ -62,6 +62,11 @@ class CrossfilterChart extends Component {
       JSONCommits.reverse();
     }
 
+    // Check if range is longer than one year
+    const oneYear = 360*24*60*60*1000; // years*hours*minutes*seconds*milliseconds
+    const diffYears = Math.round(Math.abs((startDate.getTime() - endDate.getTime())/(oneYear)));
+
+    console.log(diffYears,"diff years")
     // Calculate 25% and 75% of date for initial filter area to load for chart
     const timeBetween = endDate.getTime() - startDate.getTime();
     const quarterMark = Math.floor(timeBetween / 4);
@@ -124,7 +129,7 @@ class CrossfilterChart extends Component {
             // x-axis label of the chart
               .domain([startDate, endDate])
             // The range of the chart, how wide it is
-              .rangeRound([0, 10 * 32]))
+              .rangeRound([0, 10 * 33]))
             // Filter is the part of barChart that is selected
             .filter([filterStart, filterEnd]),
       ];
@@ -295,12 +300,16 @@ class CrossfilterChart extends Component {
       * If barchart.id is 3, it is the date chart
       * Change x-axis for date chart to display date in Mon date
       * If viewing on mobile, make every other tick on x-axis to be blank for spacing
+      * If range of dates is more than 1 year, include year in x-axis ticks
       */
       if (barChart.id === 3) {
         let count = 0;
         axis = d3.svg.axis().orient('bottom').tickFormat(d => {
           count++;
           if (!mobileView || count % 2 === 1){
+            if(diffYears){
+              return `${d.toString().slice(4,7)} ${d.getDate()} '${d.getFullYear().toString().slice(2)}`
+            }
             return `${d.toString().slice(4,7)} ${d.getDate()}`;
           }
           return '';
