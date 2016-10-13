@@ -1,5 +1,5 @@
 import { FETCH_REPO } from '../actions/index';
-import { JSONCommits, JSONBranches } from './gitGraphDemo/sampleObj';
+import { JSONCommits, JSONBranches } from './gitGraphDemo/gitcentralOct13SnapShot';
 import $ from 'jquery';
 
 const INITIAL_STATE = { JSONCommits, JSONBranches };

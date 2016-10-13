@@ -68,6 +68,8 @@ router.route('/repos/:userName/:repoName')
              }
            }); });
            console.log("mongo db has missing commit", Object.keys(missingShaTable));
+           // To update sample obj
+          //  fs.writeFileSync(path.join(__dirname,'hellodata'),JSON.stringify(packet,null,4));
            res.status(200).json(packet);
            return;
          }
@@ -140,6 +142,8 @@ router.route('/repos/:userName/:repoName')
                             repo : jsonData.repo,
                             JSONBranches : jsonData.branches,
                             JSONCommits : jsonData.commits };
+          // To update sample obj
+          //  fs.writeFileSync(path.join(__dirname,'hellodata'),JSON.stringify(packet,null,4));
            res.status(200).json(packet);
            return;
          });
@@ -171,7 +175,7 @@ router.route('/repos/:userName/:repoName')
                    return new Date(lhs.commit.author.date) - new Date(rhs.commit.author.date)
                  }
                });
-               commitArr.filter((aCommit, seenCommits = {} ) => { 
+               commitArr.filter((aCommit, seenCommits = {} ) => {
                  if (seenCommits[aCommit.sha]) { return false; }
                  seenCommits[aCommit.sha] = true;
                  return true;
