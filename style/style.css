@@ -337,144 +337,144 @@ pre {
 }
 
 /**
- *  For Chart.js
- */
+*  For Chart.js
+*/
 
- #charts {
-   margin-top: 20px;
- }
+#charts {
+  margin-top: 20px;
+}
 
- .chart {
-   text-align: center;
-   margin-bottom: 20px;
- }
+.chart {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
- .reset {
-   padding-left: 1em;
-   font-size: smaller;
-   color: #ccc;
- }
+.reset {
+  padding-left: 1em;
+  font-size: smaller;
+  color: #ccc;
+}
 
- .background.bar {
-   fill: #ccc;
- }
+.background.bar {
+  fill: #ccc;
+}
 
- .foreground.bar {
-   fill: rgb(0, 188, 212);
- }
+.foreground.bar {
+ fill: rgb(0, 188, 212);
+}
 
- .axis path, .axis line {
-   fill: none;
-   stroke: #000;
-   shape-rendering: crispEdges;
- }
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
 
- .axis text {
-   font: 10px sans-serif;
- }
+.axis text {
+  font: 10px sans-serif;
+}
 
- .brush rect.extent {
-   fill: rgb(0, 188, 212);
-   fill-opacity: .125;
- }
+.brush rect.extent {
+  fill: rgb(0, 188, 212);
+  fill-opacity: .125;
+}
 
- .brush .resize path {
-   fill: #eee;
-   stroke: #666;
- }
+.brush .resize path {
+  fill: #eee;
+  stroke: #666;
+}
 
- #commit-list {
-   min-height: 1024px;
- }
+#commit-list {
+  min-height: 1024px;
+}
 
- #commit-list .date{
-   margin-bottom: .4em;
- }
- #commit-list .day {
-   margin-bottom: .4em;
- }
+#commit-list .date{
+  margin-bottom: .4em;
+}
+#commit-list .day {
+  margin-bottom: .4em;
+}
 
- #commit-list .commit {
-   background: #E0F7FA;
-   margin-bottom: 10px;
-   border: 2px solid white;
-   border-radius: 10px;
-   padding: 5px;
- }
+#commit-list .commit {
+  background: #E0F7FA;
+  margin-bottom: 10px;
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 5px;
+}
 
- #commit-list .time {
-   color: #0097A7;
-   font-size: .88em;
- }
+#commit-list .time {
+  color: #0097A7;
+  font-size: .88em;
+}
 
- #commit-list .early {
-   color: green;
- }
+#commit-list .early {
+  color: green;
+}
 
- aside {
-   font-size: smaller;
-   display:inline-block;
-   text-align: center;
-   margin-bottom: 1em;
- }
+aside {
+  font-size: smaller;
+  display:inline-block;
+  text-align: center;
+  margin-bottom: 1em;
+}
 
-
- /**
-  * ToolTip
-  */
-
-  .contrib-content {
-    padding: 5px 5px 5px 5px;
-  }
-
-  .tooltip {
-  	position: absolute;
-  	top: 100px;
-  	left: 100px;
-    -moz-border-radius:5px;
-    border-radius: 5px;
-    border: solid gray 1px;
-    background: #fff;
-  	opacity: .9;
-    color: black;
-  	padding: 10px;
-  	width: 250px;
-  	font-size: 12px;
-    /*padding: 5px 5px 5px 5px;*/
-  	z-index: 10;
-  }
-
-  .tooltip .title {
-  	font-size: 13px;
-  }
-
-  .tooltip .name {
-    font-weight:bold;
-  }
-
-  .img-url {
-    height: 50px;
-    width: 50px;
-    border-radius: 50%;
-  }
 
 /**
- * Loading Icon
- */
+* ToolTip
+*/
 
-  #loading {
-    z-index: 20;
-    position: absolute;
-    top: 20;
-    left: 20;
-    background-color: white;
-    width: 100%;
-    height: 100%;
-  }
+.contrib-content {
+  padding: 5px 5px 5px 5px;
+}
 
-  .loading-gif {
-    align: middle;
-    margin: auto;
-    margin-top: 6em;
-    display: block;
-  }
+.tooltip {
+	position: absolute;
+	top: 100px;
+	left: 100px;
+  -moz-border-radius:5px;
+  border-radius: 5px;
+  border: solid gray 1px;
+  background: #fff;
+	opacity: .9;
+  color: black;
+	padding: 10px;
+	width: 250px;
+	font-size: 12px;
+  /*padding: 5px 5px 5px 5px;*/
+	z-index: 10;
+}
+
+.tooltip .title {
+	font-size: 13px;
+}
+
+.tooltip .name {
+  font-weight:bold;
+}
+
+.img-url {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+/**
+* Loading Icon
+*/
+
+#loading {
+  z-index: 20;
+  position: absolute;
+  top: 20;
+  left: 20;
+  background-color: white;
+  width: 100%;
+  height: 100%;
+}
+
+.loading-gif {
+  align: middle;
+  margin: auto;
+  margin-top: 6em;
+  display: block;
+}
