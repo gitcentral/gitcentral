@@ -1,4 +1,10 @@
 /* eslint-disable */
+
+/**
+ * src/components/tabs.js
+ *
+ * Contains the logic for switching between the different displays.
+ */
 import React, { Component } from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import RepoDisplay from '../containers/repo_display';
