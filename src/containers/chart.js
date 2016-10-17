@@ -501,8 +501,12 @@ class CrossfilterChart extends Component {
      * On form input, check if word exist in each word dimension,
      * if it does, filter to only show those commit
      * Utilized a flag variable to only render if neccessary
+     *
+     * $().on('input', .form-control) (EVENT DELEGATION) is required
+     * because .form-control is not created yet,
+     * and this format is neccessary to select it when it is eventually created
      */
-    $('.form-control').on('input', function () {
+    $('.navbarContainer').on('input', '.form-control', function(){
       const term = this.value.toLowerCase().split(' ');
       let needToRender = false;
       word.filterFunction((d) => {
