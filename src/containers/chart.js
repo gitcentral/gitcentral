@@ -511,10 +511,15 @@ class CrossfilterChart extends Component {
       let needToRender = false;
       word.filterFunction((d) => {
         const termCheck = term.map(input => d.includes(input));
-        if (!termCheck.includes(false)) {
+        if(term[0] === ''){
           needToRender = true;
           return true;
         }
+        if (termCheck.includes(false)) {
+          needToRender = true;
+          return false;
+        }
+        return true;
       });
       if (needToRender) {
         renderAll();
