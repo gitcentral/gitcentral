@@ -2,7 +2,7 @@ import React from 'react';
 
 const AboutPage = () => (
   <div className="container">
-    <div className="row center-children top-bottom-margin">
+    <div className="row center-children top-margin">
       <h3>About Team Git Central</h3>
     </div>
 

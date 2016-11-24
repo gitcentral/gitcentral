@@ -518,6 +518,9 @@ aside {
 .bottom-margin{
   padding-bottom:1em;
 }
+.top-margin{
+  padding-top:1em;
+}
 
 .portfolio-link{
   cursor:pointer;
