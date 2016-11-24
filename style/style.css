@@ -1,6 +1,15 @@
 body {
   overflow: hidden;
   font-family: "Avenir Next", Helvetica, sans-serif;
+  padding-top: 106px;
+}
+
+.navbar-container{
+  position:fixed;
+  top:0;
+  width:100%;
+  z-index: 2;
+  background-color: white;
 }
 
 /**

@@ -28,7 +28,6 @@ export default class NavTabs extends Component {
   }
 
   enterTab(elementId) {
-    console.log('get ' + elementId);
 
     d3.selectAll('.d3-tip')
     .style('opacity', 0)
@@ -36,7 +35,7 @@ export default class NavTabs extends Component {
 
     const elements = ['stats', 'word-cloud', 'container', 'bubble-chart'];
 
-    elements.map((element) => { console.log(element); document.getElementById(element).className = "hidden"; } );
+    elements.map((element) => document.getElementById(element).className = "hidden");
 
     document.getElementById(elementId).classList.remove("hidden");
     $('body').css('overflow', 'hidden');
