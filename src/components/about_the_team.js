@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AboutPage = () => (<div>
+const AboutPage = () => (
   <div className="container">
     <div className="row center-children top-bottom-margin">
       <h3>About Team Git Central</h3>
@@ -8,40 +8,40 @@ const AboutPage = () => (<div>
 
     <div className="row top-bottom-margin ">
       <div className="col-xs-6 col-md-3 center-children">
-        <img className="profile-pic" src="/img/arnav.jpg" />
+        <img className="profile-pic" src="/img/arnav.jpg" alt="arnav" />
         <div>Arnav Aggarwal</div>
         <div className="social-button-div">
-          <a href="https://www.github.com/arnav-aggarwal" target="_blank" rel="noopener noreferrer"><i className="fa fa-github fa-lg"></i></a>
-          <a href="https://www.linkedin.com/in/arnavaggarwal" target="_blank" rel="noopener noreferrer"><i className="fa fa-linkedin fa-lg"></i></a>
+          <a href="https://www.github.com/arnav-aggarwal" target="_blank" rel="noopener noreferrer"><i className="fa fa-github fa-lg" /></a>
+          <a href="https://www.linkedin.com/in/arnavaggarwal" target="_blank" rel="noopener noreferrer"><i className="fa fa-linkedin fa-lg" /></a>
         </div>
       </div>
       <div className="col-xs-6 col-md-3 center-children">
         <a className="portfolio-link" href="http://martinkkwan.com" target="_blank" rel="noopener noreferrer" >
-          <img className="profile-pic" src="/img/martin.jpg" />
+          <img className="profile-pic" src="/img/martin.jpg" alt="martin" />
           <div>Martin Kwan</div>
         </a>
         <div className="social-button-div">
-          <a href="https://www.github.com/martinkwan" target="_blank" rel="noopener noreferrer"><i className="fa fa-github fa-lg"></i></a>
-          <a href="https://www.linkedin.com/in/mkkwan" target="_blank" rel="noopener noreferrer"><i className="fa fa-linkedin fa-lg"></i></a>
+          <a href="https://www.github.com/martinkwan" target="_blank" rel="noopener noreferrer"><i className="fa fa-github fa-lg" /></a>
+          <a href="https://www.linkedin.com/in/mkkwan" target="_blank" rel="noopener noreferrer"><i className="fa fa-linkedin fa-lg" /></a>
         </div>
       </div>
 
       <div className="col-xs-6 col-md-3 center-children">
-        <img className="profile-pic" src="/img/cady.jpg" />
+        <img className="profile-pic" src="/img/cady.jpg" alt="cady" />
         <div>Cadence Banulis</div>
         <div className="social-button-div">
-          <a href="https://www.github.com/cadeban" target="_blank" rel="noopener noreferrer"><i className="fa fa-github fa-lg"></i></a>
-          <a href="https://www.linkedin.com/in/cadence-banulis-18b234123" target="_blank" rel="noopener noreferrer"><i className="fa fa-linkedin fa-lg"></i></a>
+          <a href="https://www.github.com/cadeban" target="_blank" rel="noopener noreferrer"><i className="fa fa-github fa-lg" /></a>
+          <a href="https://www.linkedin.com/in/cadence-banulis-18b234123" target="_blank" rel="noopener noreferrer"><i className="fa fa-linkedin fa-lg" /></a>
         </div>
       </div>
 
       <div className="col-xs-6 col-md-3 center-children">
-        <img className="profile-pic" src="/img/tim.jpg" />
+        <img className="profile-pic" src="/img/tim.jpg" alt="tim" />
         <div> Timothy Shiu </div>
         <div className="social-button-div">
-          <a href="https://www.github.com/timoweave" target="_blank" rel="noopener noreferrer"><i className="fa fa-github fa-lg"></i></a>
-          <a href="https://www.linkedin.com/in/tlinkedin" target="_blank" rel="noopener noreferrer"><i className="fa fa-linkedin fa-lg"></i></a>
-          <a href="https://www.twitter.com/timoshiu" target="_blank" rel="noopener noreferrer"><i className="fa fa-twitter fa-lg"></i></a>
+          <a href="https://www.github.com/timoweave" target="_blank" rel="noopener noreferrer"><i className="fa fa-github fa-lg" /></a>
+          <a href="https://www.linkedin.com/in/tlinkedin" target="_blank" rel="noopener noreferrer"><i className="fa fa-linkedin fa-lg" /></a>
+          <a href="https://www.twitter.com/timoshiu" target="_blank" rel="noopener noreferrer"><i className="fa fa-twitter fa-lg" /></a>
         </div>
       </div>
     </div>
@@ -68,7 +68,6 @@ const AboutPage = () => (<div>
       </div>
     </div>
   </div>
-</div>
-  );
+);
 
 export default AboutPage;
