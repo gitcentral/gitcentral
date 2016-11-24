@@ -23,6 +23,7 @@ const AboutPage = () => (
         <div className="social-button-div">
           <a href="https://www.github.com/martinkwan" target="_blank" rel="noopener noreferrer"><i className="fa fa-github fa-lg" /></a>
           <a href="https://www.linkedin.com/in/mkkwan" target="_blank" rel="noopener noreferrer"><i className="fa fa-linkedin fa-lg" /></a>
+          <a href="mailto:martinkkwan@gmail.com?Subject=Hello!" target="_top"><i className="fa fa-envelope fa-lg" /></a>
         </div>
       </div>
 
