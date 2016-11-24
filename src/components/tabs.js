@@ -25,6 +25,7 @@ export default class NavTabs extends Component {
     this.getStats = this.getStats.bind(this);
     this.getWordCloud = this.getWordCloud.bind(this);
     this.getBubbleChart = this.getBubbleChart.bind(this);
+    this.getAboutUs = this.getAboutUs.bind(this);
   }
 
   enterTab(elementId) {
@@ -33,11 +34,11 @@ export default class NavTabs extends Component {
     .style('opacity', 0)
     .html('');
 
-    const elements = ['stats', 'word-cloud', 'container', 'bubble-chart'];
+    const elements = ['stats', 'word-cloud', 'container', 'bubble-chart', 'about-us'];
 
-    elements.map((element) => document.getElementById(element).className = "hidden");
+    elements.map(element => document.getElementById(element).className = 'hidden');
 
-    document.getElementById(elementId).classList.remove("hidden");
+    document.getElementById(elementId).classList.remove('hidden');
     $('body').css('overflow', 'hidden');
   }
 
@@ -59,8 +60,13 @@ export default class NavTabs extends Component {
   }
 
   getAboutUs(){
-    window.location.href = 'http://gitcentral.com/about';
+    this.enterTab('about-us');
+    $('body').css('overflow', 'visible');
   }
+
+  // getAboutUs(){
+  //   window.location.href = 'http://gitcentral.com/about';
+  // }
 
   render() {
     const style = { padding: '10px' };

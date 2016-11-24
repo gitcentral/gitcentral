@@ -487,3 +487,39 @@ aside {
   margin-top: 6em;
   display: block;
 }
+
+/**
+ * About Page
+ */
+
+.profile-pic{
+  width:50%;
+  border-radius: 50%;
+}
+
+.center-children{
+  text-align: center;
+}
+
+.fa, .color-link{
+  color: rgb(0, 188, 212);
+}
+.social-button-div > a{
+  margin: 0 3px;
+}
+.fa:hover, .color-link:hover{
+  color:black;
+}
+.top-bottom-margin{
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.portfolio-link{
+  cursor:pointer;
+  color:black;
+}
+.portfolio-link:hover{
+  text-decoration: none;
+  color: rgb(0, 188, 212);
+}
