@@ -47,7 +47,7 @@ const AboutPage = () => (
       </div>
     </div>
     <div className="row top-bottom-margin">
-      <div className="col-md-6">
+      <div className="col-md-6 bottom-margin">
         Git is a powerful tool and has a place in every
         modern software engineering project. Good git
         practices are vital to a fast and productive
@@ -58,7 +58,6 @@ const AboutPage = () => (
         <a className="color-link" href="http://github.com/gitcentral/gitcentral" target="_blank" rel="noopener noreferrer">
           Git Central.
         </a>
-        <br />
       </div>
       <div className="col-md-6">
         The Git Central team has four amazing and
