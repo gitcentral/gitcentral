@@ -281,11 +281,8 @@ class BubbleChart extends Component {
   }
 
   render() {
-    return (
-      <div>
-        {this.makeContributors()}
-      </div>
-    );
+    this.makeContributors();
+    return null;
   }
 }
 
