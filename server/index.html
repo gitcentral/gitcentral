@@ -2,13 +2,10 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.css">
     <link rel="stylesheet" href="/style/style.css">
     <link rel="shortcut icon" type="image/x-icon" href="favicon-code-fork.ico">
-    <script src="../src/reducers/chartD3/crossfilter.js"></script>
-    <script src="../src/reducers/chartD3/d3.layout.cloud.js"></script>
     <title>Git Central</title>
   </head>
   <body>
@@ -27,7 +24,9 @@
     <div id ="word-cloud" class="hidden"></div>
     <div id="bubble-chart" class="hidden"></div>
     <div id="about-us" class="hidden"></div>
-
   </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
+  <script src="../src/reducers/chartD3/crossfilter.js"></script>
+  <script src="../src/reducers/chartD3/d3.layout.cloud.js"></script>
   <script src="../build/bundle.js"></script>
 </html>

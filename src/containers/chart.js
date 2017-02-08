@@ -45,16 +45,12 @@ class CrossfilterChart extends Component {
         <div id="lists">
           <div id="commit-list" class="list"></div>
         </div></div>`);
-    /*
-    NEED TO FIX, JSON commits are being placed in order in api.js. but sample data is not in order
-     */
 
     const JSONCommits = this.props.currentRepo.JSONCommits.slice();
     let startDate = new Date(JSONCommits[0].commit.author.date);
     let endDate = new Date(JSONCommits[JSONCommits.length - 1].commit.author.date);
 
-    // TEMP FIX because of initial state being in wrong order
-    // reverses order of array
+    // reverses order of array for intial state
     if (startDate.getTime() > endDate.getTime()) {
       const temp = startDate;
       startDate = endDate;
@@ -528,11 +524,8 @@ class CrossfilterChart extends Component {
   }
 
   render() {
-    return (
-      <div>
-        {this.makeCrossfilterChart()}
-      </div>
-    );
+    this.makeCrossfilterChart()
+    return null;
   }
 }
 
