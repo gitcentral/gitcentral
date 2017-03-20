@@ -132,8 +132,12 @@ class RepoDisplay extends Component {
 
   render() {
     $('#loading').addClass('hidden');
-    this.makeD3Display()
-    return null;
+
+    return (
+      <div>
+        {this.makeD3Display()}
+      </div>
+    );
   }
 }
 

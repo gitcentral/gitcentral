@@ -136,8 +136,11 @@ class WordCloud extends Component {
   }
 
   render() {
-    this.makeWordCloud();
-    return null;
+    return (
+      <div>
+        {this.makeWordCloud()}
+      </div>
+    );
   }
 }
 
